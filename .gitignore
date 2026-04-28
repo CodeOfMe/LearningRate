@@ -218,3 +218,5 @@ __marimo__/
 .streamlit/secrets.toml
 .DS_Store
 codes/data/cifar-10-python.tar.gz
+codes/data/cifar-10-batches-py/
+pdf_texts/
