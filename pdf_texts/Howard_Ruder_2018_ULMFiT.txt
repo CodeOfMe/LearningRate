@@ -1,0 +1,992 @@
+Universal Language Model Fine-tuning for Text Classiﬁcation
+Jeremy Howard
+fast.ai
+University of San Francisco
+j@fast.aiSebastian Ruder
+Insight Centre, NUI Galway
+Aylien Ltd., Dublin
+sebastian@ruder.io
+Abstract
+Inductive transfer learning has greatly im-
+pacted computer vision, but existing ap-
+proaches in NLP still require task-speciﬁc
+modiﬁcations and training from scratch.
+We propose Universal Language Model
+Fine-tuning (ULMFiT), an effective trans-
+fer learning method that can be applied to
+any task in NLP, and introduce techniques
+that are key for ﬁne-tuning a language
+model. Our method signiﬁcantly outper-
+forms the state-of-the-art on six text clas-
+siﬁcation tasks, reducing the error by 18-
+24% on the majority of datasets. Further-
+more, with only 100labeled examples, it
+matches the performance of training from
+scratch on 100more data. We open-
+source our pretrained models and code1.
+1 Introduction
+Inductive transfer learning has had a large impact
+on computer vision (CV). Applied CV models (in-
+cluding object detection, classiﬁcation, and seg-
+mentation) are rarely trained from scratch, but in-
+stead are ﬁne-tuned from models that have been
+pretrained on ImageNet, MS-COCO, and other
+datasets (Sharif Razavian et al., 2014; Long et al.,
+2015a; He et al., 2016; Huang et al., 2017).
+Text classiﬁcation is a category of Natural Lan-
+guage Processing (NLP) tasks with real-world ap-
+plications such as spam, fraud, and bot detection
+(Jindal and Liu, 2007; Ngai et al., 2011; Chu et al.,
+2012), emergency response (Caragea et al., 2011),
+and commercial document classiﬁcation, such as
+for legal discovery (Roitblat et al., 2010).
+1http://nlp.fast.ai/ulmfit .
+?Equal contribution. Jeremy focused on the algorithm de-
+velopment and implementation, Sebastian focused on the ex-
+periments and writing.While Deep Learning models have achieved
+state-of-the-art on many NLP tasks, these models
+are trained from scratch, requiring large datasets,
+and days to converge. Research in NLP focused
+mostly on transductive transfer (Blitzer et al.,
+2007). For inductive transfer, ﬁne-tuning pre-
+trained word embeddings (Mikolov et al., 2013),
+a simple transfer technique that only targets a
+model’s ﬁrst layer, has had a large impact in prac-
+tice and is used in most state-of-the-art models.
+Recent approaches that concatenate embeddings
+derived from other tasks with the input at different
+layers (Peters et al., 2017; McCann et al., 2017;
+Peters et al., 2018) still train the main task model
+from scratch and treat pretrained embeddings as
+ﬁxed parameters, limiting their usefulness.
+In light of the beneﬁts of pretraining (Erhan
+et al., 2010), we should be able to do better than
+randomly initializing the remaining parameters of
+our models. However, inductive transfer via ﬁne-
+tuning has been unsuccessful for NLP (Mou et al.,
+2016). Dai and Le (2015) ﬁrst proposed ﬁne-
+tuning a language model (LM) but require millions
+of in-domain documents to achieve good perfor-
+mance, which severely limits its applicability.
+We show that not the idea of LM ﬁne-tuning but
+our lack of knowledge of how to train them ef-
+fectively has been hindering wider adoption. LMs
+overﬁt to small datasets and suffered catastrophic
+forgetting when ﬁne-tuned with a classiﬁer. Com-
+pared to CV , NLP models are typically more shal-
+low and thus require different ﬁne-tuning methods.
+We propose a new method, Universal Language
+Model Fine-tuning (ULMFiT) that addresses these
+issues and enables robust inductive transfer learn-
+ing for any NLP task, akin to ﬁne-tuning ImageNet
+models: The same 3-layer LSTM architecture—
+with the same hyperparameters and no addi-
+tions other than tuned dropout hyperparameters—
+outperforms highly engineered models and trans-arXiv:1801.06146v5  [cs.CL]  23 May 2018
+fer learning approaches on six widely studied text
+classiﬁcation tasks. On IMDb, with 100labeled
+examples, ULMFiT matches the performance of
+training from scratch with 10and—given 50k
+unlabeled examples—with 100more data.
+Contributions Our contributions are the follow-
+ing: 1) We propose Universal Language Model
+Fine-tuning (ULMFiT), a method that can be used
+to achieve CV-like transfer learning for any task
+for NLP. 2) We propose discriminative ﬁne-tuning ,
+slanted triangular learning rates , and gradual
+unfreezing , novel techniques to retain previous
+knowledge and avoid catastrophic forgetting dur-
+ing ﬁne-tuning. 3) We signiﬁcantly outperform the
+state-of-the-art on six representative text classiﬁ-
+cation datasets, with an error reduction of 18-24%
+on the majority of datasets. 4) We show that our
+method enables extremely sample-efﬁcient trans-
+fer learning and perform an extensive ablation
+analysis. 5) We make the pretrained models and
+our code available to enable wider adoption.
+2 Related work
+Transfer learning in CV Features in deep neu-
+ral networks in CV have been observed to tran-
+sition from general to task- speciﬁc from the ﬁrst
+to the last layer (Yosinski et al., 2014). For this
+reason, most work in CV focuses on transferring
+the ﬁrst layers of the model (Long et al., 2015b).
+Sharif Razavian et al. (2014) achieve state-of-the-
+art results using features of an ImageNet model as
+input to a simple classiﬁer. In recent years, this
+approach has been superseded by ﬁne-tuning ei-
+ther the last (Donahue et al., 2014) or several of
+the last layers of a pretrained model and leaving
+the remaining layers frozen (Long et al., 2015a).
+Hypercolumns In NLP, only recently have
+methods been proposed that go beyond transfer-
+ring word embeddings. The prevailing approach
+is to pretrain embeddings that capture additional
+context via other tasks. Embeddings at different
+levels are then used as features, concatenated ei-
+ther with the word embeddings or with the in-
+puts at intermediate layers. This method is known
+as hypercolumns (Hariharan et al., 2015) in CV2
+and is used by Peters et al. (2017), Peters et al.
+(2018), Wieting and Gimpel (2017), Conneau
+2A hypercolumn at a pixel in CV is the vector of activa-
+tions of all CNN units above that pixel. In analogy, a hyper-
+column for a word or sentence in NLP is the concatenation of
+embeddings at different layers in a pretrained model.et al. (2017), and McCann et al. (2017) who use
+language modeling, paraphrasing, entailment, and
+Machine Translation (MT) respectively for pre-
+training. Speciﬁcally, Peters et al. (2018) require
+engineered custom architectures, while we show
+state-of-the-art performance with the same basic
+architecture across a range of tasks. In CV , hyper-
+columns have been nearly entirely superseded by
+end-to-end ﬁne-tuning (Long et al., 2015a).
+Multi-task learning A related direction is
+multi-task learning (MTL) (Caruana, 1993). This
+is the approach taken by Rei (2017) and Liu et al.
+(2018) who add a language modeling objective
+to the model that is trained jointly with the main
+task model. MTL requires the tasks to be trained
+from scratch every time, which makes it inefﬁcient
+and often requires careful weighting of the task-
+speciﬁc objective functions (Chen et al., 2017).
+Fine-tuning Fine-tuning has been used success-
+fully to transfer between similar tasks, e.g. in QA
+(Min et al., 2017), for distantly supervised senti-
+ment analysis (Severyn and Moschitti, 2015), or
+MT domains (Sennrich et al., 2015) but has been
+shown to fail between unrelated ones (Mou et al.,
+2016). Dai and Le (2015) also ﬁne-tune a lan-
+guage model, but overﬁt with 10k labeled exam-
+ples and require millions of in-domain documents
+for good performance. In contrast, ULMFiT lever-
+ages general-domain pretraining and novel ﬁne-
+tuning techniques to prevent overﬁtting even with
+only100labeled examples and achieves state-of-
+the-art results also on small datasets.
+3 Universal Language Model Fine-tuning
+We are interested in the most general inductive
+transfer learning setting for NLP (Pan and Yang,
+2010): Given a static source task TSandanytar-
+get taskTTwithTS6=TT, we would like to im-
+prove performance on TT. Language modeling
+can be seen as the ideal source task and a counter-
+part of ImageNet for NLP: It captures many facets
+of language relevant for downstream tasks, such as
+long-term dependencies (Linzen et al., 2016), hi-
+erarchical relations (Gulordava et al., 2018), and
+sentiment (Radford et al., 2017). In contrast to
+tasks like MT (McCann et al., 2017) and entail-
+ment (Conneau et al., 2017), it provides data in
+near-unlimited quantities for most domains and
+languages. Additionally, a pretrained LM can be
+easily adapted to the idiosyncrasies of a target
+13/02/2018ulmﬁt_pretraining.html
+1/1dollarThe goldorEmbeddinglayerLayer 1Layer 2Layer 3Softmaxlayer
+gold(a) LM pre-training
+13/02/2018ulmﬁt_lm_ﬁne-tuning.html
+1/1sceneThe besteverEmbeddinglayerLayer 1Layer 2Layer 3Softmaxlayer (b) LM ﬁne-tuning
+13/02/2018ulmﬁt_clas_ﬁne-tuning.html
+1/1sceneThe besteverEmbeddinglayerLayer 1Layer 2Layer 3Softmaxlayer (c) Classiﬁer ﬁne-tuning
+Figure 1: ULMFiT consists of three stages: a) The LM is trained on a general-domain corpus to capture
+general features of the language in different layers. b) The full LM is ﬁne-tuned on target task data using
+discriminative ﬁne-tuning (‘ Discr ’) and slanted triangular learning rates (STLR) to learn task-speciﬁc
+features. c) The classiﬁer is ﬁne-tuned on the target task using gradual unfreezing, ‘ Discr ’, and STLR to
+preserve low-level representations and adapt high-level ones (shaded: unfreezing stages; black: frozen).
+task, which we show signiﬁcantly improves per-
+formance (see Section 5). Moreover, language
+modeling already is a key component of existing
+tasks such as MT and dialogue modeling. For-
+mally, language modeling induces a hypothesis
+spaceHthat should be useful for many other NLP
+tasks (Vapnik and Kotz, 1982; Baxter, 2000).
+We propose Universal Language Model Fine-
+tuning (ULMFiT), which pretrains a language
+model (LM) on a large general-domain corpus and
+ﬁne-tunes it on the target task using novel tech-
+niques. The method is universal in the sense that
+it meets these practical criteria: 1) It works across
+tasks varying in document size, number, and label
+type; 2) it uses a single architecture and training
+process; 3) it requires no custom feature engineer-
+ing or preprocessing; and 4) it does not require ad-
+ditional in-domain documents or labels.
+In our experiments, we use the state-of-the-
+art language model AWD-LSTM (Merity et al.,
+2017a), a regular LSTM (with no attention,
+short-cut connections, or other sophisticated ad-
+ditions) with various tuned dropout hyperparame-
+ters. Analogous to CV , we expect that downstream
+performance can be improved by using higher-
+performance language models in the future.
+ULMFiT consists of the following steps, which
+we show in Figure 1: a) General-domain LM
+pretraining (x3.1); b) target task LM ﬁne-tuning
+(x3.2); and c) target task classiﬁer ﬁne-tuning
+(x3.3). We discuss these in the following sections.3.1 General-domain LM pretraining
+An ImageNet-like corpus for language should be
+large and capture general properties of language.
+We pretrain the language model on Wikitext-103
+(Merity et al., 2017b) consisting of 28,595 prepro-
+cessed Wikipedia articles and 103 million words.
+Pretraining is most beneﬁcial for tasks with small
+datasets and enables generalization even with 100
+labeled examples. We leave the exploration of
+more diverse pretraining corpora to future work,
+but expect that they would boost performance.
+While this stage is the most expensive, it only
+needs to be performed once and improves perfor-
+mance and convergence of downstream models.
+3.2 Target task LM ﬁne-tuning
+No matter how diverse the general-domain data
+used for pretraining is, the data of the target task
+will likely come from a different distribution. We
+thus ﬁne-tune the LM on data of the target task.
+Given a pretrained general-domain LM, this stage
+converges faster as it only needs to adapt to the id-
+iosyncrasies of the target data, and it allows us to
+train a robust LM even for small datasets. We pro-
+pose discriminative ﬁne-tuning andslanted trian-
+gular learning rates for ﬁne-tuning the LM, which
+we introduce in the following.
+Discriminative ﬁne-tuning As different layers
+capture different types of information (Yosinski
+et al., 2014), they should be ﬁne-tuned to differ-
+ent extents . To this end, we propose a novel ﬁne-
+tuning method, discriminative ﬁne-tuning3.
+Instead of using the same learning rate for all
+layers of the model, discriminative ﬁne-tuning al-
+lows us to tune each layer with different learning
+rates. For context, the regular stochastic gradient
+descent (SGD) update of a model’s parameters at
+time steptlooks like the following (Ruder, 2016):
+t=t 1 rJ() (1)
+whereis the learning rate and rJ()is the gra-
+dient with regard to the model’s objective func-
+tion. For discriminative ﬁne-tuning, we split the
+parametersintof1;:::;Lgwherelcontains
+the parameters of the model at the l-th layer and
+Lis the number of layers of the model. Similarly,
+we obtainf1;:::;Lgwherelis the learning
+rate of thel-th layer.
+The SGD update with discriminative ﬁne-
+tuning is then the following:
+l
+t=l
+t 1 lrlJ() (2)
+We empirically found it to work well to ﬁrst
+choose the learning rate Lof the last layer by
+ﬁne-tuning only the last layer and using l 1=
+l=2:6as the learning rate for lower layers.
+Slanted triangular learning rates For adapting
+its parameters to task-speciﬁc features, we would
+like the model to quickly converge to a suitable
+region of the parameter space in the beginning
+of training and then reﬁne its parameters. Using
+the same learning rate (LR) or an annealed learn-
+ing rate throughout training is not the best way
+to achieve this behaviour. Instead, we propose
+slanted triangular learning rates (STLR), which
+ﬁrst linearly increases the learning rate and then
+linearly decays it according to the following up-
+date schedule, which can be seen in Figure 2:
+cut=bTcutfracc
+p=(
+t=cut; ift<cut
+1 t cut
+cut(1=cutfrac 1);otherwise
+t=max1 +p(ratio 1)
+ratio(3)
+whereTis the number of training iterations4,
+cutfrac is the fraction of iterations we increase
+3An unrelated method of the same name exists for deep
+Boltzmann machines (Salakhutdinov and Hinton, 2009).
+4In other words, the number of epochs times the number
+of updates per epoch.the LR,cutis the iteration when we switch from
+increasing to decreasing the LR, pis the fraction of
+the number of iterations we have increased or will
+decrease the LR respectively, ratio speciﬁes how
+much smaller the lowest LR is from the maximum
+LRmax, andtis the learning rate at iteration t.
+We generally use cutfrac = 0:1,ratio = 32 and
+max= 0:01.
+STLR modiﬁes triangular learning rates (Smith,
+2017) with a short increase and a long decay pe-
+riod, which we found key for good performance.5
+In Section 5, we compare against aggressive co-
+sine annealing, a similar schedule that has recently
+been used to achieve state-of-the-art performance
+in CV (Loshchilov and Hutter, 2017).6
+Figure 2: The slanted triangular learning rate
+schedule used for ULMFiT as a function of the
+number of training iterations.
+3.3 Target task classiﬁer ﬁne-tuning
+Finally, for ﬁne-tuning the classiﬁer, we augment
+the pretrained language model with two additional
+linear blocks. Following standard practice for
+CV classiﬁers, each block uses batch normaliza-
+tion (Ioffe and Szegedy, 2015) and dropout, with
+ReLU activations for the intermediate layer and a
+softmax activation that outputs a probability dis-
+tribution over target classes at the last layer. Note
+that the parameters in these task-speciﬁc classi-
+ﬁer layers are the only ones that are learned from
+scratch. The ﬁrst linear layer takes as the input the
+pooled last hidden layer states.
+Concat pooling The signal in text classiﬁcation
+tasks is often contained in a few words, which may
+5We also credit personal communication with the author.
+6While Loshchilov and Hutter (2017) use multiple anneal-
+ing cycles, we generally found one cycle to work best.
+occur anywhere in the document. As input docu-
+ments can consist of hundreds of words, informa-
+tion may get lost if we only consider the last hid-
+den state of the model. For this reason, we con-
+catenate the hidden state at the last time step hT
+of the document with both the max-pooled and the
+mean-pooled representation of the hidden states
+over as many time steps as ﬁt in GPU memory
+H=fh1;:::;hTg:
+hc= [hT;maxpool (H);meanpool (H)] (4)
+where []is concatenation.
+Fine-tuning the target classiﬁer is the most crit-
+ical part of the transfer learning method. Overly
+aggressive ﬁne-tuning will cause catastrophic for-
+getting, eliminating the beneﬁt of the information
+captured through language modeling; too cautious
+ﬁne-tuning will lead to slow convergence (and re-
+sultant overﬁtting). Besides discriminative ﬁne-
+tuning and triangular learning rates, we propose
+gradual unfreezing for ﬁne-tuning the classiﬁer.
+Gradual unfreezing Rather than ﬁne-tuning all
+layers at once, which risks catastrophic forgetting,
+we propose to gradually unfreeze the model start-
+ing from the last layer as this contains the least
+general knowledge (Yosinski et al., 2014): We
+ﬁrst unfreeze the last layer and ﬁne-tune all un-
+frozen layers for one epoch. We then unfreeze the
+next lower frozen layer and repeat, until we ﬁne-
+tune all layers until convergence at the last itera-
+tion. This is similar to ‘ chain-thaw ’ (Felbo et al.,
+2017), except that we add a layer at a time to the
+set of ‘thawed’ layers, rather than only training a
+single layer at a time.
+While discriminative ﬁne-tuning, slanted trian-
+gular learning rates, and gradual unfreezing all
+are beneﬁcial on their own, we show in Section
+5 that they complement each other and enable our
+method to perform well across diverse datasets.
+BPTT for Text Classiﬁcation (BPT3C) Lan-
+guage models are trained with backpropagation
+through time (BPTT) to enable gradient propa-
+gation for large input sequences. In order to
+make ﬁne-tuning a classiﬁer for large documents
+feasible, we propose BPTT for Text Classiﬁca-
+tion (BPT3C): We divide the document into ﬁxed-
+length batches of size b. At the beginning of each
+batch, the model is initialized with the ﬁnal state
+of the previous batch; we keep track of the hid-
+den states for mean and max-pooling; gradientsDataset Type # classes # examples
+TREC-6 Question 6 5.5k
+IMDb Sentiment 2 25k
+Yelp-bi Sentiment 2 560k
+Yelp-full Sentiment 5 650k
+AG Topic 4 120k
+DBpedia Topic 14 560k
+Table 1: Text classiﬁcation datasets and tasks with
+number of classes and training examples.
+are back-propagated to the batches whose hidden
+states contributed to the ﬁnal prediction. In prac-
+tice, we use variable length backpropagation se-
+quences (Merity et al., 2017a).
+Bidirectional language model Similar to exist-
+ing work (Peters et al., 2017, 2018), we are not
+limited to ﬁne-tuning a unidirectional language
+model. For all our experiments, we pretrain both a
+forward and a backward LM. We ﬁne-tune a clas-
+siﬁer for each LM independently using BPT3C
+and average the classiﬁer predictions.
+4 Experiments
+While our approach is equally applicable to se-
+quence labeling tasks, we focus on text classiﬁca-
+tion tasks in this work due to their important real-
+world applications.
+4.1 Experimental setup
+Datasets and tasks We evaluate our method on
+six widely-studied datasets, with varying numbers
+of documents and varying document length, used
+by state-of-the-art text classiﬁcation and transfer
+learning approaches (Johnson and Zhang, 2017;
+McCann et al., 2017) as instances of three com-
+mon text classiﬁcation tasks: sentiment analy-
+sis, question classiﬁcation, and topic classiﬁca-
+tion. We show the statistics for each dataset and
+task in Table 1.
+Sentiment Analysis For sentiment analysis, we
+evaluate our approach on the binary movie review
+IMDb dataset (Maas et al., 2011) and on the binary
+and ﬁve-class version of the Yelp review dataset
+compiled by Zhang et al. (2015).
+Question Classiﬁcation We use the six-class
+version of the small TREC dataset (V oorhees and
+Tice, 1999) dataset of open-domain, fact-based
+questions divided into broad semantic categories.
+Model Test Model TestIMDbCoVe (McCann et al., 2017) 8.2
+TREC-6CoVe (McCann et al., 2017) 4.2
+oh-LSTM (Johnson and Zhang, 2016) 5.9 TBCNN (Mou et al., 2015) 4.0
+Virtual (Miyato et al., 2016) 5.9 LSTM-CNN (Zhou et al., 2016) 3.9
+ULMFiT (ours) 4.6 ULMFiT (ours) 3.6
+Table 2: Test error rates (%) on two text classiﬁcation datasets used by McCann et al. (2017).
+AG DBpedia Yelp-bi Yelp-full
+Char-level CNN (Zhang et al., 2015) 9.51 1.55 4.88 37.95
+CNN (Johnson and Zhang, 2016) 6.57 0.84 2.90 32.39
+DPCNN (Johnson and Zhang, 2017) 6.87 0.88 2.64 30.58
+ULMFiT (ours) 5.01 0.80 2.16 29.98
+Table 3: Test error rates (%) on text classiﬁcation datasets used by Johnson and Zhang (2017).
+Topic classiﬁcation For topic classiﬁcation, we
+evaluate on the large-scale AG news and DBpedia
+ontology datasets created by Zhang et al. (2015).
+Pre-processing We use the same pre-processing
+as in earlier work (Johnson and Zhang, 2017; Mc-
+Cann et al., 2017). In addition, to allow the lan-
+guage model to capture aspects that might be rel-
+evant for classiﬁcation, we add special tokens for
+upper-case words, elongation, and repetition.
+Hyperparameters We are interested in a model
+that performs robustly across a diverse set of tasks.
+To this end, if not mentioned otherwise, we use the
+same set of hyperparameters across tasks, which
+we tune on the IMDb validation set. We use
+the AWD-LSTM language model (Merity et al.,
+2017a) with an embedding size of 400,3layers,
+1150 hidden activations per layer, and a BPTT
+batch size of 70. We apply dropout of 0:4to
+layers, 0:3to RNN layers, 0:4to input embed-
+ding layers, 0:05to embedding layers, and weight
+dropout of 0:5to the RNN hidden-to-hidden ma-
+trix. The classiﬁer has a hidden layer of size 50.
+We use Adam with 1= 0:7instead of the de-
+fault1= 0:9and2= 0:99, similar to (Dozat
+and Manning, 2017). We use a batch size of 64,
+a base learning rate of 0:004 and0:01for ﬁne-
+tuning the LM and the classiﬁer respectively, and
+tune the number of epochs on the validation set of
+each task7. We otherwise use the same practices
+7On small datasets such as TREC-6, we ﬁne-tune the LM
+only for 15epochs without overﬁtting, while we can ﬁne-tune
+longer on larger datasets. We found 50epochs to be a good
+default for ﬁne-tuning the classiﬁer.used in (Merity et al., 2017a).
+Baselines and comparison models For each
+task, we compare against the current state-of-the-
+art. For the IMDb and TREC-6 datasets, we com-
+pare against CoVe (McCann et al., 2017), a state-
+of-the-art transfer learning method for NLP. For
+the AG, Yelp, and DBpedia datasets, we com-
+pare against the state-of-the-art text categorization
+method by Johnson and Zhang (2017).
+4.2 Results
+For consistency, we report all results as error rates
+(lower is better). We show the test error rates
+on the IMDb and TREC-6 datasets used by Mc-
+Cann et al. (2017) in Table 2. Our method outper-
+forms both CoVe, a state-of-the-art transfer learn-
+ing method based on hypercolumns, as well as the
+state-of-the-art on both datasets. On IMDb, we
+reduce the error dramatically by 43.9% and 22%
+with regard to CoVe and the state-of-the-art re-
+spectively. This is promising as the existing state-
+of-the-art requires complex architectures (Peters
+et al., 2018), multiple forms of attention (McCann
+et al., 2017) and sophisticated embedding schemes
+(Johnson and Zhang, 2016), while our method em-
+ploys a regular LSTM with dropout. We note
+that the language model ﬁne-tuning approach of
+Dai and Le (2015) only achieves an error of 7.64
+vs. 4.6 for our method on IMDb, demonstrating
+the beneﬁt of transferring knowledge from a large
+ImageNet-like corpus using our ﬁne-tuning tech-
+niques. IMDb in particular is reﬂective of real-
+world datasets: Its documents are generally a few
+Figure 3: Validation error rates for supervised and semi-supervised ULMFiT vs. training from scratch
+with different numbers of training examples on IMDb, TREC-6, and AG (from left to right).
+paragraphs long—similar to emails (e.g for legal
+discovery) and online comments (e.g for commu-
+nity management); and sentiment analysis is simi-
+lar to many commercial applications, e.g. product
+response tracking and support email routing.
+On TREC-6, our improvement—similar as the
+improvements of state-of-the-art approaches—is
+not statistically signiﬁcant, due to the small size of
+the 500-examples test set. Nevertheless, the com-
+petitive performance on TREC-6 demonstrates
+that our model performs well across different
+dataset sizes and can deal with examples that range
+from single sentences—in the case of TREC-6—
+to several paragraphs for IMDb. Note that despite
+pretraining on more than two orders of magnitude
+less data than the 7 million sentence pairs used by
+McCann et al. (2017), we consistently outperform
+their approach on both datasets.
+We show the test error rates on the larger AG,
+DBpedia, Yelp-bi, and Yelp-full datasets in Table
+3. Our method again outperforms the state-of-
+the-art signiﬁcantly. On AG, we observe a simi-
+larly dramatic error reduction by 23.7% compared
+to the state-of-the-art. On DBpedia, Yelp-bi, and
+Yelp-full, we reduce the error by 4.8%, 18.2%,
+2.0% respectively.
+5 Analysis
+In order to assess the impact of each contribution,
+we perform a series of analyses and ablations. We
+run experiments on three corpora, IMDb, TREC-
+6, and AG that are representative of different tasks,
+genres, and sizes. For all experiments, we split off
+10% of the training set and report error rates on
+this validation set with unidirectional LMs. We
+ﬁne-tune the classiﬁer for 50epochs and train all
+methods but ULMFiT with early stopping.
+Low-shot learning One of the main beneﬁts of
+transfer learning is being able to train a model forPretraining IMDb TREC-6 AG
+Without pretraining 5.63 10.67 5.52
+With pretraining 5.00 5.69 5.38
+Table 4: Validation error rates for ULMFiT with
+and without pretraining.
+a task with a small number of labels. We evalu-
+ate ULMFiT on different numbers of labeled ex-
+amples in two settings: only labeled examples are
+used for LM ﬁne-tuning (‘ supervised ’); and all
+task data is available and can be used to ﬁne-tune
+the LM (‘ semi-supervised ’). We compare ULM-
+FiT to training from scratch—which is necessary
+for hypercolumn-based approaches. We split off
+balanced fractions of the training data, keep the
+validation set ﬁxed, and use the same hyperparam-
+eters as before. We show the results in Figure 3.
+On IMDb and AG, supervised ULMFiT with
+only 100 labeled examples matches the perfor-
+mance of training from scratch with 10and20
+more data respectively, clearly demonstrating the
+beneﬁt of general-domain LM pretraining. If we
+allow ULMFiT to also utilize unlabeled exam-
+ples ( 50k for IMDb, 100k for AG), at 100labeled
+examples, we match the performance of training
+from scratch with 50and100more data on AG
+and IMDb respectively. On TREC-6, ULMFiT
+signiﬁcantly improves upon training from scratch;
+as examples are shorter and fewer, supervised and
+semi-supervised ULMFiT achieve similar results.
+Impact of pretraining We compare using no
+pretraining with pretraining on WikiText-103
+(Merity et al., 2017b) in Table 4. Pretraining is
+most useful for small and medium-sized datasets,
+which are most common in commercial applica-
+tions. However, even for large datasets, pretrain-
+ing improves performance.
+LM IMDb TREC-6 AG
+Vanilla LM 5.98 7.41 5.76
+AWD-LSTM LM 5.00 5.69 5.38
+Table 5: Validation error rates for ULMFiT with a
+vanilla LM and the AWD-LSTM LM.
+LM ﬁne-tuning IMDb TREC-6 AG
+No LM ﬁne-tuning 6.99 6.38 6.09
+Full 5.86 6.54 5.61
+Full + discr 5.55 6.36 5.47
+Full + discr + stlr 5.00 5.69 5.38
+Table 6: Validation error rates for ULMFiT with
+different variations of LM ﬁne-tuning.
+Impact of LM quality In order to gauge the im-
+portance of choosing an appropriate LM, we com-
+pare a vanilla LM with the same hyperparame-
+ters without any dropout8with the AWD-LSTM
+LM with tuned dropout parameters in Table 5.
+Using our ﬁne-tuning techniques, even a regular
+LM reaches surprisingly good performance on the
+larger datasets. On the smaller TREC-6, a vanilla
+LM without dropout runs the risk of overﬁtting,
+which decreases performance.
+Impact of LM ﬁne-tuning We compare no ﬁne-
+tuning against ﬁne-tuning the full model (Erhan
+et al., 2010) (‘ Full’), the most commonly used
+ﬁne-tuning method, with and without discrimi-
+native ﬁne-tuning (‘ Discr ’) and slanted triangular
+learning rates (‘ Stlr’) in Table 6. Fine-tuning the
+LM is most beneﬁcial for larger datasets. ‘ Discr ’
+and ‘ Stlr’ improve performance across all three
+datasets and are necessary on the smaller TREC-6,
+where regular ﬁne-tuning is not beneﬁcial.
+Impact of classiﬁer ﬁne-tuning We compare
+training from scratch, ﬁne-tuning the full model
+(‘Full’), only ﬁne-tuning the last layer (‘ Last’)
+(Donahue et al., 2014), ‘ Chain-thaw ’ (Felbo et al.,
+2017), and gradual unfreezing (‘ Freez ’). We fur-
+thermore assess the importance of discriminative
+ﬁne-tuning (‘ Discr ’) and slanted triangular learn-
+ing rates (‘ Stlr’). We compare the latter to an
+alternative, aggressive cosine annealing schedule
+(‘Cos’) (Loshchilov and Hutter, 2017). We use a
+learning rate L= 0:01for ‘Discr ’, learning rates
+8To avoid overﬁtting, we only train the vanilla LM classi-
+ﬁer for 5epochs and keep dropout of 0:4in the classiﬁer.Classiﬁer ﬁne-tuning IMDb TREC-6 AG
+From scratch 9.93 13.36 6.81
+Full 6.87 6.86 5.81
+Full + discr 5.57 6.21 5.62
+Last 6.49 16.09 8.38
+Chain-thaw 5.39 6.71 5.90
+Freez 6.37 6.86 5.81
+Freez + discr 5.39 5.86 6.04
+Freez + stlr 5.04 6.02 5.35
+Freez + cos 5.70 6.38 5.29
+Freez + discr + stlr 5.00 5.69 5.38
+Table 7: Validation error rates for ULMFiT with
+different methods to ﬁne-tune the classiﬁer.
+of0:001and0:0001 for the last and all other layers
+respectively for ‘ Chain-thaw ’ as in (Felbo et al.,
+2017), and a learning rate of 0:001otherwise. We
+show the results in Table 7.
+Fine-tuning the classiﬁer signiﬁcantly improves
+over training from scratch, particularly on the
+small TREC-6. ‘ Last’, the standard ﬁne-tuning
+method in CV , severely underﬁts and is never
+able to lower the training error to 0. ‘Chain-
+thaw ’ achieves competitive performance on the
+smaller datasets, but is outperformed signiﬁcantly
+on the large AG. ‘ Freez ’ provides similar per-
+formance as ‘ Full’. ‘Discr ’ consistently boosts
+the performance of ‘ Full’ and ‘ Freez ’, except
+for the large AG. Cosine annealing is competi-
+tive with slanted triangular learning rates on large
+data, but under-performs on smaller datasets. Fi-
+nally, full ULMFiT classiﬁer ﬁne-tuning (bottom
+row) achieves the best performance on IMDB and
+TREC-6 and competitive performance on AG. Im-
+portantly, ULMFiT is the only method that shows
+excellent performance across the board—and is
+therefore the only universal method.
+Classiﬁer ﬁne-tuning behavior While our re-
+sults demonstrate that how we ﬁne-tune the clas-
+siﬁer makes a signiﬁcant difference, ﬁne-tuning
+for inductive transfer is currently under-explored
+in NLP as it mostly has been thought to be un-
+helpful (Mou et al., 2016). To better understand
+the ﬁne-tuning behavior of our model, we compare
+the validation error of the classiﬁer ﬁne-tuned with
+ULMFiT and ‘ Full’ during training in Figure 4.
+On all datasets, ﬁne-tuning the full model leads
+to the lowest error comparatively early in train-
+ing, e.g. already after the ﬁrst epoch on IMDb.
+Figure 4: Validation error rate curves for ﬁne-
+tuning the classiﬁer with ULMFiT and ‘ Full’ on
+IMDb, TREC-6, and AG (top to bottom).
+The error then increases as the model starts to
+overﬁt and knowledge captured through pretrain-
+ing is lost. In contrast, ULMFiT is more sta-
+ble and suffers from no such catastrophic forget-
+ting; performance remains similar or improves un-
+til late epochs, which shows the positive effect of
+the learning rate schedule.
+Impact of bidirectionality At the cost of train-
+ing a second model, ensembling the predictions of
+a forward and backwards LM-classiﬁer brings a
+performance boost of around 0:5–0:7. On IMDb
+we lower the test error from 5:30of a single model
+to4:58for the bidirectional model.
+6 Discussion and future directions
+While we have shown that ULMFiT can achieve
+state-of-the-art performance on widely used text
+classiﬁcation tasks, we believe that language
+model ﬁne-tuning will be particularly useful in the
+following settings compared to existing transfer
+learning approaches (Conneau et al., 2017; Mc-
+Cann et al., 2017; Peters et al., 2018): a) NLP for
+non-English languages, where training data for su-
+pervised pretraining tasks is scarce; b) new NLP
+tasks where no state-of-the-art architecture exists;
+and c) tasks with limited amounts of labeled data
+(and some amounts of unlabeled data).Given that transfer learning and particularly
+ﬁne-tuning for NLP is under-explored, many fu-
+ture directions are possible. One possible direc-
+tion is to improve language model pretraining and
+ﬁne-tuning and make them more scalable: for
+ImageNet, predicting far fewer classes only in-
+curs a small performance drop (Huh et al., 2016),
+while recent work shows that an alignment be-
+tween source and target task label sets is impor-
+tant (Mahajan et al., 2018)—focusing on predict-
+ing a subset of words such as the most frequent
+ones might retain most of the performance while
+speeding up training. Language modeling can also
+be augmented with additional tasks in a multi-task
+learning fashion (Caruana, 1993) or enriched with
+additional supervision, e.g. syntax-sensitive de-
+pendencies (Linzen et al., 2016) to create a model
+that is more general or better suited for certain
+downstream tasks, ideally in a weakly-supervised
+manner to retain its universal properties.
+Another direction is to apply the method to
+novel tasks and models. While an extension to
+sequence labeling is straightforward, other tasks
+with more complex interactions such as entailment
+or question answering may require novel ways to
+pretrain and ﬁne-tune. Finally, while we have
+provided a series of analyses and ablations, more
+studies are required to better understand what
+knowledge a pretrained language model captures,
+how this changes during ﬁne-tuning, and what in-
+formation different tasks require.
+7 Conclusion
+We have proposed ULMFiT, an effective and ex-
+tremely sample-efﬁcient transfer learning method
+that can be applied to any NLP task. We have also
+proposed several novel ﬁne-tuning techniques that
+in conjunction prevent catastrophic forgetting and
+enable robust learning across a diverse range of
+tasks. Our method signiﬁcantly outperformed ex-
+isting transfer learning techniques and the state-
+of-the-art on six representative text classiﬁcation
+tasks. We hope that our results will catalyze new
+developments in transfer learning for NLP.
+Acknowledgments
+We thank the anonymous reviewers for their valu-
+able feedback. Sebastian is supported by Irish
+Research Council Grant Number EBPPG/2014/30
+and Science Foundation Ireland Grant Number
+SFI/12/RC/2289.
+References
+Jonathan Baxter. 2000. A Model of Inductive Bias
+Learning. Journal of Artiﬁcial Intelligence Research
+12:149–198.
+John Blitzer, Mark Dredze, and Fernando Pereira.
+2007. Biographies, bollywood, boom-boxes
+and blenders: Domain adaptation for sentiment
+classiﬁcation. Annual Meeting-Association
+for Computational Linguistics 45(1):440.
+https://doi.org/10.1109/IRPS.2011.5784441.
+Cornelia Caragea, Nathan McNeese, Anuj Jaiswal,
+Greg Traylor, Hyun-Woo Kim, Prasenjit Mitra,
+Dinghao Wu, Andrea H Tapia, Lee Giles, Bernard J
+Jansen, et al. 2011. Classifying text messages for the
+haiti earthquake. In Proceedings of the 8th interna-
+tional conference on information systems for crisis
+response and management (ISCRAM2011) . Citeseer.
+Rich Caruana. 1993. Multitask learning: A
+knowledge-based source of inductive bias. In Pro-
+ceedings of the Tenth International Conference on
+Machine Learning .
+Zhao Chen, Vijay Badrinarayanan, Chen-Yu Lee, and
+Andrew Rabinovich. 2017. GradNorm: Gradient
+Normalization for Adaptive Loss Balancing in Deep
+Multitask Networks pages 1–10.
+Zi Chu, Steven Gianvecchio, Haining Wang, and Sushil
+Jajodia. 2012. Detecting automation of twitter ac-
+counts: Are you a human, bot, or cyborg? IEEE
+Transactions on Dependable and Secure Computing
+9(6):811–824.
+Alexis Conneau, Douwe Kiela, Holger Schwenk, Lo ¨ıc
+Barrault, and Antoine Bordes. 2017. Supervised
+Learning of Universal Sentence Representations
+from Natural Language Inference Data. In Proceed-
+ings of the 2017 Conference on Empirical Methods
+in Natural Language Processing .
+Andrew M. Dai and Quoc V . Le. 2015. Semi-
+supervised Sequence Learning. Advances in Neu-
+ral Information Processing Systems (NIPS ’15)
+http://arxiv.org/abs/1511.01432.
+Jeff Donahue, Yangqing Jia, Oriol Vinyals, Judy Hoff-
+man, Ning Zhang, Eric Tzeng, and Trevor Darrell.
+2014. Decaf: A deep convolutional activation fea-
+ture for generic visual recognition. In International
+conference on machine learning . pages 647–655.
+Timothy Dozat and Christopher D. Manning. 2017.
+Deep Biafﬁne Attention for Neural Dependency
+Parsing. In Proceedings of ICLR 2017 .
+Dumitru Erhan, Yoshua Bengio, Aaron Courville,
+Pierre-Antoine Manzagol, Pascal Vincent, and Samy
+Bengio. 2010. Why does unsupervised pre-training
+help deep learning? Journal of Machine Learning
+Research 11(Feb):625–660.Bjarke Felbo, Alan Mislove, Anders Søgaard, Iyad
+Rahwan, and Sune Lehmann. 2017. Using millions
+of emoji occurrences to learn any-domain represen-
+tations for detecting sentiment, emotion and sar-
+casm. In Proceedings of the 2017 Conference on
+Empirical Methods in Natural Language Process-
+ing.
+Kristina Gulordava, Piotr Bojanowski, Edouard Grave,
+Tal Linzen, and Marco Baroni. 2018. Colorless
+green recurrent networks dream hierarchically. In
+Proceedings of NAACL-HLT 2018 .
+Bharath Hariharan, Pablo Arbel ´aez, Ross Girshick, and
+Jitendra Malik. 2015. Hypercolumns for object seg-
+mentation and ﬁne-grained localization. In Proceed-
+ings of the IEEE Conference on Computer Vision
+and Pattern Recognition . pages 447–456.
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian
+Sun. 2016. Deep Residual Learning for Image
+Recognition. In Proceedings of the IEEE Confer-
+ence on Computer Vision and Pattern Recognition .
+Gao Huang, Zhuang Liu, Kilian Q. Weinberger, and
+Laurens van der Maaten. 2017. Densely Connected
+Convolutional Networks. In Proceedings of CVPR
+2017 .
+Minyoung Huh, Pulkit Agrawal, and Alexei A Efros.
+2016. What makes ImageNet good for transfer
+learning? arXiv preprint arXiv:1608.08614 .
+Sergey Ioffe and Christian Szegedy. 2015. Batch nor-
+malization: Accelerating deep network training by
+reducing internal covariate shift. In International
+Conference on Machine Learning . pages 448–456.
+Nitin Jindal and Bing Liu. 2007. Review spam de-
+tection. In Proceedings of the 16th international
+conference on World Wide Web . ACM, pages 1189–
+1190.
+Rie Johnson and Tong Zhang. 2016. Supervised and
+semi-supervised text categorization using lstm for
+region embeddings. In International Conference on
+Machine Learning . pages 526–534.
+Rie Johnson and Tong Zhang. 2017. Deep pyramid
+convolutional neural networks for text categoriza-
+tion. In Proceedings of the 55th Annual Meeting of
+the Association for Computational Linguistics (Vol-
+ume 1: Long Papers) . volume 1, pages 562–570.
+Tal Linzen, Emmanuel Dupoux, and Yoav Gold-
+berg. 2016. Assessing the ability of lstms to
+learn syntax-sensitive dependencies. arXiv preprint
+arXiv:1611.01368 .
+Liyuan Liu, Jingbo Shang, Frank Xu, Xiang Ren, Huan
+Gui, Jian Peng, and Jiawei Han. 2018. Empower
+sequence labeling with task-aware neural language
+model. In Proceedings of AAAI 2018 .
+Jonathan Long, Evan Shelhamer, and Trevor Darrell.
+2015a. Fully convolutional networks for semantic
+segmentation. In Proceedings of the IEEE Confer-
+ence on Computer Vision and Pattern Recognition .
+pages 3431–3440.
+Mingsheng Long, Yue Cao, Jianmin Wang, and
+Michael I. Jordan. 2015b. Learning Transferable
+Features with Deep Adaptation Networks. In Pro-
+ceedings of the 32nd International Conference on
+Machine learning (ICML ’15) . volume 37.
+Ilya Loshchilov and Frank Hutter. 2017. SGDR:
+Stochastic Gradient Descent with Warm Restarts. In
+Proceedings of the Internal Conference on Learning
+Representations 2017 .
+Andrew L Maas, Raymond E Daly, Peter T Pham, Dan
+Huang, Andrew Y Ng, and Christopher Potts. 2011.
+Learning word vectors for sentiment analysis. In
+Proceedings of the 49th Annual Meeting of the Asso-
+ciation for Computational Linguistics: Human Lan-
+guage Technologies-Volume 1 . Association for Com-
+putational Linguistics, pages 142–150.
+Dhruv Mahajan, Ross Girshick, Vignesh Ramanathan,
+Kaiming He, Manohar Paluri, Yixuan Li, Ashwin
+Bharambe, and Laurens van der Maaten. 2018. Ex-
+ploring the Limits of Weakly Supervised Pretraining
+.
+Bryan McCann, James Bradbury, Caiming Xiong, and
+Richard Socher. 2017. Learned in Translation: Con-
+textualized Word Vectors. In Advances in Neural
+Information Processing Systems .
+Stephen Merity, Nitish Shirish Keskar, and Richard
+Socher. 2017a. Regularizing and Optimiz-
+ing LSTM Language Models. arXiv preprint
+arXiv:1708.02182 .
+Stephen Merity, Caiming Xiong, James Bradbury, and
+Richard Socher. 2017b. Pointer Sentinel Mixture
+Models. In Proceedings of the International Con-
+ference on Learning Representations 2017 .
+Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey
+Dean. 2013. Distributed Representations of Words
+and Phrases and their Compositionality. In Ad-
+vances in Neural Information Processing Systems .
+Sewon Min, Minjoon Seo, and Hannaneh Hajishirzi.
+2017. Question Answering through Transfer Learn-
+ing from Large Fine-grained Supervision Data. In
+Proceedings of the 55th Annual Meeting of the As-
+sociation for Computational Linguistics (Short Pa-
+pers) .
+Takeru Miyato, Andrew M Dai, and Ian Good-
+fellow. 2016. Adversarial training methods for
+semi-supervised text classiﬁcation. arXiv preprint
+arXiv:1605.07725 .
+Lili Mou, Zhao Meng, Rui Yan, Ge Li, Yan Xu,
+Lu Zhang, and Zhi Jin. 2016. How Transferable areNeural Networks in NLP Applications? Proceed-
+ings of 2016 Conference on Empirical Methods in
+Natural Language Processing .
+Lili Mou, Hao Peng, Ge Li, Yan Xu, Lu Zhang, and
+Zhi Jin. 2015. Discriminative neural sentence mod-
+eling by tree-based convolution. In Proceedings of
+the 2015 Conference on Empirical Methods in Nat-
+ural Language Processing .
+EWT Ngai, Yong Hu, YH Wong, Yijun Chen, and Xin
+Sun. 2011. The application of data mining tech-
+niques in ﬁnancial fraud detection: A classiﬁca-
+tion framework and an academic review of literature.
+Decision Support Systems 50(3):559–569.
+Sinno Jialin Pan and Qiang Yang. 2010. A survey on
+transfer learning. IEEE Transactions on Knowledge
+and Data Engineering 22(10):1345–1359.
+Matthew E Peters, Waleed Ammar, Chandra Bhagavat-
+ula, and Russell Power. 2017. Semi-supervised se-
+quence tagging with bidirectional language models.
+InProceedings of ACL 2017 .
+Matthew E Peters, Mark Neumann, Mohit Iyyer, Matt
+Gardner, Christopher Clark, Kenton Lee, and Luke
+Zettlemoyer. 2018. Deep contextualized word rep-
+resentations. In Proceedings of NAACL 2018 .
+Alec Radford, Rafal Jozefowicz, and Ilya Sutskever.
+2017. Learning to generate reviews and discovering
+sentiment. arXiv preprint arXiv:1704.01444 .
+Marek Rei. 2017. Semi-supervised multitask learning
+for sequence labeling. In Proceedings of ACL 2017 .
+Herbert L Roitblat, Anne Kershaw, and Patrick Oot.
+2010. Document categorization in legal electronic
+discovery: computer classiﬁcation vs. manual re-
+view. Journal of the Association for Information
+Science and Technology 61(1):70–80.
+Sebastian Ruder. 2016. An overview of gradient
+descent optimization algorithms. arXiv preprint
+arXiv:1609.04747 .
+Ruslan Salakhutdinov and Geoffrey Hinton. 2009.
+Deep boltzmann machines. In Artiﬁcial Intelligence
+and Statistics . pages 448–455.
+Rico Sennrich, Barry Haddow, and Alexandra Birch.
+2015. Improving neural machine translation
+models with monolingual data. arXiv preprint
+arXiv:1511.06709 .
+Aliaksei Severyn and Alessandro Moschitti. 2015.
+UNITN: Training Deep Convolutional Neural Net-
+work for Twitter Sentiment Classiﬁcation. Proceed-
+ings of the 9th International Workshop on Semantic
+Evaluation (SemEval 2015) pages 464–469.
+Ali Sharif Razavian, Hossein Azizpour, Josephine Sul-
+livan, and Stefan Carlsson. 2014. Cnn features off-
+the-shelf: an astounding baseline for recognition. In
+Proceedings of the IEEE conference on computer vi-
+sion and pattern recognition . pages 806–813.
+Leslie N Smith. 2017. Cyclical learning rates for train-
+ing neural networks. In Applications of Computer
+Vision (WACV), 2017 IEEE Winter Conference on .
+IEEE, pages 464–472.
+Vladimir Naumovich Vapnik and Samuel Kotz. 1982.
+Estimation of dependences based on empirical data ,
+volume 40. Springer-Verlag New York.
+Ellen M V oorhees and Dawn M Tice. 1999. The trec-8
+question answering track evaluation. In TREC . vol-
+ume 1999, page 82.
+John Wieting and Kevin Gimpel. 2017. Revisiting Re-
+current Networks for Paraphrastic Sentence Embed-
+dings. In Proceedings of the 55th Annual Meeting of
+the Association for Computational Linguistics (ACL
+2017) .
+Jason Yosinski, Jeff Clune, Yoshua Bengio, and Hod
+Lipson. 2014. How transferable are features in deep
+neural networks? In Advances in neural information
+processing systems . pages 3320–3328.
+Xiang Zhang, Junbo Zhao, and Yann LeCun. 2015.
+Character-level convolutional networks for text clas-
+siﬁcation. In Advances in neural information pro-
+cessing systems . pages 649–657.
+Peng Zhou, Zhenyu Qi, Suncong Zheng, Jiaming Xu,
+Hongyun Bao, and Bo Xu. 2016. Text classiﬁcation
+improved by integrating bidirectional lstm with two-
+dimensional max pooling. In Proceedings of COL-
+ING 2016 .

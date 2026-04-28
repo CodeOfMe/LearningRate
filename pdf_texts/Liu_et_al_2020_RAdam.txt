@@ -1,0 +1,830 @@
+arXiv:1910.01315v1  [cond-mat.str-el]  3 Oct 2019Magnetization process of the breathing pyrochlore magnet C uInCr 4S8
+in ultra-high magnetic ﬁelds up to 150 T
+Masaki Gen,1,∗Yoshihiko Okamoto,2Masaki Mori,2Koshi Takenaka,2and Yoshimitsu Kohama1,†
+1Institute for Solid State Physics, University of Tokyo, Kas hiwa, Chiba 277-8581, Japan
+2Department of Applied Physics, Nagoya University, Nagoya 4 64-8603, Japan
+(Dated: October 4, 2019)
+The magnetization process of the breathing pyrochlore magn et CuInCr 4S8has been investigated in ultra-high
+magnetic ﬁelds up to 150 T. Successive phase transitions cha racterized with a substantially wide 1 /2-plateau
+from 55 T to 110 T are observed in this system, resembling thos e reported in chromium spinel oxides. In
+addition to the 1/2-plateau phase, the magnetization is found to exhibit two i nherent behaviors: a slight change in
+the slope of the M–Hcurve at∼85 T and a shoulder-like shape at ∼130 T prior to the saturation. Both of them
+are accompanied by a hysteresis, suggesting ﬁrst-order tra nsitions. The theoretical calculation applicable to
+CuInCr 4S8is also shown, based on the microscopic model with the spin-l attice coupling. The calculation fairly
+well reproduces the main features of the experimentally obs erved magnetization process, including a relatively
+wide cant 2:1:1 phase clearly observed in the previous work [ Y . Okamoto et al. , J. Phys. Soc. Jpn. 87, 034709
+(2018)]. The robust 1 /2-plateau on CuInCr 4S8seems to be originated from the dominant antiferromagnetic
+interactions and the strong spin-lattice coupling.
+I. INTRODUCTION
+Frustrated spin systems have been extensively studied for
+several decades because they can exhibit macroscopically d e-
+generate ground states such as quantum spin-liquid [1, 2].
+In real compounds, however, the macroscopic degeneracy is
+lifted by various perturbations such as quantum and ther-
+mal ﬂuctuations [2], spin-lattice coupling [3], Dzyaloshi nskii-
+Moriya interaction [4], and so on. Intriguingly, such pertu r-
+bations can induce successive phase transitions under mag-
+netic ﬁelds, including unconventional magnetic phases as r ep-
+resented by a magnetization plateau.
+Chromium spinel oxides ACr2O4(A=Hg, Cd, Zn, Mg) are
+well known as typical 3D frustrated magnets exhibiting ﬁeld -
+induced successive phase transitions [5–13]. In these sys-
+tems, non-magnetic divalent cations occupying the tetrahe dral
+Asites form a diamond lattice, whereas magnetic Cr3+ions
+octahedrally surrounded by oxygen ions form a pyrochlore
+lattice. The orbital degrees of freedom are quenched becaus e
+of the half-ﬁlled t2gorbitals, making Cr spinel oxides an ideal
+S=3/2 Heisenberg spin system with strong geometrical frus-
+tration. This frustration suppresses a long range antiferr o-
+magnetic (AFM) ordering well below the Weiss temperature,
+i.e. TN≪ |ΘCW|[5, 16–19]. The strength of the nearest-
+neighbor (NN) exchange interaction strongly depends on the
+Cr-Cr distance [14, 15], indicative of a strong spin-lattic e cou-
+pling, and consequently, the frustration is resolved due to the
+spin Jahn-Teller eﬀect at TN,[20, 21]. The spin-lattice cou-
+pling is also responsible for the robust 1 /2-plateau phase with
+a 3 up-1 down spin conﬁguration that appears universally in
+these oxide compounds [5–13, 22–26]. Recently, A-site or-
+dered Cr spinel oxides Li MCr4O8(M=In, Ga) have been at-
+tracted attention [27–34]. In these systems, Cr3+ions form a
+breathing pyrochlore lattice comprised of an alternating a rray
+∗gen@issp.u-tokyo.ac.jp
+†ykohama@issp.u-tokyo.ac.jpof small and large tetrahedra, where two kinds of NN AFM
+exchange interactions, JandJ′, exist, respectively [28]. The
+diﬀerence in the strengths of JandJ′might introduce uncon-
+ventional magnetic properties in high magnetic ﬁelds, dist inct
+from ACr2O4. However, since Li MCr4O8possesses extremely
+strong NN AFM interactions, as indicated by the large Weiss
+temperature (ΘCW=−332 K and−659 K for M=In and Ga,
+respectively [28]), the observation up to saturation requi res
+several hundred tesla, which has not yet been achieved exper -
+imentally [35].
+Here, we report a combined experimental and theoretical
+investigation into the magnetization process of an A-site or-
+dered Cr spinel sulﬁde, CuInCr 4S8, on which the Weiss tem-
+perature is known to be −7(2)×101K [41], suggesting exper-
+imentally accessible saturation ﬁeld. The fundamental mag -
+netic properties of this compound were investigated in 1970 s
+[36–40], and refocused by Okamoto et al. recently [41]. The
+heat capacity of CuInCr 4S8shows a sharp peak at Tp=28 K
+with a sudden drop in the magnetic susceptibility, suggesti ng
+the magnetic ordering below Tp[41]. The previous neutron
+diﬀraction experiment clariﬁed that the spin structure at 4.2 K
+is a collinear order comprising decoupled (100) ferromagne tic
+planes [37, 39]. This strongly indicates the coexistence of
+AFM Jand FM J′for small and large tetrahedra, respectively.
+The magnetization process of CuInCr 4S8was revealed up to
+73 T, where Mreaches 45 % of the saturation magnetization of
+Ms=3.06µB/Cr (this value is estimated from the Land´ e gfac-
+tor of 2.04) [41]. The magnetization shows a jump at ∼25 T
+with a large hysteresis loop and exhibits a kink at ∼40 T sug-
+gesting a ﬁrst order phase transition. Another magnetizati on
+kink appears at∼55 T followed by a plateau-like behavior,
+which may be a phase transition to the 1 /2-plateau state. In
+this study, we have performed magnetization measurements
+on CuInCr 4S8under ultra-high magnetic ﬁelds up to 150 T
+to elucidate the full magnetization process. We also theore t-
+ically investigated the magnetization process of the breat hing
+pyrochlore magnet by using a microscopic model with the
+spin-lattice coupling. Achievement of these works can help
+us to understand the high-ﬁeld properties of a novel type of
+2
+the pyrochlore spin system that consists of two kinds of NN
+exchange interactions with opposite sign.
+This paper is organized as follows. In section II, we show
+the experimental method and the result of high-ﬁeld magneti -
+zation measurements. The details of measurement technique
+are described in Supplemental Material. In section III, we i n-
+troduce the microscopic Heisenberg model incorporating th e
+spin-lattice coupling, which can be applied to the breathin g
+pyrochlore magnet with J>0 and J′<0. The numerical cal-
+culation on the eﬀective spin model gives a detailed and gen-
+eral phase diagram and magnetization curves for CuInCr 4S8.
+In section IV , we compare the calculated magnetization curv es
+with those obtained in experiments and discuss the characte r-
+istic features for CuInCr 4S8. Finally, the possible spin struc-
+tures on CuInCr 4S8under magnetic ﬁelds are proposed, and
+the strengths of several exchange interactions of CuInCr 4S8
+are also estimated.
+II. EXPERIMENT
+A polycrystalline powder sample of CuInCr 4S8, synthe-
+sized by a solid-state reaction method as in Ref. [41], was
+used in the present work. The lattice parameter was found
+to be a=10.05970(11) Å, and the amount of intersite de-
+fects was estimated at most ∼3 %. High-ﬁeld magnetiza-
+tion measurements were performed using a horizontal single -
+turn-coil (HSTC) system up to 150 T. The pulsed-ﬁeld dura-
+tion time was approximately 7.3 µs. The induction method
+was adopted to detect the dM/dtsignal using a coaxial-type
+self-compensated magnetization pickup coil. In order to mi n-
+imize the uncompensated contribution of the background sig -
+nal, three sets of measurements, in the order of sample-out,
+sample-in, and sample-out, were carried out as in Ref. [34].
+The detailed setup to obtain high-quality magnetization da ta
+under magnetic ﬁelds up to 150 T is described in Supplemen-
+tal Material. The magnetic ﬁeld was measured by a calibrated
+pickup coil wound around the magnetization pickup coil. The
+sample was cooled down to approximately 5 K using a liquid-
+He ﬂow cryostat made of glass-epoxy (G-10). The tempera-
+ture was monitored by a RuO 2resistance thermometer.
+TheM–Hcurves (up to 134 T and 150 T) and the derivative
+dM/dH(up to 150 T) of CuInCr 4S8are shown in Fig. 1. They
+are consistent with the previous result up to 73 T obtained by
+a non-destructive pulsed magnet [41], which is also shown in
+Fig. 1. Although the present data taken in HSTC have poor
+Signal-to-Noise ratio up to ∼60 T for up sweep, the two sets
+of data overlap quantitatively in the high ﬁeld region up to
+134 T, guaranteeing the high accuracy of our measurements.
+As seen in Fig. 1, the hysteresis opening at ∼20 T once
+closes in the ﬁeld region of 60 ∼80 T, where Mis almost
+constant at∼Ms/2, implying the 1/2-plateau phase. For both
+up and down sweeps, this plateau-like feature survives unti l
+∼110 T, then Mclearly exhibits an upturn behavior. Note
+that a substantial hysteretic behavior is seen in the middle of
+the plateau region: a gradual dM/dHchange is seen at∼87 T
+for up sweep and at ∼81 T for down sweep. With increasing a
+magnetic ﬁeld above the plateau phase, Mexhibits a shoulderMs
+Ms/2Hc1
+Hc2
+Hc1Hc3Hc2'
+Hc2'Hc3Hc4
+Hc4
+FIG. 1. M–Hcurves of a powder sample of CuInCr 4S8measured
+at approximately 5 K in a HSTC megagauss generator. Measure-
+ments were performed up to 134 T (pink and purple curves for up
+and down sweeps, respectively) and 150 T (red and blue curves for
+up and down sweeps, respectively). The dM/dHof the M–Hcurves
+up to 150 T are shown in the upper panel. The previously report ed
+M–Hcurve and its derivative dM/dHmeasured at 1.4 K in a non-
+destructive pulsed magnet up to 73 T are also shown (orange an d
+cyan curves for up and down sweeps, respectively) [41]. Each data
+is shifted vertically for clarity (The dashed lines in the up per panel
+indicate dM/dH=0 lines). Transition ﬁelds are denoted by brackets
+or arrows in dM/dH.
+shape at∼130 T, followed by a gradual increase until 150 T,
+where Mreaches∼2.7µB/Cr. Assuming that Mincreases
+linearly above 150 T, the saturation ﬁeld is expected to be ∼
+180 T. Judging from the fact that Mreaches the value of Ms/2
+at∼90 T for up sweep, this estimation could be plausible.
+We summarize the transition ﬁelds for CuInCr 4S8in Table
+I, which are experimentally determined from the anomalies
+indM/dH.Hc1andHc2for both up and down sweeps are
+deduced from the previous result in Ref. [41] by taking the
+value around the hump in dM/dH(the upper panel in Fig. 1).
+The order of each transition is judged from the existence of
+3
+TABLE I. Transition ﬁelds for CuInCr 4S8determined from the
+anomalies in dM/dH. The unit is tesla.
+Hc1 Hc2 Hc2′ Hc3 Hc4 Hsat
+up 29±455±787±4111±2132±2>150
+down 27±755±681±2109±2128±2>150
+order 1st 2nd 1st 2nd 1st —
+a hysteresis. Note that our magnetization data did not detec t
+the hump structure around Hc2for down sweep. This might
+be the inﬂuence of the fast ﬁeld-sweep rate or the magnetic
+ﬁeld inhomogeneity which becomes inevitable for the down
+sweep due to the deformation of the ﬁeld generation coil. In-
+terestingly, there are in total six phase transitions up to t he full
+saturation, resulting in a very complicated magnetization pro-
+cess. The detailed explanation on the experimental result a nd
+its theoretical analysis are given in the following section s.
+III. CALCULATION
+As mentioned above, chromium spinel oxides ACr2O4ex-
+hibit a variety of ﬁeld-induced magnetic phases, represent ed
+by a robust 1/2-plateau phase. Although several theoretical
+studies have been devoted to the Cr spinel oxides [22–26, 42] ,
+the ground state of the breathing pyrochlore under magnetic
+ﬁelds has not been investigated so far. For the sake of the in-
+terpretation of the observed magnetization process, we con -
+structed an eﬀective spin model on a breathing pyrochlore
+magnet with J>0 and J′<0 and examined the ground state
+under magnetic ﬁelds.
+A. BP model and SP model
+First, we introduce two microscopic models considering
+the spin-lattice coupling used for a standard pyrochlore an -
+tiferromagnet. One was ﬁrst proposed by Penc et al. [22],
+called the bond-phonon (BP) model, which assumes indepen-
+dent changes in the distance between neighboring spins Siand
+Sj. In the following, we treat spins in the classical limit, and
+normalize to|S|=1. The eﬀective Heisenberg Hamiltonian
+of the BP model is expressed as
+HBP=J/summationdisplay
+/angbracketlefti,j/angbracketright[Si·Sj−b(Si·Sj)2]−h/summationdisplay
+iSi, (1)
+where the summation /angbracketlefti,j/angbracketrightis taken over all the NN bonds, the
+coeﬃcient bof the biquadratic term is a dimensionless param-
+eter representing the strength of the spin-lattice couplin g
+b=1
+cJdJ
+dr/vextendsingle/vextendsingle/vextendsingle/vextendsingle/vextendsingler=|r0
+i j|2
+, (2)
+where cis an elastic constant, |ri j|0is the bond length between
+NN sites at their regular positions. When we take J>0 and
+dJ/dr<0,bbecomes a positive value. In applied magnetic
+ﬁelds, the BP model can determine the local spin structure oneach tetrahedron. As magnetic ﬁeld is increased, the model
+undergoes successive phase transitions from an AFM phase to
+cant 2:2, 1/2-plateau, cant 3:1, then spin-saturated phases. In
+a weak spin-lattice coupling regime ( b/lessorsimilar0.05), a cant 2:1:1
+phase appears between the cant 2:2 and the 1 /2-plateau phase.
+The mechanism for stabilizing the 1 /2-plateau phase can be at-
+tributed to the biquadratic term favoring a collinear spin c on-
+ﬁguration. The zero-temperature b–hphase diagram on Eq.
+1 has been well understood [22, 25, 26], and the correspond-
+ing magnetization curves are compatible to the experimenta lly
+observed magnetization processes of ACr2O4(b=0.15, 0.10,
+and 0.02 for A=Hg, Cd, and Zn, respectively). However,
+the biquadratic term cannot completely reproduce the degen -
+eracy lifting in the pyrochlore system because spin correla -
+tions beyond NN sites via the lattice distortion are not take n
+into account on the BP model, resulting in the absence of the
+magnetic long-range order [26]. This is not the case in real
+compounds.
+Alternatively, Bergman et al. [24] proposed another micro-
+scopic spin model, called the site-phonon (SP) model, which
+assumes independent displacement of each site position. Th e
+eﬀective Hamiltonian of the SP model is expressed as
+HSP=J/summationdisplay
+/angbracketlefti,j/angbracketright[Si·Sj−b(Si·Sj)2]
+−Jb
+2/summationdisplay
+j/nequalk∈N(i)ei j·eik(Si·Sj)(Si·Sk)
+−h/summationdisplay
+iSi,(3)
+where ei jdenotes the unit vector connecting NN sites iand j
+at their regular positions, N(i) denotes the set of NN sites of
+sitei. In addition to the biquadratic term as present in the BP
+model, the SP model includes an additional 3-body term de-
+rived from the eﬀective second and third NN interactions due
+to the lattice distortion. Since the biquadratic term still plays a
+dominant role on the SP model, the basic feature of the mag-
+netization curves remains unchanged. On the other hand, the
+additional term in Eq. 3 reduces the macroscopic degener-
+acy of the spin degrees of freedom, leading to the magnetic
+long-range order. For example, as a long-range AFM state
+at zero ﬁeld, a tetragonal collinear spin structure with (1, 1,0)
+magnetic Bragg peaks is predicted for b<0.25 [43]. This is
+consistent with the neutron scattering experiments on ACr2O4
+where the observed Bragg-peak patterns involve (1,1,0) re-
+ﬂections although they are composed of rich and complex re-
+ﬂections [16, 44, 45]. Furthermore, the SP model predicts a
+16-sublattice cubic spin structure with space group P4332 for
+the 1/2-plateau phase. This spin structure was also observed
+in high-ﬁeld neutron scattering experiments on HgCr 2O4and
+CdCr 2O4[44, 46].
+B. Eﬀective spin model applicable to CuInCr 4S8
+Here, let’s move to the case of the breathing pyrochlore lat-
+tice. Recently, Aoyama et al. [47] derived a SP model in
+the presence of breathing lattice distortion. The Heisenbe rg
+4
+Hamiltonian considering two kinds of NN exchange interac-
+tions, JandJ′, is written as
+H0=J/summationdisplay
+/angbracketlefti,j/angbracketrightSSi·Sj+J′/summationdisplay
+/angbracketlefti,j/angbracketrightLSi·Sj,(4)
+where the summation /angbracketlefti,j/angbracketrightS(/angbracketlefti,j/angbracketrightL) is deﬁned only in
+the small (large) tetrahedra. Assuming J,J′>0 and
+dJ/dr,dJ′/dr<0, we can deﬁne two spin-lattice coupling
+parameters with positive sign, bandb′, in the small and large
+tetrahedra, respectively. Then, the spin interactions med iated
+by the SP eﬀect can be expressed as
+HSLC=−Jb/summationdisplay
+/angbracketlefti,j/angbracketrightS(Si·Sj)2−J′b′/summationdisplay
+/angbracketlefti,j/angbracketrightL(Si·Sj)2
+−/summationdisplay
+iJb
+4/summationdisplay
+j/nequalk∈NS(i)+J′b′
+4/summationdisplay
+j/nequalk∈NL(i)(Si·Sj)(Si·Sk)
+−√
+JJ′bb′/summationdisplay
+i/summationdisplay
+j∈NS(i)/summationdisplay
+k∈NL(i)ei j·eik(Si·Sj)(Si·Sk),
+(5)
+where NS(i) (NL(i)) is deﬁned only in the small (large) tetra-
+hedra. The derivation process of Eq. 5 is described in Ref.
+[47]. As well as the case of ACr2O4, this Hamiltonian also sta-
+bilizes a tetragonal collinear spin structure with (1,1,0) mag-
+netic Bragg peaks in the wide ranges of b,b′, and J′/J[47],
+which is in agreement with the experimentally observed do-
+main state in the low-temperature ordered phase on Li MCr4O8
+(M=In, Ga) [30, 31]. The investigation of b–hphase diagrams
+on the SP model for various values of J′/J(0<J′/J≤1) is
+in progress [48].
+Although one adopted this model to the antiferromagnet
+with J,J′>0, it is also applicable to the case of J>0
+andJ′<0. In this process, however, we have to be care-
+ful of the preceding sign of each term in Eq. 5. In the case
+ofJ′<0, the sign of dJ′/dris nontrivial for the following
+reasons. In Cr spinel sulﬁdes, the NN exchange interaction i s
+mainly originated from the AFM direct exchange interaction
+between NN Cr sites and the FM superexchange interaction
+via Cr-S-Cr path. The di ﬀerence in the Cr-Cr distance on the
+small and large tetrahedra is only 6 % at room temperature
+on CrInCr 4S8, so the opposite sign of JandJ′implies that
+the AFM direct exchange and the FM superexchange interac-
+tions are competitive. Considering that the former is a ﬀected
+by the Cr-Cr distance whereas the latter by the Cr-S-Cr angle ,
+which is clariﬁed to be more than 90◦in all NN Cr pairs on
+CuInCr 4S8[41], the increase in the Cr-Cr distance will make
+both the direct exchange and the superexchange interaction s
+weaker. Hence, both situations, dJ′/dr<0 and dJ′/dr>0,
+could be realized in CrInCr 4S8. Note that the above expla-
+nation cannot remove the possibility of dJ/dr>0, but the
+assumption of dJ/dr<0 is more plausible because the di-
+rect exchange interaction becomes relatively dominant as t he
+Cr atoms get closer. Regardless of the sign of dJ/drand
+dJ′/dr, the sign of each spin-lattice coupling parameter be-
+comes b>0 and b′<0 (See Eq. 2). However, under the
+assumption of dJ/dr<0 and dJ′/dr>0, the preceding signof the last term in Eq. 5 changes form minus to plus [49]. In
+the following discussion, we will exclude this case, i.e. we
+will assume dJ/dr<0 and dJ′/dr<0 as the eﬀect of the
+spin-lattice coupling. Indeed, the calculation for the cas e of
+dJ′/dr<0 reproduces the experimental results better than the
+case of dJ′/dr>0, in the sense that it can reproduce the ob-
+served wide intermediate phase prior to the 1 /2-plateau phase
+on CuInCr 4S8.
+In addition, we include further-neighbor (FN) AFM inter-
+actions between sites of second and third NNs, which are ex-
+pected to be strong in sulﬁdes unlike oxides [14, 50]:
+HFN=J2/summationdisplay
+/angbracketleft/angbracketlefti,j/angbracketright/angbracketrightSi·Sj+J3a/summationdisplay
+/angbracketleft/angbracketleft/angbracketlefti,j/angbracketright/angbracketright/angbracketright3aSi·Sj+J3b/summationdisplay
+/angbracketleft/angbracketleft/angbracketlefti,j/angbracketright/angbracketright/angbracketright3bSi·Sj,(6)
+where the summations /angbracketleft/angbracketlefti,j/angbracketright/angbracketright,/angbracketleft/angbracketleft/angbracketlefti,j/angbracketright/angbracketright/angbracketright3a, and/angbracketleft/angbracketleft/angbracketlefti,j/angbracketright/angbracketright/angbracketright3bare
+taken for second NN and two kinds of third NN sites (3 aand
+3b), respectively [Fig. 2(a)]. For simplicity, we do not take
+care of the eﬀects of the magnetostriction on the strengths of
+these FN interactions. Organizing the above, we obtain
+HCuInCr 4S8=H0+HSLC+HFN−h/summationdisplay
+iSi (7)
+as the spin Hamiltonian of CuInCr 4S8under magnetic ﬁelds.
+In this study, we convert this complicated model into a sim-
+ple one. We naively anticipate that all four spins in the same
+large tetrahedron always take a ferromagnetically aligned spin
+conﬁguration even in the external magnetic ﬁelds as in zero
+ﬁeld. By treating those four spins as one localized spin at th e
+center of a large tetrahedra, the breathing pyrochlore magn et
+with J>0 and J′<0 can be mapped onto the antiferromagnet
+composed of a face-centered cubic (fcc) lattice [Fig. 2(b)] . In
+the following, we will represent a spin vector Sαas a spin lo-
+cated at the fcc site after the model transformation mention ed
+above. By omitting constant terms and assuming Jb=J′b′
+in Eq. 7, we ﬁnally derive the e ﬀective spin Hamiltonian of
+CuInCr 4S8as
+Heﬀ
+CuInCr 4S8=(J+4J2+2J3a+2J3b)/summationdisplay
+/angbracketleftα,β/angbracketrightSα·Sβ
+−Jb/summationdisplay
+/angbracketleftα,β/angbracketright(Sα·Sβ)2+4Jb/summationdisplay
+/angbracketleftα,β/angbracketrightSα·Sβ
+−Jb
+4/summationdisplay
+k/summationdisplay
+α/nequalβ/nequalγ∈k(Sα·Sβ)(Sα·Sγ)
+−h
+4/summationdisplay
+αSα,(8)
+where the ﬁrst summation in the fourth term are taken for all
+local tetrahedra kdepicted in the fcc lattice of Fig. 2(b). The
+second term is originated from the BP e ﬀect, and the third
+and fourth terms from the SP e ﬀect. Note that the fcc lattice
+can be regarded as the 3D network of edge-sharing tetrahedra ,
+possessing geometrical frustration. If we consider only NN
+interactions on the fcc lattice, two kinds of Neel orders, Ty pe
+I and Type III [Fig. 2(c)], become candidate for the ground
+state at zero ﬁeld (Type II state can only be realized in the
+existence of FN interactions). Such a degeneracy can be lift ed
+5
+(a)
+(b)
+(c)J2
+J3a
+J3bJJ'
+type I type III
+: up spin : down spin
+FIG. 2. (a) Crystal structure of the breathing pyrochlore la ttice with
+two kinds of NN exchange interactions, JandJ′, in the small and
+large tetrahedra, respectively. Second NN ( J2) and third NN inter-
+actions ( J3aandJ3bfor two symmetrically inequivalent paths) are
+also shown. (b) Model transformation from the breathing pyr ochlore
+magnet with J>0 and J′<0 to the fcc lattice antiferromagnet. Four
+spins in each large tetrahedron are converted to one localiz ed spin,
+as indicated by red arrows. (c) Two types of AFM ordering whic h
+are candidate for the ground state on the fcc lattice antifer romagnet.
+Sites with up (down) spins are colored by red (blue).
+by ﬂuctuations [2, 51, 52], FN interactions [40], and so on.
+Theoretically, It has been shown that ﬂuctuations favor Typ e
+I state with an ordering wavevector q=(1,0,0). Indeed, the
+observed magnetic structure of CuInCr 4S8at zero ﬁeld can be
+mapped onto Type I state [39].
+C. Calculation results
+In this section, we focus on the characteristics of the zero-
+temperature b–hphase diagram and magnetization curves de-
+rived from Eq. 8. In our analysis, the fourth and sixth NN
+interactions in the original breathing pyrochlore lattice are not
+taken into account. Consequently, only NN interactions and
+intra-tetrahedral interactions appear in the e ﬀective Hamilto-
+nian on the fcc lattice. Thus, we can rewrite Eq. 8 by taking aA1
+ET2T2
+E+T2
+FIG. 3. Phase diagram of Eq. 10 as a function of the spin-latti ce cou-
+pling parameter band magnetic ﬁeld h. Red solid and blue dashed
+lines denote ﬁrst- and second-order transitions, respecti vely. The re-
+gions shaded in pink, yellow, blue, white, and green express a cant
+2:2, cant 2:1:1, 1/2-plateau, cant 3:1, and fully polarized phase, re-
+spectively. Schematic spin conﬁguration within a single te trahedron
+and its irreducible representation of the tetrahedral symm etry group
+are also illustrated in each region. This phase diagram is ap plicable
+to any value of JFN.
+summation of local Hamiltonian on each single tetrahedron:
+Heﬀ
+CuInCr 4S8=/summationdisplay
+kHlocal
+CuInCr 4S8, (9)
+Hlocal
+CuInCr 4S8=[J(1+4b)+JFN]/summationdisplay
+/angbracketleftα,β/angbracketrightkSα·Sβ
+−Jb/summationdisplay
+/angbracketleftα,β/angbracketrightk(Sα·Sβ)2
+−Jb
+4/summationdisplay
+α/nequalβ/nequalγ∈k(Sα·Sβ)(Sα·Sγ)
+−h
+4/summationdisplay
+α∈kSα,(10)
+where JFN≡4J2+2J3a+2J3b, and the summation /angbracketleftα,β/angbracketrightkis
+taken over all pairs in a single tetrahedron k. Here, we nor-
+malize spin vectors to |Sα|=1, and choose JFN/Jandbas
+adjustable dimensionless parameters. Since all the optimu m
+spin conﬁguration on each local tetrahedron can be simulta-
+neously satisﬁed on the fcc lattice with an inﬁnite size, we
+can obtain the ground state just by numerically minimizing
+Eq. 10 in a certain magnetic ﬁeld.
+Theb–hphase diagram and the corresponding magnetiza-
+tion curves for given values of bare summarized in Figs. 3
+and 4, respectively. Regardless of the value of JFN/J, the b–
+hphase diagram becomes identical except the scale of both
+axes. Here, we demonstrate the case of JFN/J=0. As shown
+in Fig. 3, several magnetic phases such as cant 2:2, cant 2:1: 1,
+6
+/s32/s33/s34
+/s34/s33/s35
+/s34/s32/s36/s32/s37
+/s32/s38/s32/s34/s39/s40/s41/s38/s34
+/s33/s36/s41/s42/s34/s35/s43/s34/s44/s45/s46/s36/s36/s42/s32/s43/s34/s44/s45/s36/s34/s47/s46
+/s47/s34/s47/s47/s47 /s47/s34/s33/s34/s35
+/s47/s34/s33/s32/s34/s47/s47/s47 /s47/s34/s33/s32/s35
+/s47/s34/s33/s38/s34/s47/s47/s47 /s47/s34/s33/s38/s35
+FIG. 4. Magnetization curves as a function of magnetic ﬁeld hfor
+b/(1+JFN/J)=0 to 0.25 in steps of 0.05.
+1/2-plateau, cant 3:1, and spin-saturated phases appear in ap -
+plied magnetic ﬁelds. We deﬁne hc1,hc2,hc3, and hsatas
+transition ﬁelds to the cant 2:1:1, 1 /2-plateau, cant 3:1, and
+spin-saturated phases, respectively. For b/lessorsimilar0.17, the cant
+2:1:1 phase appears immediately below the 1 /2-plateau phase.
+The transition from the cant 2:2 to cant 2:1:1 phase at hc1is
+the ﬁrst order accompanied by a magnetization jump. The
+transition from the cant 2:1:1 to 1 /2-plateau phase at hc2is
+the second order for b/lessorsimilar0.12, where the value of hc2/4 is
+constant to 4 J, while it turns to the ﬁrst order for b/greaterorsimilar0.12,
+where hc2becomes slightly higher as bincreases. The tran-
+sition ﬁeld hc1gets monotonously higher as bincreases, and
+ﬁnally marges with hc2atb≈0.17. For b/greaterorsimilar0.17, a ﬁrst-
+order transition from the cant 2:2 to 1 /2-plateau phase occurs
+athc2, accompanied by a magnetization jump. The width of
+the 1/2-plateau phase is extremely broad, indicating that the
+3 up-1 down collinear spin conﬁguration with the magnetiza-
+tion M/Ms=1/2 is substantially stable in a wide ﬁeld re-
+gion. When higher magnetic ﬁeld is applied in the 1 /2-plateau
+phase, the system undergoes a second-order transition to th e
+cant 3:1 phase at hc3/4=4(1+6b)J, then ﬁnally enters the
+spin-saturated phase at hsat. The transition from the cant 3:1 to
+spin-saturated phase is the second order for b/lessorsimilar0.06, where
+the value of hsat/4 is constant to 8 J, while it becomes the ﬁrst
+order for b/greaterorsimilar0.06, where hsatincreases gradually as bin-
+creases.
+Although the b–hphase diagram of Eq. 10 is similar with
+that of Eq. 1 proposed in Ref. [22], there are two remarkable
+diﬀerences. First, as bincreases the broadening of the 1 /2-
+plateau phase becomes saturated for Eq. 1, whereas the width
+of the 1/2-plateau becomes constantly wider in our model.
+Second, the cant 2:1:1 phase emerges in wider ranges of b
+andhin our results. If we adopt the BP model to the breath-
+ing pyrochlore magnet with J>0 and J′<0, the eﬀective
+Hamiltonian becomes identical with Eq. 1. Hence, the di ﬀer-
+ences in the b–hphase diagram can be considered to originate
+from the eﬀective FN interactions due to the lattice distortion,
+which is only taken into account on the SP model (The third
+and fourth terms of Eq. 8).IV . DISCUSSION AND CONCLUSION
+A few experimental studies have been made under high
+magnetic ﬁelds on CuInCr 4S8so far [40, 41]. Despite these
+eﬀorts, there is still little understanding on the ﬁeld-induc ed
+magnetic phases. Here, we compare our experimental and the-
+oretical results on CuInCr 4S8with those on Cr spinel oxides,
+and discuss how our research contributes to the fundamental
+understanding of the magnetization process of CuInCr 4S8.
+In the low ﬁeld region up to 70 T, two phase transitions
+atHc1andHc2are obviously seen prior to the 1 /2-plateau.
+The former is the ﬁrst-order phase transition which is accom -
+panied by a large hysteresis and associated with a cusp in
+dMdH , whereas the latter might be the second order one with
+a broad hump in dM/dH(visible only in the result obtained by
+a non-destructive pulsed magnet [41]). The calculated mag-
+netization curve with a small spin-lattice coupling parame ter
+(b/lessorsimilar0.17) shown in Fig. 4 well reproduces this behavior qual-
+itatively. Hence, the intermediate phase between Hc1andHc2
+can be attributed to a cant 2:1:1 phase. The cant 2:1:1 phase
+has already been observed for ZnCr 2O4(120∼135 T) [10]
+and MgCr 2O4(125∼140 T) [13] by optical Faraday rota-
+tion measurements, but its ﬁeld region is narrow compared to
+the cant 2:2 phase. In contrast, the M–Hcurve of CuInCr 4S8
+seems to show a relatively broad cant 2:1:1 phase although it
+is diﬃcult to deﬁne the precise values of Hc1andHc2. Such a
+broad cant 2:1:1 phase is reproduced better by our theoretic al
+calculation based on the SP model rather than the BP model
+[22]. As shown in Fig. 4, if the magnetization changes lin-
+early in higher ﬁelds than hc1, it will reach Ms/2 at around
+Hc3regardless of the value of b. On the other hand, the lin-
+ear ﬁt of the experimental M–Hcurve below Hc1will cross the
+M=Ms/2 value at∼70 T, which is much lower than the value
+of the observedµ0Hc3≈110 T. There are a few possible rea-
+sons for this behavior. One is that we restrict our theoretic al
+analysis on the simple case of the equal coupling in di ﬀerent
+symmetry bA1=bE=bT2. When we adopt the microscopic
+model to real compounds, we can assume di ﬀerent values of
+b, i.e. bA1/nequalbE/nequalbT2[22, 25, 53]. Indeed, bT2seems larger
+than bEfor HgCr 2O4and CdCr 2O4[53], which might also be
+true for CuInCr 4S8. Another possible reason is that AFM FN
+interactions might become stronger in the 1 /2-plateau phase
+due to the lattice distortion. In order to accurately accoun t
+for the observed value of Hc3. it is necessary to estimate the
+change in the FN interactions caused by the magnetostrictio n.
+In addition to the phase transitions mentioned above, two
+exotic features are observed in the M–Hcurve of CuInCr 4S8,
+which cannot be explained by our theoretical calculation.
+First, a gradual dM/dHchange appears at Hc2′accompanied
+by a substantial hysteresis. Judging from the second-order -
+like behavior (non-hysteretic) at Hc2and Hc3, it is natural
+to consider that Hc2andHc3correspond to hc2andhc3de-
+ﬁned in our calculated results, respectively. Accordingly , the
+magnetic structure between Hc2andHc3should be the 3 up-1
+down spin conﬁguration, analogous to the 1 /2-plateau phase
+realized in Cr spinel oxides. One possible mechanism for
+the ﬁrst-order nature at Hc2′is that the global symmetry of
+the spin structure changes accompanied by the lattice disto r-
+7
+tion while maintaining the collinear 3:1 spin conﬁguration in
+small tetrahedra. Such a scenario can happen in certain spe-
+cial situations: for example, FM J′turns to AFM at Hc2′. To
+the best of our knowledge, a phase transition within a mag-
+netization plateau, in which the size of the magnetization r e-
+mains unchanged, has been reported only on MnCr 2S4, which
+is composed of two kinds of magnetic ions, Mn2+(S=5/2)
+and Cr3+(S=3/2) occupying the tetrahedral Aand octahe-
+dral Bsites of the spinel structure AB2X4, respectively [54].
+In the case of MnCr 2S4, however, the transition within the
+magnetization plateau was hardly detected as anomalies in
+theM–Hcurve while it was clearly observed by the ultra-
+sound measurements. As for CuInCr 4S8, a dedicated tech-
+nique sensitive to the lattice deformation under high magne tic
+ﬁelds might be required to understand such an exotic feature
+in the M–Hcurve. Second, the M–Hcurve of CuInCr 4S8
+exhibits a shoulder-like behavior characterized with a sha rp
+peak in dM/dHatHc4, where Mreaches∼2.5µB/Cr, which
+is much smaller than Ms=3.06µB/Cr. It suggests the ex-
+istence of another intermediate phase between the cant 3:1
+and spin-saturated phases. In the series of Cr spinel oxides
+ACr2O4(A=Hg, Cd, Zn), a shoulder-like behavior in the M–
+Hcurve and a drastic change in the intensity of the optical ab-
+sorption associated with an exciton-magnon-phonon proces s
+have been reported just before the full saturation of magnet i-
+zation [7, 9, 11]. This intermediate phase is now believed to
+be a spin-nematic phase, after the theoretical proposal inc or-
+porating the quantum e ﬀect [42]. Recently, the ground state
+of the S=1/2 Heisenberg model on the fcc lattice under
+magnetic ﬁelds was also investigated by Morita et al. [55].
+The magnetization curve on the S=1/2 fcc lattice without
+tetragonal distortion is quite similar with our results (Fi g. 4),
+and exhibits a cant 2:2, cant 2:1:1, 1 /2-plateau, cant 3:1, and
+spin-saturated phase. In this case, the tetragonal distort ion
+on the fcc lattice induces more diverse super-solid phases i m-
+mediately below the 1 /2-plateau and the spin-saturated phase.
+This distortion can be regarded as the lattice distortion ca used
+by the spin-lattice coupling on the isotropic fcc lattice. T hus,
+these quantum phases might be relevant to our experimental
+observation although CuInCr 4S8is aS=3/2 system.
+Finally, we remark on the estimation of the exchange inter-
+actions on CuInCr 4S8. Under the mean-ﬁeld approximation,
+the Weiss temperature ΘCWand the saturation ﬁeld Hsatcan
+be deduced as follows, respectively:
+ΘCW=−S(S+1)
+kB(J+J′+JFN), (11)
+µ0Hsat=8S kB
+gµB(J+JFN), (12)
+where kBis the Boltzmann’s constant and µBis the Bohr mag-
+neton. By combining two formulas Eqs. 11 and 12, J+JFNand
+J′can be obtained independently. Previously, Plumier et al.
+[40] calculated them from the experimental results of the ma g-
+netic susceptibility and the magnetization up to 38 T by usin gthe estimated values of ΘCW=−77 K andµ0Hsat=146 T,
+where they might mistakenly multiply a factor of 2 to the
+right side of Eq. 11. Here, we recalculate in the same way,
+which yields the exchange interactions of J+JFN=21 K
+andJ′=−2 K withg=2.04,ΘCW=−7×101K [41], and
+µ0Hsat=1.8×102T (estimated from this study). This implies
+that the AFM interactions are dominant on CuInCr 4S8, which
+could be responsible for a robust 1 /2-plateau as observed in
+Cr spinel oxides. It should be noted that the M–Hcurves
+of LiGaCr 4S8and LiInCr 4S8, where the FM interaction J′is
+expected to be strong, do not clearly exhibit the 1 /2-plateau
+[41]. Recently, the exchange interactions of several Cr spi nel
+compounds forming a breathing pyrochlore lattice were the-
+oretically investigated by Ghosh et al. [50]. By using the
+lattice parameter of CuInCr 4S8at room temperature, the ex-
+change interactions are obtained as J=14.7 K, J′=−26.0 K,
+J2=1.1 K, J3a=6.4 K and J3b=4.5 K. Assuming these
+values, the saturation ﬁeld is calculated to be ∼3.6×102T,
+which is much higher than the experimental observation. It
+seems that we have to carefully consider the inﬂuence of the
+spin-lattice coupling and thermal ﬂuctuation.
+To summarize, we have investigated the magnetization pro-
+cess of the breathing pyrochlore magnet CuInCr 4S8with J>
+0 and J′<0 from both experimentally and theoretically.
+The observed M–Hcurve is characterized with a wide 1 /2-
+plateau exhibiting from µ0Hc2≈55 T toµ0Hc3≈110 T,
+and the saturation ﬁeld is estimated to be µ0Hsat≈180 T.
+Two unique behaviors are also observed in the M–Hcurve: a
+slight slope change accompanied by a hysteresis at µ0Hc2′≈
+85 T in the 1/2-plateau region, and a shoulder-like shape at
+µ0Hc4≈130 T prior to the saturation. In particular, there are
+few reports on the former phenomenon, i.e. a phase transitio n
+within a magnetization-plateau state. We also have propose d
+the microscopic classical spin model to understand the mag-
+netic behavior of the breathing pyrochlore magnet with J>0
+andJ′<0. The calculation well reproduces the main features
+of the magnetization process of CuInCr 4S8, especially a rel-
+atively wide cant 2:1:1 phase. However, there are still many
+unsolved issues in CuInCr 4S8, such as the global spin struc-
+ture in each phase, the possible change in the exchange inter -
+actions under magnetic ﬁelds, and so on. Further experimen-
+tal investigation such as the magnetostriction, magnetoca loric
+eﬀect, ultrasound, ESR, NMR, neutron and X-ray measure-
+ments under high magnetic ﬁelds should be interesting and
+will provide useful clues to understand the essence of the su c-
+cessive phase transitions on CuInCr 4S8.
+ACKNOWLEDGMENTS
+We appreciate for fruitful discussion to Dr. K. Morita,
+Dr. K. Aoyama, and Prof. H. Kawamura. This work was
+supported by JSPS KAKENHI Grant Number 16H03848,
+18H01163, and 19H05823.
+8
+[1] P. W. Anderson, Mat. Res. Bull. 8, 153 (1973).
+[2] R. Moessner and J. T. Chalker, Phys. Rev. B 58, 12049 (1998).
+[3] O. Tchernyshyov, R. Moessner, and S. L. Sondhi, Phys. Rev .
+Lett. 88, 067203 (2002).
+[4] M. Elhajal, B. Canals, R. Sunyer, and C. Lacroix, Phys. Re v. B
+71, 094420 (2005).
+[5] H. Ueda, H. Mitamura, T. Goto, and Y . Ueda, Phys. Rev. B 73,
+094415 (2006).
+[6] S. Kimura, M. Hagiwara, T. Takeuchi, H. Yamaguchi, H. Ued a,
+Y . Ueda, and K. Kindo, Phys. Rev. B 83, 214401 (2011).
+[7] D. Nakamura, A. Miyata, Y . Aida, H. Ueda, and S. Takeyama,
+J. Phys. Soc. Jpn. 83, 113703 (2014).
+[8] E. Kojima, A. Miyata, S. Miyabe, S. Takeyama, H. Ueda, and
+Y . Ueda, Phys. Rev. B 77, 212408 (2008).
+[9] A. Miyata, S. Takeyama, and H. Ueda, Phys. Rev. B 87, 214424
+(2013).
+[10] A. Miyata, H. Ueda, Y . Ueda, Y . Motome, N. Shannon, K. Pen c,
+and S. Takeyama, J. Phys. Soc. Jpn. 80, 074709 (2011).
+[11] A. Miyata, H. Ueda, Y . Ueda, H. Sawabe, and S. Takeyama,
+Phys. Rev. Lett. 107, 207203 (2011).
+[12] A. Miyata, H. Ueda, Y . Ueda, Y . Motome, N. Shannon, K. Pen c,
+and S. Takeyama, J. Phys. Soc. Jpn. 81, 114701 (2012).
+[13] A. Miyata, H. Ueda, S. Takeyama, J. Phys. Soc. Jpn. 83, 063702
+(2014).
+[14] A. Yaresko, Phys. Rev. B 77, 115106 (2008).
+[15] H. Ueda and Y . Ueda, Phys. Rev. B 77, 224411 (2008).
+[16] J.-H. Chung, M. Matsuda, S.-H. Lee, K. Kakurai, H. Ueda, T.
+J. Sato, H. Takagi, K.-P. Hong, and S. Park, Phys. Rev. Lett. 95,
+247204 (2005).
+[17] S.-H. Lee, C. Broholm, T. H. Kim, W. Ratcli ﬀII, and S.-W.
+Cheong, Phys. Rev. Lett. 84, 3718 (2000).
+[18] S. Ji, S.-H. Lee, C. Broholm, T. Y . Koo, W. Ratcli ﬀ, and S.-W.
+Cheong, P. Zschack, Phys. Rev. Lett. 103, 037201 (2009).
+[19] L. Ortega-San-Martin, A. J. Williams, C. D. Gordon, S.
+Klemme, and J. P. Attﬁeld, J. Phys.: Condens. Matter 20,
+104238 (2008).
+[20] Y . Tanaka, Y . Narumi, N. Terada, K. Katsumata, H. Ueda, U .
+Staub, K. Kindo, T. Fukui, T. Yamamoto, R. Kammuri, M.
+Hagiwara, A. Kikkawa, Y . Ueda, H. Toyokawa, T. Ishikawa,
+and H. Kitamura, J. Phys. Soc. Jpn. 76, 043708 (2008).
+[21] S.-H. Lee, G. Gasparovic, C. Broholm, M. Matsuda, J.-H.
+Chung, Y . J. Kim, H. Ueda, G. Xu, P. Zschack, K. Kakurai,
+H. Takagi, W. Ratcli ﬀ, T. H. Kim, and S.-W, Cheong, J. Phys.:
+Condens. Matter 19, 145259 (2007).
+[22] K. Penc, N. Shannon, and H. Shiba, Phys. Rev. Lett. 93, 197203
+(2004).
+[23] Y . Motome, K. Penc, N. Shannon, J. Magn. Magn. Mater. 300,
+57 (2006).
+[24] D. L. Bergman, R. Shindou, G. A. Fiete, and L. Balents, Ph ys.
+Rev. B 74, 134409 (2006).
+[25] K. Penc, N. Shannon, Y . Motome, and H. Shiba, J. Phys.: Co n-
+dens. Matter 19, 145267 (2007).
+[26] N. Shannon, K. Penc, and Y . Motome, Phys. Rev. B 81, 184409
+(2010).
+[27] J.-C. Joubert and A. Durif, Bull. Soc. Fr. Mineral. Cris tallogr.
+89, 26 (1966).
+[28] Y . Okamoto, G. J. Nilsen, J. P. Attﬁeld, and Z. Hiroi, Phy s. Rev.
+Lett. 110, 097203 (2013).
+[29] Y . Tanaka, M. Yoshida, M. Takigawa, Y . Okamoto, and Z. Hi roi,
+Phys. Rev. Lett. 113, 227204 (2014).[30] G. J. Nilsen, Y . Okamoto, T. Masuda, J. Rodriguez-Carva jal,
+H. Mutka, T. Hansen, and Z. Hiroi, Phys. Rev. B 91, 174435
+(2015).
+[31] R. Saha, F. Fauth, M. Avdeev, P. Kayser, B. J. Kennedy, an d A.
+Sundaresan, Phys. Rev. B 94, 064420 (2016).
+[32] S. Lee, S.-H. Do, W.-J. Lee, Y . S. Choi, M. Lee, E. S. Choi,
+A. P. Reyes, P. L. Kuhns, and A. Ozarowski, K.-Y . Choi, Phys.
+Rev. B 93, 174402 (2016).
+[33] Y . Okamoto, D. Nakamura, A. Miyake, S. Takeyama, M. Toku -
+naga, A. Matsuo, K. Kindo, and Z. Hiroi, Phys. Rev. B 95,
+134438 (2017).
+[34] M. Gen, D. Nakamura, Y . Okamoto, and S. Takeyama, J. Magn .
+Magn. Mater. 473, 387 (2019).
+[35] The magnetization measurements on Li MCr4O8(M=In, Ga)
+in ultra-high magnetic ﬁelds are on going by our group. The
+results will be submitted in another paper.
+[36] H. L. Pinch, M. J. Woods, and E. Lopatin, Mater. Res. Bull .5,
+425 (1970).
+[37] R. Plumier, F. K. Lotgering, and R. P. van Stapele, J. Phy s. C1,
+324 (1971).
+[38] W. K. Unger, H. G¨ obel, L. Treitinger, and H. Pink, Physi ca80B,
+62 (1975).
+[39] R. Plumier, M. Sougi, and M. Lecomte, Phys. Lett. A 60, 341
+(1977).
+[40] R. Plumier, M. Sougi, M. Lecomte, and A. Miedan-Gros, Z.
+Phys. B 40, 227 (1980).
+[41] Y . Okamoto, M. Mori, N. Katayama, A. Miyake, M. Tokunaga ,
+A. Matsuo, K. Kindo, and K. Takenaka, J. Phys. Soc. Jpn. 87,
+034709 (2018).
+[42] E. Takata, T. Momoi, M. Oshikawa, arXiv: 1510, 02373 (20 15).
+[43] K. Aoyama and H. Kawamura, Phys. Rev. Lett. 116, 257201
+(2016).
+[44] M. Matsuda, H. Ueda, A. Kikkawa, Y . Tanaka, K. Katsumata ,
+Y . Narumi, T. Inami, Y . Ueda, and S.-H. Lee, Nat. Phys. 3, 397
+(2007).
+[45] S.-H. Lee, W. Ratcli ﬀ, II, Q. Huang, T. H. Kim, and S.-W.
+Cheong, Phys. Rev. B 77, 014405 (2008).
+[46] M. Matsuda, K. Ohoyama, S. Yoshii, H. Nojiri, P. Frings, F.
+Duc, B. Vignolle, G. L. J. A. Rikken, L.-P. Regnault, S.-H. Le e,
+H. Ueda, and Y . Ueda, Phys. Rev. Lett. 104, 047201 (2010).
+[47] K. Aoyama and H. Kawamura, Phys. Rev. B 99, 144406 (2019).
+[48] K. Aoyama, M. Gen, Y . Kohama, and H. Kawamura, to be sub-
+mitted.
+[49] This is because the preceding sign of the second term of u∗
+iin
+Eq. (4) proposed in Ref. [47] is changed from plus to minus in
+the case of dJ′/dr>0.
+[50] P. Ghosh, Y . Iqbal, T. M¨ uller, R. Thomale, J. Reuther, M . J. P.
+Gingras, and H. O. Jeschke, arXiv: 1903. 01928 (2019).
+[51] C. L. Henley, J. Appl. Phys. 61, 3962 (1987).
+[52] O. Benton and N. Shannon, J. Phys. Soc. Jpn. 84, 104710
+(2015).
+[53] S. Kimura, Y . Sawada, Y . Narumi, and K. Watanabe, Phys. R ev.
+B92, 144410 (2015).
+[54] V . Tsurkan, S. Zherlitsyn, L. Prodan, V . Felea, P. T. Con g, Y .
+Skourski, Z. Wang, J. Deisenhofer, H.-A. K. von Nidda, J. Wos -
+nitza, and A. Loidl, Sci. Adv. 3, e1601982 (2017).
+[55] K. Morita and T. Tohyama, Phys. Rev. B 99, 144417 (2019).
+arXiv:1910.01315v1  [cond-mat.str-el]  3 Oct 2019Supplemental Material for ”Magnetization process of the br eathing pyrochlore magnet CuInCr 4S8
+in ultra-high magnetic ﬁelds up to 150 T”
+Masaki Gen,1,∗Yoshihiko Okamoto,2Masaki Mori,2Koshi Takenaka,2and Yoshimitsu Kohama1,†
+1Institute for Solid State Physics, University of Tokyo, Kas hiwa, Chiba 277-8581, Japan
+2Department of Applied Physics, Nagoya University, Nagoya 4 64-8603, Japan
+(Dated: October 4, 2019)
+I. IMPROVEMENT OF MAGNETIZATION MEASUREMENT TECHNIQUE
+Magnetization is one of the most fundamental physical quant ities in magnetic materials, and its precise observation is very
+important. However, the direct magnetization measurement using a pickup coil under ultra-high magnetic ﬁeld above 100 T
+is still challenging. The di ﬃculty comes from (i) large initial electro-magnetic noise i n a single-turn-coil (STC) system, (ii)
+large induced voltage generated in the pickup coil due to the instantaneous magnetic ﬁeld sweep, and (iii) the growth of t he ﬁeld
+inhomogeneity in space and time especially for down sweep du e to the explosion of the STC. Especially, the e ﬀect of (ii) and (iii)
+is enhanced as the generated magnetic ﬁeld becomes higher. I n order to overcome these problems, we have already develope d a
+coaxial-type self-compensated magnetization pickup coil instead of a parallel-type and realized precise measuremen ts up to 130
+T by using a STC with a diameter of 14 mm [1]. The pickup coil was comprised of an inner-coil with 28 turns (diameter of 1.3
+mm) and an outer-coil with 18 turns (diameter of 1.7 mm), usin g a polyamide-imide enameled copper wire (AIW wire, TOTOKU
+Electric Co. Ltd.) with an outer diameter of 0.06 mm and a rein forced insulation coating (withstand voltage of approxima tely 1
+kV). The deference in the winding numbers between inner- and outer-coils allows the detection of the magnetization sign al from
+the sample.
+In this work, we optimized the size and the winding number of t he coaxial-type pickup coil to extend the measurable maximu m
+ﬁeld up to 150 T. In order to measure above 130 T in STC system, w e have to use a STC with a diameter of less than 14 mm (In
+this work, we adopt 12 mm). Hence, we reduced the winding numb ers of the pickup coil to prevent the dielectric breakdown of
+the wire insulation caused by high induced voltage, and chan ged the diameter of the outer coil from 1.7 mm to 2.1 mm to keep
+the deference in the winding numbers between inner- and oute r-coils as much as possible. The characteristics of the pick up coil
+used in this experiments are as follows: an inner-coil with 1 9 turns (diameter of 1.3 mm) and an outer-coil with 8 turns (di ameter
+of 2.1 mm) for measurements up to 134 T, and an inner-coil with 14 turns (diameter of 1.3 mm) and an outer-coil with 6 turns
+(diameter of 2.1 mm) for measurements up to 150 T. These picku p coils enable accurate magnetization measurements withou t
+the dielectric breakdown during several pulsed-ﬁeld gener ation.
+[1] M. Gen, D. Nakamura, Y . Okamoto, and S. Takeyama, J. Magn. Magn. Mater. 473, 387 (2019).
+∗Electronic address: gen@issp.u-tokyo.ac.jp
+†Electronic address: ykohama@issp.u-tokyo.ac.jp

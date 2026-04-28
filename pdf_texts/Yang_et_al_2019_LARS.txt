@@ -1,0 +1,315 @@
+arXiv:1708.04162v2  [math.CO]  16 Aug 2017Asymptotically Almost Every 2r-regular Graph has an
+Internal Partition
+Nathan Linial∗Sria Louis†
+July 30, 2018
+Abstract
+Aninternal partition of a graph is a partitioning of the vertex set into two parts su ch that
+for every vertex, at least half of its neighbors are on its sid e. We prove that for every positive
+integerr, asymptotically almost every 2r-regular graph has an internal partition.
+1 Introduction
+1.1 Notations
+We denote the neighbor set of a vertex xin a graph G= (V,E)byN(x)and its degree by d(x).
+The number of neighbors that xhas in a subset A⊆Vis denoted by dA(x) =|N(x)∩A|. We
+denote by N≥kthe set{k,k+1,...}. For a vertex xand a set Awe use the shorthand notation
+A∪xandA\xrather than A∪{x}andA\{x}respectively.
+Our main concern is with partitions ofVinto two parts /a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}ht. We denote by e(A,B)thecut
+sizeof this partition, i.e., the number of edges e= (x,y)withx∈Aandy∈B.
+1.2 Internal Partitions
+LetG= (V,E)be a simple undirected graph. A partition /a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}htofVis called external if every
+vertex has at least as many neighbors on the other side as it ha s on its own side. Clearly, every
+graph has an external partition, e.g., one that maximizes th e cut size e(A,B). Likewise, in an
+internal partition every vertex has at least as many neighbors on its own side as o n the other side.
+This requirement is clearly satisﬁed by the trivial partiti on/a\}brack⌉tl⌉{t∅,V/a\}brack⌉tri}ht, but we insist on a non-trivial
+internal partition where both parts are non-empty.
+Yet, it is worthwhile to consider the following more general deﬁnition:
+Deﬁnition 1.1. LetG= (V,E)be a graph and let a,b:V→Nbe two functions. We say that a
+partition /a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}htofVis(a,b)-internal , if:
+1.dA(x)≥a(x)for every x∈A, and
+2.dB(x)≥b(x)for every x∈B.
+In these terms, an internal partition as mentioned above is the same as a/parenleftBig
+⌈d(x)
+2⌉,⌈d(x)
+2⌉/parenrightBig
+-
+internal partition.
+The problem of the existence of, or the eﬃcient ﬁnding of, int ernal partitions appears in the
+literature under various names: Decomposition under Degree Constraints [T83],Cohesive Subsets
+[M00],q-internal Partition [BL16] and Satisfactory Graph Partition [GK00 ]. A related subject
+isDefensive Alliance Partition Number of a graph. A short survey about alliance andfriendly
+partitions, and the link to the internal partitions, can be f ound in [ GE08]. A generalization (and
+a survey) of Alliance Partitions can be found in [ FR14].
+It is also interesting to reformulate, saying that /a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}htis an(a,b)-internal partition iﬀ
+dB(x)≤d(x)−a(x)for every x∈AanddA(y)≤d(y)−b(y)for every y∈B. From this perspective,
+∗Department of Computer Science, Hebrew University, Jerusa lem 91904, Israel. e-mail: nati@cs.huji.ac.il .
+Supported by ISF Grant 1169/14, Local and Global Combinator ics.
+†Department of Computer Science, Hebrew University, Jerusa lem 91904, Israel. e-mail: sria.louis@cs.huji.ac.il .
+1
+the existence of an (a,b)-internal partition can be viewed as a strong isoperimetric inequality for
+G. Recall that the isoperimetric number (or Cheeger constant ) of a graph is mine(A,B)
+|A|over all
+partitions /a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}htand where |A| ≤ |B|. That is, it is deﬁned by a set A⊂Vwhich minimizes the
+average1
+|A|/summationtext
+x∈AdB(x), whereas in considering (a,b)-internal partitions, we bound dB(x)foreach
+vertex in A. We return to this perspective in the open problems section.
+While every graph has an external partition, there are simpl e examples of graphs with no
+internal partitions, e.g., cliques or complete bipartite graphs in w hich at least one part has odd
+cardinality. On the other hand, it is not easy to ﬁnd large spa rse graphs that have no internal
+partition. Also, as some of the theorems next mentioned show ,nearly internal partitions (the exact
+meaning of this is clariﬁed below) always exist.
+Stiebitz [ S96], responding to a problem of Thomassen [ T83], made a breakthrough in this area.
+His results and later work by others in a similar vein are summ arized in the following theorem.
+Theorem 1.2. LetG= (V,E)be a graph and let a,b:V(G)→N. Each of the following conditions
+implies the existence of an (a,b)-internal partition:
+1. [S96]d(x)≥a(x)+b(x)+1for every x∈V.
+2. [K98]d(x)≥a(x)+b(x)for every x∈VandGis triangle-free.
+3. [D00][GK04]d(x)≥a(x)+b(x)−1for every x∈Vand girth (G)≥5.
+A very recent manuscript by Ma and Yang [ MY17 ] shows that in the last statement of the
+theorem it suﬃces to assume that GisC4-free.
+Further work in this area falls into several main categories :
+•How hard is it to decide whether a given graph has an (a,b)-internal partition?
+This question is investigated in a series of papers by Bazgan et al., surveyed in [ BTV10 ].
+Each existence statement in theorem 1.2comes with a polynomial time algorithm to ﬁnd the
+promised partition. For large aandbthe problem seems to become diﬃcult. For example,
+a theorem of Chvátal [ C84] says that the case a=b=d−1is NP-hard for graphs in which
+all vertex degrees are 3and4.
+•Generalizations and variations: Gerber and Kobler [ GK00 ] introduced vertex- and edge-
+weighted versions of the problem and showed that these are NP -complete. Recent works by
+Ban [B16] and by Schweser and Stiebitz [ SS17] extend theorem 1.2to edge-weighted graphs.
+It is NP-hard to decide the existence of an internal bisection i.e., an internal partition with
+|A|=|B|[BTV06 ]. There is literature concerning approximate internal par titions, partitions
+into more than two parts etc. See [ GK03 ], [GK04 ] , [BTV05 ], [BTV10 ].
+•Suﬃcient conditions: Shaﬁque and Dutton [ S02] and [ GK04 ] provide several suﬃcient
+conditions for the existence of an internal partition in gen eral graphs, and more speciﬁc
+conditions for line-graphs and triangle-free graphs.
+•Necessary conditions: It is proved in [ S02] that there is no forbidden subgraph characteri-
+zation for the existence or non-existence of an internal par tition. Given a graph’s edge-density
+it is possible to bound the cardinality of the parts of an inte rnal partition, if it exists [ GK00 ].
+•Regular graphs: Ford= 3,4the only d-regular graphs with no internal partition are
+K3,3,K4,K5[S02]. As shown by Ban and Linial [ BL16], every6-regular graph with 14or
+more vertices has an internal partition. The case of 5-regular graphs remains open.
+The most comprehensive survey of the subject of which we know is [BTV10 ].
+2 The Theorem : 2r-regular Graphs
+As mentioned, the repertoire of graphs with no internal part itions seems rather limited, and for
+d∈ {3,4,6}there are only ﬁnitely many d-regular graphs with no internal partition. This has led
+to the following conjecture [ BL16]:
+Conjecture 2.1. For every dthere are only ﬁnitely many d-regular graphs with no internal par-
+titions.
+2
+The main theorem of this paper is a weaker version of this conj ecture, namely, an asymptotic
+result for an even d.
+We say that a graph Gis4-sparse if every set of four vertices spans at most four edges (i.e.,
+has noK4and no diamond-graph as subgraph). We prove:
+Theorem 2.2. LetGbe a graph and let a,b:V(G)→N≥2be such that d(x)≥a(x) +b(x)for
+every vertex x∈V. IfGis4-sparse then it has an (a,b)-internal partition.
+Corollary 2.3. IfGis a4-sparse graph and all its vertices have even degrees, then Ghas an
+internal partition.
+We note the following simple fact about random regular graph s:
+Proposition 2.4. For every d≥3asymptotically almost every d-regular graph is 4-sparse.
+Proof. We work with the conﬁguration model of random n-vertexd-regular graphs. Let Xbe the
+random variable that counts the number of sets of four vertic es that span ﬁve or six edges. Then
+E(X)≤O(n4)·(dn−11)!!
+(dn−1)!!=O(1
+n).
+We can now conclude the theorem in the title of this paper, nam ely:
+Corollary 2.5. Asymptotically almost every 2r-regular graph has an internal partition.
+Before we prove theorem 2.2, we need to introduce several deﬁnitions.
+Deﬁnition 2.6. LetG= (V,E)be a graph, and let f:V→N.
+•We say that A⊆Visf-internal if dA(x)≥f(x)for every x∈A.
+•We say that A⊆Visf-degenerate if every non-empty subset K⊆Ahas a vertex x∈K
+such that dK(x)≤f(x).
+Remark 2.7. Clearly, a non-empty set is not (a−1)-degenerate if and only if it contains a
+non-empty a-internal subset.
+Deﬁnition 2.8. LetA,B⊆Vbe non-empty disjoint sets, and let f,g:A→N. The pair /a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}ht
+is said to be
+•(f,g)-internal if Aisf-internal and Bisg-internal.
+•(f,g)-degenerate if Aisf-degenerate and Bisg-degenerate.
+It is an(f,g)-degenerate partition if it is an (f,g)-degenerate pair and, in addition, B=V\A.
+We claim next that for every (a,b)-degenerate partition /a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}htit holds that |A| ≥2(and, by
+symmetry, also |B| ≥2). Otherwise, every vertex x∈BsatisﬁesdB(x) =d(x)−dA(x)≥d(x)−1>
+d(x)−a(x) =b(x), so that Bis notb-degenerate. The last inequality uses the assumption that
+a(v)≥2for allv∈V.
+Proof of Theorem 2.2
+For the proof of 2.2it clearly suﬃces to consider the case where d(x) =a(x)+b(x)for every x∈V.
+Our proof is based on the methodology initiated by Stiebitz [ S96]. The proof is by contradiction.
+We assume that Gis a counterexample, i.e., a 4-sparsed-regular graph with no (a,b)-internal
+partition.
+We next deﬁne an objective function on vertex partitions of t he graph. By optimizing it, we
+will achieve a contradiction.
+For a function f:V→NandS⊆V, we denote f(S) :=/summationtext
+x∈Sf(x). We make substantial use
+of the following function wthat is deﬁned for every partition /a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}htofVas follows:
+w(A,B) =a(B)+b(A)−e(A,B)
+3
+We calculate the change in wwhen one vertex changes sides. If /a\}brack⌉tl⌉{tA′,B′/a\}brack⌉tri}ht=/a\}brack⌉tl⌉{tA∪x,B\x/a\}brack⌉tri}ht, then
+w(A′,B′)−w(A,B) = 2(b(x)−dB(x))
+and if/a\}brack⌉tl⌉{tA′′,B′′/a\}brack⌉tri}ht=/a\}brack⌉tl⌉{tA\y,B∪y/a\}brack⌉tri}ht, then
+w(A′′,B′′)−w(A,B) = 2(a(y)−dA(y))
+We denote by ∆wthe change in wand call a partition of Vlocally maximal if∆w≤0whenever
+a single vertex moves from one part to the other.
+For the sake of completeness, we reproduce two easy but cruci al propositions, following Stiebitz.
+Proposition 2.9. IfGhas an(a,b)-internal pair, then it has an (a,b)-internal partition.
+Proof. Consider an (a,b)-internal pair of sets A,B⊂V, that maximizes |A|+|B|. If/a\}brack⌉tl⌉{tA,B/a\}brack⌉tri}htis not
+an internal partition, then U:=V\(A∪B)is non-empty. By maximality, for every vertex x∈U
+it holds that dA(x)≤a(x)−1, and hence dB∪U(x)≥b(x)+1. Thus the partition /a\}brack⌉tl⌉{tA,B∪U/a\}brack⌉tri}htis
+(a,b)-internal contrary to the assumed maximality.
+Proposition 2.10. IfGhas no(a,b)-internal partition, and if A/subsetnoteqlVis not(a−1)-degenerate,
+thenV\Ais(b−1)-degenerate.
+Proof. SinceAis not(a−1)-degenerate it has a non-empty a-internal subset. If V\Ais not
+(b−1)-degenerate, then it contains a non-empty b-internal subset. This gives an (a,b)-internal
+pair, contrary to Proposition 2.9.
+Consider the family of non-empty sets A/subsetnoteqlVthat area-degenerate, but not (a−1)-degenerate.
+This family is not empty (for instance, take Ato be an inclusion-minimal a-internal subset). Among
+this family of sets, take a set Asuch that
+•the partition /a\}brack⌉tl⌉{tA,V\A/a\}brack⌉tri}htis locally maximal for w, and
+•minimizes |A|under these assumptions.
+We claim now that the resulting set Aisa-internal. Otherwise, there is v∈Asuch that
+dA(v)≤a(v)−1. Then, however, A\vis non-empty a-degenerate and not (a−1)-degenerate. In
+addition, upon moving vfromAtoB=V\Ait holds that ∆w≥2, contradicting the maximality
+ofw.
+We next consider the vertices of "low internal-degree" in Aand inB. Denote
+C={v∈A|dA(v) =a(v)}andD={v∈B|dB(v)≤b(v)−1}.
+Note that C/\⌉}atio\slash=∅sinceAisa-degenerate. Also D/\⌉}atio\slash=∅, sinceBis(b−1)-degenerate by Proposition
+2.10. For every x∈Dby moving xtoAwe get∆w≥2. Also, for y∈C, by moving ytoBwe
+get∆w≥0.
+Proposition 2.11. For every x∈Dthere is a subset Ax⊆Asuch that Ax∪xis(a+1)-internal.
+Proof. As mentioned, moving x∈DtoAyields∆w≥2. Also,A∪xis clearly not (a−1)-
+degenerate. Consequently, by the maximality of w(A,V\A),A∪xcannot be a-degenerate, and it
+must contain an (a+1)-internal subset. This (a+1)-internal subset must contain x, as claimed.
+Note also that Axis necessarily a-internal.
+Proposition 2.12. For every x∈Dand for every such set Axit holds that C⊆Ax.
+Proof. Suppose there is y∈C\Ax. Clearly, A\yisa-degenerate. Also, A\yis not(a−1)-degenerate
+since it contains the a-internal subset Ax. In addition w(A\y,B∪y) =w(A,B), contradicting the
+minimality of |A|.
+Proposition 2.13. Every vertex in Cis adjacent to every vertex in D.
+Proof. Consider some x∈Dandy∈C. ThendA(y) =a(y). Butyalso belongs to the (a+1)-
+internal set Ax∪x, so that dA∪x(y) =a(y)+1. The conclusion follows.
+4
+Proposition 2.14. There are two adjacent vertices in C.
+Proof. We know already that C/\⌉}atio\slash=∅. Consider some y∈C. Clearly A\yisa-degenerate. Also
+w(A\y,B∪y) =w(A,B), therefore, by the minimality of |A|, the set A\ymust be (a−1)-
+degenerate. In particular there is z∈Asuch that dA\y(z)≤a(x)−1, whereas dA(z)≥a(x). It
+follows that z∈Candyz∈E(G).
+The above propositions, and the 4-sparsity of Gimply that
+•Neither y nor z have an additional neighbor in C.
+•The only common neighbor of yandzisx∈D.
+In other words, dA\{y,z}(v)≥a(v)for every v∈A\{y,z}. This means that A′:=A\{y,z}
+isa-internal. Therefore, A′isa-degenerate, and not (a−1)-degenerate. Also, A′/\⌉}atio\slash=∅since
+dA(y) =a(y)≥2. Finally, w(A′,V\A′)≥w(A,V\A), contrary to the minimality of |A|.
+3 Some Computational and Experimental Results
+3.1 Algorithmic Realization
+As mentioned, to the best of our knowledge, all previous exis tence proofs of (a,b)-internal partitions
+translate into polynomial-time algorithms. This applies a s well to Theorem 2.2and its proof. Thus,
+letGbe a4-sparse graph, and assume d(x) =a(x)+b(x)for every x∈V(G). We maintain from
+the proof of the theorem the deﬁnitions of the sets CandD. Here is a polynomial-time algorithm
+that ﬁnds an (a,b)-internal partition of G:
+Initialization. Find a set Athat isa-degenerate but not (a−1)-degenerate. Repeatedly
+remove any vertex x∈AwithdA(x)< a(x)until none remain.
+Loop. WhileV\Ais(b−1)-degenerate:
+1. If there is x∈Dsuch that A∪xisa-degenerate, update A:=A∪x.
+2. Else, there is a triangle xyzwithx∈Dandy,z∈C. Update A:=A\{y,z}.
+Note that the initialization can be done in polynomial time, since (i) for any ϕ:V→Nit
+takes linear time to check whether a given S⊆Visϕ-degenerate, (ii) Gis(a+b)-internal, (iii) if
+Sis not(ϕ+1)-degenerate, then S\xis notϕ-degenerate for every x∈Sand (iv) if, moreover,
+d(x)≤ϕ(x), thenS\xis not(ϕ+1)-degenerate.
+The if-else dichotomy is proven in Propositions 2.13and2.14.
+The algorithm terminates , since in step (1) ∆w >0, and step (2) decreases |A|while keeping
+∆w≥0. Termination is proved by induction on lexicographically- ordered pairs (w,−|A|).
+Aremains not- (a−1)-degenerate throughout, and upon termination V\Ais not(b−1)-degenerate.
+Therefore, AandV\Acontaina-internal and b-internal subsets, respectively, which is, according
+to proposition ( 2.9), a suﬃcient condition for the existence of an internal part ition that can be
+found in polynomial time (See Proposition 1in [BTV03, Technical Report ]).
+3.2 Improving Previous Experimental Results
+In [GK00 ] some experimental results are presented. They apply a heur istic algorithm in an attempt
+to ﬁnd a/parenleftBig
+⌈d(x)
+2⌉,⌈d(x)
+2⌉/parenrightBig
+-internal partition in random graphs. Their algorithm star ts from a ran-
+dom partition and at each iteration minimizes f(A,B) =/summationtext
+v∈A(dA(v)−dB(v))++/summationtext
+v∈B(dB(v)−
+dA(v))+where the minimum is taken over all partitions which were ach ieved by switching a single
+vertex most of whose neighbors are on the other side of the par tition. The process can terminate
+with either an internal partition or a trivial partition. It can also loop indeﬁnitely. In the latter
+two cases, they restart the process.
+We have experimented with a similar algorithm. The main chan ge is that we consider only near-
+bisections /a\}brack⌉tl⌉{tA,V\A/a\}brack⌉tri}ht, and insist that/vextendsingle/vextendsingle/vextendsingle|A|−|V|
+2/vextendsingle/vextendsingle/vextendsingle≤c(n)forc(n) = logd(n). When this condition
+is violated, we move a random vertex from the big part to the sm all. This algorithm may either
+output an internal partition or loop forever. However, in ex tensive simulations with random d-
+regular graphs ( 30≤n≤10000 and4≤d≤min(50,n
+2)) the algorithm has always found an
+internal partition in fewer than 5niterations. This conclusion seems to be hardly aﬀected by th e
+exact choice of c.
+5
+4 Discussion and Some Open Problems
+We have mentioned above the analogy between the existence of internal partitions and upper
+bounds on Cheeger constants. As shown by Alon [ A97], for every large d-regular graph the Cheeger
+constant is at mostd
+2−c√
+dfor some absolute c >0. Although conjecture 2.1is still open, this
+prompts an even more far-reaching possibility.
+Problem 4.1. Is it true that for every integer δ≥1there are integers dandn0such that every
+d-regular graph on n > n0vertices has a (d
+2+δ,d
+2+δ)-internal partition ?
+Also, the upper bound on Cheeger’s constant in Alon’s paper i s actually attained by a bisection
+(the two parts diﬀer in size by at most one). This suggests:
+Problem 4.2. Does conjecture 2.1hold also with "near" bisections? E.g., where the cardinalit ies
+of the two parts diﬀer by Od(1).
+How does the computational complexity of the internal parti tion vary as ngrows? So far,
+existence theorems have gone hand-in-hand with eﬃcient sea rch algorithms. Is this a coincidence
+or is there a real phenomenon?
+Problem 4.3. Consider the computational complexity of both the decision and the search version
+of the internal partition problem for d-regular graphs on nvertices. Conjecture 2.1says that an
+internal partition exists whenever n > n 0(d). Is there some n1(d)such that for n > n 1(d)an
+internal partition can be found eﬃciently? If so, do n0andn1coincide?
+Acknowledgements
+We thank Amir Ban, David Eisenberg, Zur Luria, Jonathan Mosh eiﬀ, and Yuval Peled for careful
+reading and useful comments.
+References
+[A97] Alon, N. (1997). On the edge-expansion of graphs. Comb inatorics, Probability and Comput-
+ing, 6(2), 145-152.
+[BL16] Ban, A., & Linial, N. (2016). Internal partitions of r egular graphs. Journal of Graph Theory,
+83(1), 5-18.
+[B16] Ban A.: Decomposing Weighted Graphs , arXiv:1702.00205
+[BTV03] Bazgan, C., Tuza, Z., & Vanderpooten, D. (2003, Dece mber). On the existence and
+determination of satisfactory partitions in a graph. In ISA AC (pp. 444-453).
+[BTV03, Technical Report] Bazgan, C., Tuza, Z., & Vanderpoo ten, D. (2003). Complexity of the
+satisfactory partition problem. Algorithmic Discrete Mat hematics Technical Report, 34.
+[BTV05] Bazgan, C., Tuza, Z., & Vanderpooten, D. (2005). Com plexity and approximation of
+satisfactory partition problems. Lecture notes in compute r science, 3595, 829.
+[BTV06] Bazgan, C., Tuza, Z., & Vanderpooten, D. (2006). The satisfactory partition problem.
+Discrete applied mathematics, 154(8), 1236-1245.
+[BTV10] Bazgan, C., Tuza, Z., & Vanderpooten, D. (2010). Sat isfactory graph partition, variants,
+and generalizations. European Journal of Operational Rese arch, 206(2), 271-280.
+[C84] Chvátal, V. (1984). Recognizing decomposable graphs . Journal of Graph Theory, 8(1), 51-53.
+[D00] Diwan, A. A. (2000). Decomposing graphs with girth at l east ﬁve under degree constraints.
+Journal of Graph Theory, 33(4), 237-239.
+[GE08] Eroh, L., & Gera, R. (2008). Global Alliance Partitio ns in Graphs, Paper presented at the
+annual meeting of the Mathematical Association of America, The Fairmont Hotel, San Jose,
+CA, Aug 03, 2007
+6
+[FR14] Fernau, H., & Rodriguez-Velazquez, J. A. (2014). A su rvey on alliances and related param-
+eters in graphs. Electronic Journal of Graph Theory and Appl ications (EJGTA), 2(1), 70-86.
+[GK00] Gerber, M. U., & Kobler, D. (2000). Algorithmic appro ach to the satisfactory graph par-
+titioning problem. European Journal of Operational Resear ch, 125(2), 283-291.
+[GK03] Gerber, M. U., & Kobler, D. (2003). Algorithms for ver tex-partitioning problems on graphs
+with ﬁxed clique-width. Theoretical Computer Science, 299 (1-3), 719-734.
+[GK04] Gerber, M. U., & Kobler, D. (2004). Classes of graphs t hat can be partitioned to satisfy
+all their vertices. Australasian Journal of Combinatorics , 29, 201-214.
+[K98] Kaneko, A. (1998). On decomposition of triangle-free graphs under degree constraints. Jour-
+nal of Graph Theory, 27(1), 7-9.
+[MY17] Ma, J., & Yang, T. (2017). Decomposing C4-free graphs under degree constraints. arXiv
+preprint arXiv:1706.07292.
+[M00] Morris, S. (2000). Contagion. The Review of Economic S tudies, 67(1), 57-78.
+[S02] Shaﬁque, K. H., & Dutton, R. D. (2002). On satisfactory partitioning of graphs. Congressus
+Numerantium, 183-194.
+[S96] Stiebitz, M. (1996). Decomposing graphs under degree constraints. Journal of Graph Theory,
+23(3), 321-324.
+[SS17] Schweser, T., & Stiebitz, M. (2017). Partitions of mu ltigraphs under degree constraints.
+arXiv preprint arXiv:1703.08502.
+[T83] Thomassen, C. (1983). Graph decomposition with const raints on the connectivity and min-
+imum degree. Journal of Graph Theory, 7(2), 165-167.
+7

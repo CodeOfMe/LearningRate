@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 280" width="500" height="280">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  </style>
+
+  <!-- Arrows between nodes -->
+  <line x1="98" y1="85" x2="112" y2="85" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="196" y1="85" x2="210" y2="85" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="294" y1="85" x2="308" y2="85" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="392" y1="85" x2="406" y2="85" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Gen 1: Fixed LR - Red -->
+  <rect x="14" y="45" rx="7" ry="7" width="84" height="80" fill="#c0392b" stroke="#a93226" stroke-width="0.5"/>
+  <text x="56" y="68" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Gen 1</text>
+  <text x="56" y="83" text-anchor="middle" fill="#fff" font-size="9.5">Fixed LR</text>
+  <line x1="24" y1="90" x2="88" y2="90" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="56" y="104" text-anchor="middle" fill="#f5b7b1" font-size="8.5" font-style="italic">Global</text>
+  <text x="56" y="118" text-anchor="middle" fill="#fadbd8" font-size="8">SGD</text>
+
+  <!-- Gen 2: LR Schedule - Orange -->
+  <rect x="112" y="45" rx="7" ry="7" width="84" height="80" fill="#d35400" stroke="#ba4a00" stroke-width="0.5"/>
+  <text x="154" y="68" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Gen 2</text>
+  <text x="154" y="83" text-anchor="middle" fill="#fff" font-size="9.5">LR Schedule</text>
+  <line x1="122" y1="90" x2="186" y2="90" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="154" y="104" text-anchor="middle" fill="#f5cba7" font-size="8.5" font-style="italic">Global × Time</text>
+  <text x="154" y="118" text-anchor="middle" fill="#fdebd0" font-size="8">Cosine, SGDR</text>
+
+  <!-- Gen 3: Adaptive - Blue -->
+  <rect x="210" y="45" rx="7" ry="7" width="84" height="80" fill="#2471a3" stroke="#1a5276" stroke-width="0.5"/>
+  <text x="252" y="68" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Gen 3</text>
+  <text x="252" y="83" text-anchor="middle" fill="#fff" font-size="9.5">Adaptive</text>
+  <line x1="220" y1="90" x2="284" y2="90" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="252" y="104" text-anchor="middle" fill="#aed6f1" font-size="8.5" font-style="italic">Parameter</text>
+  <text x="252" y="118" text-anchor="middle" fill="#d6eaf8" font-size="8">Adam, AdamW</text>
+
+  <!-- Gen 4: Layer-wise - Green -->
+  <rect x="308" y="45" rx="7" ry="7" width="84" height="80" fill="#1e8449" stroke="#196f3d" stroke-width="0.5"/>
+  <text x="350" y="68" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Gen 4</text>
+  <text x="350" y="83" text-anchor="middle" fill="#fff" font-size="9.5">Layer-wise</text>
+  <line x1="318" y1="90" x2="382" y2="90" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="350" y="104" text-anchor="middle" fill="#a9dfbf" font-size="8.5" font-style="italic">Layer</text>
+  <text x="350" y="118" text-anchor="middle" fill="#d5f5e3" font-size="8">LARS, Disc.</text>
+
+  <!-- Gen 5: Layer×Time - Purple -->
+  <rect x="406" y="45" rx="7" ry="7" width="84" height="80" fill="#7d3c98" stroke="#6c3483" stroke-width="0.5"/>
+  <text x="448" y="68" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Gen 5</text>
+  <text x="448" y="83" text-anchor="middle" fill="#fff" font-size="9.5">Layer × Time</text>
+  <line x1="416" y1="90" x2="480" y2="90" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="448" y="104" text-anchor="middle" fill="#d2b4de" font-size="8.5" font-style="italic">Layer × Time</text>
+  <text x="448" y="118" text-anchor="middle" fill="#ebdef0" font-size="8">DALS (Ours)</text>
+
+  <!-- Granularity axis label -->
+  <text x="250" y="20" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">Evolution of Learning Rate Strategies</text>
+  <text x="250" y="34" text-anchor="middle" fill="#666" font-size="9">Increasing granularity: Global → Parameter → Layer → Layer × Time</text>
+
+  <!-- Bottom annotation: granularity arrow -->
+  <line x1="30" y1="155" x2="470" y2="155" stroke="#999" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="250" y="170" text-anchor="middle" fill="#666" font-size="8.5">Granularity of LR assignment</text>
+  <text x="35" y="170" text-anchor="start" fill="#999" font-size="8">Coarse</text>
+  <text x="465" y="170" text-anchor="end" fill="#999" font-size="8">Fine</text>
+
+  <!-- Timeline bar -->
+  <rect x="14" y="190" rx="3" ry="3" width="476" height="6" fill="#eee" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="14" y="190" rx="3" ry="3" width="16" height="6" fill="#c0392b"/>
+  <rect x="112" y="190" rx="3" ry="3" width="16" height="6" fill="#d35400"/>
+  <rect x="210" y="190" rx="3" ry="3" width="16" height="6" fill="#2471a3"/>
+  <rect x="308" y="190" rx="3" ry="3" width="16" height="6" fill="#1e8449"/>
+  <rect x="406" y="190" rx="3" ry="3" width="16" height="6" fill="#7d3c98"/>
+
+  <!-- Period labels -->
+  <text x="56" y="212" text-anchor="middle" fill="#666" font-size="7.5">~2012</text>
+  <text x="154" y="212" text-anchor="middle" fill="#666" font-size="7.5">~2016</text>
+  <text x="252" y="212" text-anchor="middle" fill="#666" font-size="7.5">~2017</text>
+  <text x="350" y="212" text-anchor="middle" fill="#666" font-size="7.5">~2019</text>
+  <text x="448" y="212" text-anchor="middle" fill="#666" font-size="7.5">~2024+</text>
+
+  <!-- Formal notation -->
+  <text x="250" y="250" text-anchor="middle" fill="#444" font-size="9">
+    η = const → η(t) → η(θᵢ) → η(l) → η(l, t)
+  </text>
+  <text x="250" y="268" text-anchor="middle" fill="#888" font-size="8" font-style="italic">Formal granularity progression</text>
+</svg>

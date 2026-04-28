@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 340" width="500" height="340">
+  <defs>
+    <marker id="flow-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#333"/>
+    </marker>
+    <marker id="decay-arr" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+      <path d="M0,0 L6,2.5 L0,5 Z" fill="#8e44ad"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  </style>
+
+  <!-- Title -->
+  <text x="250" y="18" text-anchor="middle" fill="#222" font-size="12" font-weight="bold">DALS: Discriminative Adaptive Layer-wise Schedule</text>
+
+  <!-- Input -->
+  <rect x="8" y="130" rx="8" ry="8" width="56" height="50" fill="#ecf0f1" stroke="#7f8c8d" stroke-width="1"/>
+  <text x="36" y="152" text-anchor="middle" fill="#2c3e50" font-size="9" font-weight="bold">Input</text>
+  <text x="36" y="165" text-anchor="middle" fill="#7f8c8d" font-size="7">x₀</text>
+
+  <!-- Arrow to Layer 1 -->
+  <line x1="64" y1="155" x2="78" y2="155" stroke="#333" stroke-width="1.5" marker-end="url(#flow-arr)"/>
+
+  <!-- Layer 1 -->
+  <rect x="78" y="50" rx="6" ry="6" width="105" height="210" fill="#fef9e7" stroke="#f39c12" stroke-width="1.2"/>
+  <text x="130" y="68" text-anchor="middle" fill="#2c3e50" font-size="10" font-weight="bold">Layer 1</text>
+
+  <!-- Layer 1: Discriminative LR -->
+  <rect x="86" y="76" rx="3" ry="3" width="89" height="34" fill="#8e44ad" opacity="0.15" stroke="#8e44ad" stroke-width="0.8"/>
+  <text x="130" y="89" text-anchor="middle" fill="#8e44ad" font-size="8" font-weight="bold">Discriminative LR</text>
+  <text x="130" y="103" text-anchor="middle" fill="#8e44ad" font-size="7.5">η¹ = η_top · decay⁴</text>
+
+  <!-- Layer 1: STLR Schedule -->
+  <rect x="86" y="115" rx="3" ry="3" width="89" height="34" fill="#2471a3" opacity="0.15" stroke="#2471a3" stroke-width="0.8"/>
+  <text x="130" y="128" text-anchor="middle" fill="#2471a3" font-size="8" font-weight="bold">STLR Schedule</text>
+  <text x="130" y="142" text-anchor="middle" fill="#2471a3" font-size="7.5">α¹ = stlr(t)</text>
+
+  <!-- Layer 1: Trust + Grokfast -->
+  <rect x="86" y="154" rx="3" ry="3" width="89" height="34" fill="#27ae60" opacity="0.15" stroke="#27ae60" stroke-width="0.8"/>
+  <text x="130" y="167" text-anchor="middle" fill="#27ae60" font-size="8" font-weight="bold">Trust + Grokfast</text>
+  <text x="130" y="181" text-anchor="middle" fill="#27ae60" font-size="7.5">ε¹ = trust(φ) · gf</text>
+
+  <!-- Combined η¹ -->
+  <rect x="86" y="194" rx="3" ry="3" width="89" height="24" fill="#f8f9fa" stroke="#555" stroke-width="0.8"/>
+  <text x="130" y="209" text-anchor="middle" fill="#2c3e50" font-size="8" font-weight="bold">η¹ × α¹ × ε¹</text>
+
+  <!-- Layer 1 output -->
+  <rect x="86" y="224" rx="3" ry="3" width="89" height="28" fill="#dfe6e9" stroke="#636e72" stroke-width="0.8"/>
+  <text x="130" y="241" text-anchor="middle" fill="#2c3e50" font-size="8">Update Layer 1</text>
+
+  <!-- Arrow to Layer 2 -->
+  <line x1="183" y1="155" x2="197" y2="155" stroke="#333" stroke-width="1.5" marker-end="url(#flow-arr)"/>
+
+  <!-- Layer 2 -->
+  <rect x="197" y="50" rx="6" ry="6" width="105" height="210" fill="#fef9e7" stroke="#f39c12" stroke-width="1.2"/>
+  <text x="249" y="68" text-anchor="middle" fill="#2c3e50" font-size="10" font-weight="bold">Layer 2</text>
+
+  <rect x="205" y="76" rx="3" ry="3" width="89" height="34" fill="#8e44ad" opacity="0.15" stroke="#8e44ad" stroke-width="0.8"/>
+  <text x="249" y="89" text-anchor="middle" fill="#8e44ad" font-size="8" font-weight="bold">Discriminative LR</text>
+  <text x="249" y="103" text-anchor="middle" fill="#8e44ad" font-size="7.5">η² = η_top · decay³</text>
+
+  <rect x="205" y="115" rx="3" ry="3" width="89" height="34" fill="#2471a3" opacity="0.15" stroke="#2471a3" stroke-width="0.8"/>
+  <text x="249" y="128" text-anchor="middle" fill="#2471a3" font-size="8" font-weight="bold">STLR Schedule</text>
+  <text x="249" y="142" text-anchor="middle" fill="#2471a3" font-size="7.5">α² = stlr(t)</text>
+
+  <rect x="205" y="154" rx="3" ry="3" width="89" height="34" fill="#27ae60" opacity="0.15" stroke="#27ae60" stroke-width="0.8"/>
+  <text x="249" y="167" text-anchor="middle" fill="#27ae60" font-size="8" font-weight="bold">Trust + Grokfast</text>
+  <text x="249" y="181" text-anchor="middle" fill="#27ae60" font-size="7.5">ε² = trust(φ) · gf</text>
+
+  <rect x="205" y="194" rx="3" ry="3" width="89" height="24" fill="#f8f9fa" stroke="#555" stroke-width="0.8"/>
+  <text x="249" y="209" text-anchor="middle" fill="#2c3e50" font-size="8" font-weight="bold">η² × α² × ε²</text>
+
+  <rect x="205" y="224" rx="3" ry="3" width="89" height="28" fill="#dfe6e9" stroke="#636e72" stroke-width="0.8"/>
+  <text x="249" y="241" text-anchor="middle" fill="#2c3e50" font-size="8">Update Layer 2</text>
+
+  <!-- Arrow to Layer 3 -->
+  <line x1="302" y1="155" x2="316" y2="155" stroke="#333" stroke-width="1.5" marker-end="url(#flow-arr)"/>
+
+  <!-- Layer 3 -->
+  <rect x="316" y="50" rx="6" ry="6" width="105" height="210" fill="#fef9e7" stroke="#f39c12" stroke-width="1.2"/>
+  <text x="368" y="68" text-anchor="middle" fill="#2c3e50" font-size="10" font-weight="bold">Layer 3</text>
+
+  <rect x="324" y="76" rx="3" ry="3" width="89" height="34" fill="#8e44ad" opacity="0.15" stroke="#8e44ad" stroke-width="0.8"/>
+  <text x="368" y="89" text-anchor="middle" fill="#8e44ad" font-size="8" font-weight="bold">Discriminative LR</text>
+  <text x="368" y="103" text-anchor="middle" fill="#8e44ad" font-size="7.5">η³ = η_top · decay²</text>
+
+  <rect x="324" y="115" rx="3" ry="3" width="89" height="34" fill="#2471a3" opacity="0.15" stroke="#2471a3" stroke-width="0.8"/>
+  <text x="368" y="128" text-anchor="middle" fill="#2471a3" font-size="8" font-weight="bold">STLR Schedule</text>
+  <text x="368" y="142" text-anchor="middle" fill="#2471a3" font-size="7.5">α³ = stlr(t)</text>
+
+  <rect x="324" y="154" rx="3" ry="3" width="89" height="34" fill="#27ae60" opacity="0.15" stroke="#27ae60" stroke-width="0.8"/>
+  <text x="368" y="167" text-anchor="middle" fill="#27ae60" font-size="8" font-weight="bold">Trust + Grokfast</text>
+  <text x="368" y="181" text-anchor="middle" fill="#27ae60" font-size="7.5">ε³ = trust(φ) · gf</text>
+
+  <rect x="324" y="194" rx="3" ry="3" width="89" height="24" fill="#f8f9fa" stroke="#555" stroke-width="0.8"/>
+  <text x="368" y="209" text-anchor="middle" fill="#2c3e50" font-size="8" font-weight="bold">η³ × α³ × ε³</text>
+
+  <rect x="324" y="224" rx="3" ry="3" width="89" height="28" fill="#dfe6e9" stroke="#636e72" stroke-width="0.8"/>
+  <text x="368" y="241" text-anchor="middle" fill="#2c3e50" font-size="8">Update Layer 3</text>
+
+  <!-- Arrow to Output -->
+  <line x1="421" y1="155" x2="435" y2="155" stroke="#333" stroke-width="1.5" marker-end="url(#flow-arr)"/>
+
+  <!-- Output -->
+  <rect x="435" y="130" rx="8" ry="8" width="56" height="50" fill="#ecf0f1" stroke="#7f8c8d" stroke-width="1"/>
+  <text x="463" y="152" text-anchor="middle" fill="#2c3e50" font-size="9" font-weight="bold">Output</text>
+  <text x="463" y="165" text-anchor="middle" fill="#7f8c8d" font-size="7">ŷ</text>
+
+  <!-- Exponential decay visualization on left margin -->
+  <text x="8" y="44" text-anchor="start" fill="#8e44ad" font-size="7.5" font-style="italic">Decay factor:</text>
+  <text x="8" y="338" text-anchor="start" fill="#8e44ad" font-size="7">η¹ &lt; η² &lt; η³</text>
+
+  <!-- Bottom legend -->
+  <rect x="78" y="278" rx="3" ry="3" width="12" height="10" fill="#8e44ad" opacity="0.25" stroke="#8e44ad" stroke-width="0.6"/>
+  <text x="94" y="287" text-anchor="start" fill="#555" font-size="8">Discriminative LR (exponential decay per layer)</text>
+
+  <rect x="78" y="295" rx="3" ry="3" width="12" height="10" fill="#2471a3" opacity="0.25" stroke="#2471a3" stroke-width="0.6"/>
+  <text x="94" y="304" text-anchor="start" fill="#555" font-size="8">STLR Schedule (time-varying per iteration)</text>
+
+  <rect x="78" y="312" rx="3" ry="3" width="12" height="10" fill="#27ae60" opacity="0.25" stroke="#27ae60" stroke-width="0.6"/>
+  <text x="94" y="321" text-anchor="start" fill="#555" font-size="8">Trust Ratio + Grokfast Filter (adaptive scaling)</text>
+
+  <!-- Effective LR formula -->
+  <text x="250" y="272" text-anchor="middle" fill="#2c3e50" font-size="9" font-weight="bold">Effective LR for layer l: ηˡ(t) = ηˡ_disc · αˡ_stlr(t) · εˡ_trust</text>
+</svg>

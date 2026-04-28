@@ -1,0 +1,1396 @@
+Symbolic Discovery of Optimization Algorithms
+Xiangning Chen1 2x∗Chen Liang1xDa Huang1Esteban Real1
+Kaiyuan Wang1Yao Liu1†Hieu Pham1Xuanyi Dong1Thang Luong1
+Cho-Jui Hsieh2Yifeng Lu1Quoc V. Le1
+xEqual & Core Contribution
+1Google2UCLA
+Abstract
+We present a method to formulate algorithm discovery as program search, and apply it to discover opti-
+mizationalgorithmsfordeepneuralnetworktraining. Weleverageeﬃcientsearchtechniquestoexplore
+an inﬁnite and sparse program space. To bridge the large generalization gap between proxy and target
+tasks,wealsointroduceprogramselectionandsimpliﬁcationstrategies. Ourmethoddiscoversasimple
+and eﬀective optimization algorithm, Lion(EvoLved S ign M omentum). It is more memory-eﬃcient than
+Adam as it only keeps track of the momentum. Diﬀerent from adaptive optimizers, its update has the same
+magnitudeforeachparametercalculatedthroughthesignoperation. WecompareLionwithwidelyused
+optimizers, such as Adam and Adafactor, for training a variety of models on diﬀerent tasks. On image
+classiﬁcation, Lion boosts the accuracy of ViT by up to 2% on ImageNet and saves up to 5x the pre-training
+compute on JFT.On vision-language contrastive learning, we achieve 88.3% zero-shot and 91.1% ﬁne-tuning
+accuracy on ImageNet, surpassing the previous best results by 2% and 0.1%, respectively. On diﬀusion
+models, Lion outperforms Adam by achieving a better FID score and reducing the training compute by up
+to2.3x. Forautoregressive,maskedlanguagemodeling,andﬁne-tuning,Lionexhibitsasimilarorbetter
+performance compared to Adam. Our analysis of Lion reveals that its performance gain grows with the
+training batch size. It also requires a smaller learning rate than Adam due to the larger norm of the update
+produced by the sign function. Additionally, we examine the limitations of Lion and identify scenarios
+where its improvements are small or not statistically signiﬁcant. The implementation of Lion is publicly
+available.1LionisalsosuccessfullydeployedinproductionsystemssuchasGoogle’ssearchadsCTRmodel.
+1 Introduction
+Optimizationalgorithms,i.e.,optimizers,playafundamentalroleintrainingneuralnetworks. Therearea
+large number of handcrafted optimizers, mostly adaptive ones, introduced in recent years (Anil et al., 2020;
+BallesandHennig,2018;Bernsteinetal.,2018;Dozat,2016;Liuetal.,2020;Zhuangetal.,2020). However,
+Adam(KingmaandBa,2014)withdecoupledweightdecay(LoshchilovandHutter,2019),alsoreferred
+to as AdamW, and Adafactor with factorized second moments (Shazeer and Stern, 2018), are still the de
+facto standard optimizers for training most deep neural networks, especially the recent state-of-the-art
+language(Brownetal.,2020;Devlinetal.,2019;Vaswanietal.,2017),vision(Daietal.,2021;Dosovitskiy
+etal.,2021;Zhaietal.,2021)andmultimodal(Radfordetal.,2021;Sahariaetal.,2022;Yuetal.,2022)models.
+∗Work done as a student researcher at Google Brain.
+†Work done while at Google.
+1https://github.com/google/automl/tree/master/lion .
+Correspondence: xiangning@cs.ucla.edu, crazydonkey@google.com.
+1arXiv:2302.06675v4  [cs.LG]  8 May 2023
+Table1: AccuracyofBASIC-L(Phametal.,2021)onImageNetandseveralrobustnessbenchmarks. Weapply
+Lion to both vision tower pre-training and vision-language contrastive training stages. The previous SOTA
+results on zero-shot andﬁne-tuning ImageNet accuracy are 86.3% and 91.0% (Yu et al., 2022).
+OptimizerZero-shot Fine-tune
+ImageNet V2 A R Sketch ObjectNet ImageNet
+Adafactor 85.7 80.6 85.6 95.7 76.1 82.3 90.9
+Lion 88.3 81.2 86.4 96.8 77.2 82.9 91.1
+Figure 1: Left: ImageNet ﬁne-tuning accuracy vs. pre-
+trainingcostof ViTmodelsonJFT-300M. Right: FIDofthe
+diﬀusionmodelon 2562imagegeneration. WeuseDDPM
+for 1K steps w/o guidance to decode image. As a reference,
+the FID of ADM is 10.94 (Dhariwal and Nichol, 2021).
+Program1: DiscoveredoptimizerLion. 1=
+0:9and2= 0:99by default are derived from
+Program4. Itonlytracksmomentumanduses
+thesignoperationtocomputetheupdate. The
+two gray lines compute the standard decou-
+pled weight decay, where is the strength.
+def train(weight, gradient, momentum, lr):
+update = interp(gradient, momentum, 1)
+update = sign(update)
+momentum = interp(gradient, momentum, 2)
+weight_decay = weight * 
+update = update + weight_decay
+update = update * lr
+return update, momentum
+Another direction is to automatically discover such optimization algorithms. The learning to optimize
+(L2O)approachproposestodiscoveroptimizersbytrainingparameterizedmodels,e.g.,neuralnetworks,
+to output the updates (Andrychowicz et al., 2016; Li and Malik, 2017; Metz et al., 2019, 2022). However,
+thoseblack-boxoptimizers,typicallytrainedonalimitednumberofsmalltasks,struggletogeneralizeto
+state-of-the-artsettingswheremuchlargermodelsaretrainedwithsigniﬁcantlymoretrainingsteps. Another
+line of methods (Bello et al., 2017; Wang et al., 2022) apply reinforcement learning or Monte Carlo Sampling
+to discover new optimizers, where the search space is deﬁned by trees composed from predeﬁned operands
+(e.g., gradient and momentum) and operators (e.g., unary and binary math operations). However, to make
+thesearch manageable,they oftenlimitthe searchspace byusingﬁxed operandsandrestricting thesize of
+the tree, thereby limiting the potential for discovery. For example, they are unableto modify the tracking
+ofmomentumorhowitcontributestotheupdate,whichisanessentialcomponentofLion. Consequently,
+thealgorithmsdiscoveredhavenotyetreachedthestate-of-the-art. AutoML-Zero(Realetal.,2020)isan
+ambitious eﬀort that attempts to search every component of a machine learning pipeline while evaluating on
+toy tasks. Thisworkfollows theresearchdirection ofautomatic discoveringoptimizers andis inparticular
+inspiredbyAutoML-Zero,butaimsatdiscoveringeﬀectiveoptimizationalgorithmsthatcanimprovethe
+state-of-the-art benchmarks.
+In this paper, we present a method to formulate algorithm discovery as program search and apply it to
+discover optimization algorithms. There are two primary challenges. The ﬁrst one is to ﬁnd high-quality
+algorithms inthe inﬁnite andsparse program space. The secondone is to further select out the algorithms
+thatcangeneralizefromsmallproxytaskstomuchlarger,state-of-the-arttasks. Totacklethesechallenges,we
+employ a range of techniques including evolutionary search with warm-start and restart, abstract execution,
+funnel selection, and program simpliﬁcation.
+Ourmethoddiscoversasimpleandeﬀectiveoptimizationalgorithm: Lion,shortfor EvoLvedSignMomentum.
+Thisalgorithmdiﬀersfromvariousadaptivealgorithmsbyonlytrackingmomentumandleveragingthesign
+operation to calculate updates, leading to lower memory overhead and uniform update magnitudes across
+all dimensions. Despite its simplicity, Lion demonstrates outstanding performance across a range of models
+(Transformer, MLP, ResNet, U-Net, and Hybrid) and tasks (image classiﬁcation, vision-language contrastive
+learning, diﬀusion, language modeling, and ﬁne-tuning). Notably, we achieve 88.3% zero-shot and 91.1%
+2
+Program 2: An example training loop,
+where the optimization algorithm that we
+are searching for is encoded within the
+trainfunction. The main inputs are the
+weight ( w), gradient ( g) and learning rate
+schedule ( lr). The main output is the
+updatetotheweight. v1andv2aretwoad-
+ditional variables for collecting historical
+information.
+w = weight_initialize()
+v1 = zero_initialize()
+v2 = zero_initialize()
+for i in range(num_train_steps):
+lr = learning_rate_schedule(i)
+g = compute_gradient(w, get_batch(i))
+update, v1, v2 = train(w, g, v1, v2, lr)
+w = w - updateProgram 3: Initial program
+(AdamW). The bias correc-
+tion andare omitted for
+simplicity.
+def train(w, g, m, v, lr):
+g2 = square(g)
+m = interp(g, m, 0.9)
+v = interp(g2, v, 0.999)
+sqrt_v = sqrt(v)
+update = m / sqrt_v
+wd = w * 0.01
+update = update + wd
+lr = lr * 0.001
+update = update * lr
+return update, m, vProgram 4: Discovered pro-
+gram after search, selection
+andremovingredundanciesin
+the raw Program 8. Some vari-
+ables are renamed for clarity.
+def train(w, g, m, v, lr):
+g = clip(g, lr)
+g = arcsin(g)
+m = interp(g, v, 0.899)
+m2 = m * m
+v = interp(g, m, 1.109)
+abs_m = sqrt(m2)
+update = m / abs_m
+wd = w * 0.4602
+update = update + wd
+lr = lr * 0.0002
+m = cosh(update)
+update = update * lr
+return update, m, v
+ﬁne-tuning accuracy on ImageNet by replacing Adafactor with Lion in BASIC (Pham et al., 2021), surpassing
+the previous best results by 2% and 0.1%, respectively. Additionally, Lion reduces the pre-training compute
+on JFT by up to 5x, improves training eﬃciency on diﬀusion models by 2.3x and achieves a better FID score,
+and oﬀers similar or better performance on language modeling with up to 2x compute savings.
+WeanalyzethepropertiesandlimitationsofLion. Usersshouldbeawarethattheuniformupdatecalculated
+using the sign function usually yields a larger norm compared to those generated by SGD and adaptive
+methods. Therefore, Lion requires a smaller learning rate lr, and a larger decoupled weight decay to
+maintain the eﬀective weight decay strength. For detailed guidance, please referto Section 5. Additionally,
+ourexperimentsshowthatthegainofLionincreaseswiththebatchsizeanditismorerobusttodiﬀerent
+hyperparameterchoices comparedtoAdamW. Forlimitations,thediﬀerence betweenLionand AdamWis
+not statistical signiﬁcant on some large-scale language and image-text datasets. The advantage of Lion is
+smaller if using strong augmentations or a small batch size ( <64) during training. See Section 6 for details.
+2 Symbolic Discovery of Algorithms
+We present an approach that formulates algorithm discovery as program search (Brameier et al., 2007; Koza,
+1994;Realetal.,2020). Weuseasymbolicrepresentationintheformofprogramsforthefollowingadvantages:
+(1) it aligns with the fact that algorithms must be implemented as programs for execution; (2) symbolic
+representations like programs are easier to analyze, comprehend and transfer to new tasks compared to
+parameterized models such as neural networks; (3) program length can be used to estimate the complexity
+ofdiﬀerentprograms,makingiteasiertoselectthesimpler,oftenmoregeneralizableones. Thisworkfocuses
+on optimizers for deep neural network training, but the method is generally applicable to other tasks.
+2.1 Program Search Space
+Weadheretothefollowingthreecriteriawhiledesigningtheprogramsearchspace: (1)thesearchspace
+shouldbeﬂexible enoughtoenablethe discoveryofnovelalgorithms; (2)theprogramsshould beeasyto
+analyze and incorporate into a machine learning workﬂow; (3) the programs should focus on the high-level
+algorithmicdesignratherthanlow-levelimplementationdetails. Wedeﬁnetheprogramstocontainfunctions
+operatingovern-dimensionalarrays,includingstructureslikelistsanddictionariescontainingsucharrays,in
+3
+an imperative language. They are similar to Python code using NumPy / JAX (Bradbury et al., 2018; Harris
+et al., 2020) as well as pseudo code of optimization algorithms. The details of the design are outlined below,
+with an example representation of AdamW in Program 3.
+Input /output signature The program deﬁnes a trainfunction, which encodes the optimization algorithm
+being searched for, where the main inputs are the model weight ( w), the gradient ( g) and the learning rate
+schedule value ( lr) at the current training step. The main output is the updateto the weight. The program
+also incorporates extra variables initialized as zeros to collect historical information during training. For
+example,AdamWrequirestwoextravariablestoestimateﬁrstandsecondmoments. Notethatthosevariables
+can be used arbitrarily, we use the name mandvin Program 3 just for better readability. This simpliﬁed code
+snippet in Program 2 uses the same signature as AdamW to ensure that the discovered algorithms have
+smallerorequalmemoryfootprints. Asopposedtopreviousoptimizersearchattempts(Belloetal.,2017;
+Wang et al., 2022), our method allows discovering better ways of updating the extra variables.
+Buildingblocks Thetrainfunctionconsistsofasequenceofassignmentstatements,withnorestrictions
+onthenumberofstatementsorlocalvariables. Eachstatementcallsafunctionusingconstantsorexisting
+variables as inputs, and the resulting value is stored in a new or existing variable. For the program, we select
+45 commonmathfunctions, most ofwhich correspondsto afunction in NumPy oran operation inlinear
+algebra. Some functions are introduced to make the program more compact, such as the linear interpolation
+function interp(x, y, a) ,whichismadeequivalentto (1 - a) * x + a * y . Preliminaryexperiments
+have investigated the inclusion of more advanced features such as conditional and loop statements, and
+deﬁningandcallingnewfunctions,butthesedonotyieldimprovedresults,soweleavethemout. Adetailed
+descriptionofthefunctionsaresummarizedinAppendixH.Whennecessary,thetypesandshapesofthe
+function arguments are automatically cast, e.g., in the case of adding a dictionary of arrays to a scalar.
+Mutations and redundant statements The design of mutations utilized in evolutionary search is tightly
+intertwinedwiththerepresentationoftheprogram. Weincludethreetypesofmutations: (1)insertinga
+new statement at a random location with randomly chosen functions and arguments, (2) deleting a random
+chosenstatement,and(3)modifyingarandomstatementbyrandomlyalteringoneofitsfunctionarguments,
+whichmaybeeithervariablesorconstants. Tomutateanargument,wereplaceitwithanexistingvariable
+oranewlygeneratedconstantobtainedbysamplingfromanormaldistribution XN(0 1). Additionally,
+we can mutate an existing constant by multiplying it by a random factor 2a, whereaN (0 1). These
+constantsserveastunablehyperparametersintheoptimizationalgorithm,suchasthepeaklearningrate
+and weight decay in AdamW. Note that we allow a program to include redundant statements during search,
+i.e.,statementsthatdonotimpacttheﬁnalprogramoutputs. Thisisnecessaryasmutationsarelimitedto
+only aﬀecting a single statement. Redundant statements therefore serve as intermediate steps towards future
+substantial modiﬁcations in the program.
+Inﬁnite and sparse search space Given the limitless number of statements and local variables, as well as the
+presence of mutable constants, the program search space is inﬁnite. Even if we ignore the constants and
+bound the program length and number of variables, the number of potential programs is still intractably
+large. A rough estimate of the number of possible programs is np=nl
+fnnal
+v, wherenfis the number of
+possible functions, nvis the number of local variables, nais the average number of arguments per statement,
+andlistheprogramlength. Moreimportantly,thechallengecomesfromthesparsityofhigh-performing
+programsinthesearchspace. Toillustratethispoint,weconductarandomsearchthatevaluatesover2M
+programs on a low-cost proxy task. The best program among them is still signiﬁcantly inferior to AdamW.
+2.2 Eﬃcient Search Techniques
+We employ the following techniques to address the challenges posed by the inﬁnite and sparse space.
+Evolution with warm-start and restart We apply regularized evolution as it is simple, scalable, and has
+shownsuccessonmanyAutoMLsearchtasks(Holland,1992;Realetal.,2019,2020;Soetal.,2019;Yingetal.,
+2019). Itkeepsapopulationof Palgorithmsthataregraduallyimprovedthroughcycles. Eachcyclepicks
+T<Palgorithmsatrandomandthebestperformerischosenasthe parent,i.e.,tournamentselection (Goldberg
+4
+Figure 2: Left: We run hyperparameter tuning on AdamW and random search, both with 4x more compute,
+to get the best results as two baselines (green and red lines). The evolutionary search, with mean and
+standard error calculated from ﬁve runs, signiﬁcantly outperforms both of them. The use of multiple restarts
+from the initial program is crucial due to the high variance in the search ﬁtness (blue curves), and restarting
+fromthebestprogramafter300Kprogressfurtherimprovestheﬁtness(orangecurves)whentheoriginal
+search plateaus. Right: Example curves of search ﬁtness, the cache hit rate, and the percentage of redundant
+statements. The cache hit rate and the redundant statements percentage increase along with the search
+progress to90% and70%.
+and Deb, 1991). This parent is then copied and mutatedto produce a childalgorithm, which is added to
+thepopulation,whiletheoldestalgorithmisremoved. Normally,evolutionarysearchstartswithrandom
+candidates, but we warm-start the initial population as AdamW to accelerate the search. By default, we use
+a tournament size of two and a population size of 1K. To further improve the search eﬃciency, we apply
+twotypesof restart: (1) restartingfromtheinitial program,whichcanlead todiﬀerentlocaloptimadue to
+therandomnessinevolutionandencourageexploration. Thiscanbedonebyrunningmultiplesearchesin
+parallel. (2)restartingfromthebestalgorithmfoundthusfartofurtheroptimizeit,encouragingexploitation.
+Figure 2 (Left) displays the mean and standard error of ﬁve evolutionary search experiments. We run
+hyperparameter tuning based on AdamW by only allowing mutations of constants in the evolution, and
+runrandomsearchbysamplingrandomprograms,bothwith4xmorecompute. Oursearchsigniﬁcantly
+outperforms the best results achieved by both baselines, demonstrated as the two dashed lines in the ﬁgure.
+The high variance in the search ﬁtness necessitates running multiple repeats through restarting from the
+initialprogram. Whenthesearchﬁtnessplateausafter 300Kprogress,restartingfromthebestprogram
+found thus far further improves the ﬁtness shown by the orange curve.
+Pruningthroughabstractexecution Weproposetoprunetheredundanciesintheprogramspacefromthree
+sources: programs with syntax or type / shape errors, functionally equivalent programs, and redundant
+statementsintheprograms. Beforeaprogramisactuallyexecuted,weperformanabstractexecutionstepthat
+(1) infers variable types and shapes to detect programs with errors, and keeps mutating the parent program
+untilavalidchildprogramisgenerated;(2)producesahashthatuniquelyidentiﬁeshowtheoutputsare
+computed from the inputs, allowing us to cache and look up semantically duplicate programs (Gillard et al.,
+2023); (3) identiﬁes redundant statements that can be ignored during actual execution and analysis. For
+instance,Program4isobtainedafterremovingallredundantstatementsinProgram8. Abstractexecution
+has negligible cost compared to theactual execution, with each input and function replaced by customized
+values, e.g., hash. See Appendix I for details of abstract execution. Preliminary experiments have shown
+that the search process can become overwhelmed with invalid programs and cannot make progress without
+ﬁlteringoutinvalidprograms. AsseeninFigure2(Right),thepercentageofredundantstatementsandcache
+hit rate both increase as the search proceeds. Based on ﬁve search runs, each covering 300K programs, there
+are69:81:9%redundant statements towards the end, implying that redundant statements removal makes
+the program3x shorter on average, thus easier to analyze. The cache hit rate is 89:10:6%, indicating that
+using the hash table as cache brings 10x reduction on the search cost.
+Proxy tasks and search cost To reduce search cost, we create low-cost proxies by decreasing the model size,
+numberoftrainingexamples,andstepsfromthetargettasks. Evaluationontheproxiescanbecompleted
+on one TPU V2 chip within 20min. We use the accuracy or perplexity on the validation set as the ﬁtness.
+Eachsearchexperimentutilizes100TPUV2chipsandrunsfor 72h. Thereareatotalof200-300Kprograms
+generated during each search experiment. However, the number of programs that are actually evaluated is
+5
+Figure 3: Left: The meta-validation (deﬁned in Section 2.3) curves of two search runs measured on a 500x
+largermeta-validationtaskcomparedtotheproxy. Theblueonemeta-overﬁtsat 15%ofthesearchprogress,
+while the orange one meta-overﬁts at 90% and achieves a better metric. Right: Histogram of the search
+progress when meta-overﬁtting happens based on 50 runs. Half of the runs meta-overﬁt early but a long tail
+of runs meta-overﬁt much later. Blue cross depicts the best meta-validation metric averaged within each bin,
+indicating that meta-overﬁtting happening later leads to programs that generalize better.
+around20-30K,thankstotheuseofthecachethroughabstractexecution. Toincorporaterestart,westart
+ﬁve repeats of search experiments, followed by another round of search initializing from the best algorithm
+found thus far. This results in a total cost of 3K TPU V2 days. See Appendix F for the details of proxy tasks.
+2.3 Generalization: Program Selection and Simpliﬁcation
+The search experiments can discover promising programs on proxy tasks. We use performance on meta-
+validation tasksthatarelargerthantheproxytasksbyincreasingthemodelsizeandtrainingsteps,toselectthe
+programsthatgeneralizebeyondproxytasksthenfurthersimplifythem. Thephenomenonof meta-overﬁtting
+occurswhenthesearchﬁtness keepsgrowing,but the meta-validationmetricdeclines, indicatingthatthe
+discoveredalgorithmshaveoverﬁttheproxytasks. TwoexamplesareshowninFigure3(Left),wherethe
+blue curve represents early meta-overﬁtting and the orange curve represents later meta-overﬁtting.
+Large generalization gap The discovered algorithmsface a signiﬁcant challenge dueto the substantial gap
+betweentheproxytasksduringsearchandthetargettasks. Whileproxytaskscantypicallybecompleted
+within 20min on one TPU V2 chip, target tasks can be >104x larger and require days of training on 512 TPU
+V4 chips. Furthermore, we expect the optimizer to perform well on diﬀerent architectures, datasets and even
+diﬀerent domains, so the discovered algorithms need to show strong out-of-distribution generalization. The
+sparse search space and inherent noise in the evolution process further compound this challenge, leading to
+inconsistentgeneralizationpropertiesbetweendiﬀerentruns. Ourobservationsuggeststhatevolutionary
+searchexperimentsthatmeta-overﬁtlatertendtouncoveroptimizationalgorithmsthatgeneralizebetter.
+See more details in Figure 3 (Right).
+Funnelselection To mitigate the generalization gap, we collect promising programs based on search ﬁtness
+andaddanextraselectionstepusingaseriesofmeta-validationtaskstoselectthosegeneralizebetter. Tosave
+compute, we apply a funnel selection process that gradually increases the scale of the meta-validation tasks.
+Forexample,startingwithproxytaskA,wecreatea10xlargertaskBbyincreasingthemodelsizeandthe
+training steps. Only algorithms that surpass the baseline on task B will be evaluated on task C, which is 100x
+larger. Thisapproachallowsustograduallyﬁlteroutalgorithmsthatshowpoorgeneralizationperformance,
+ultimately leading to the selection of algorithms that generalize well to larger tasks.
+Simpliﬁcation Simplerprogramsareeasiertounderstandandourintuitionisthattheyaremorelikelyto
+generalize,sowesimplifytheprogramswiththefollowingsteps. Firstly,weremoveredundantstatements
+that do not contribute to the ﬁnal output as identiﬁed through abstract execution. Secondly, we remove
+statementsthatarenon-redundantbutproduceminimaldiﬀerenceswhenremoved. Thisstepcanalsobe
+achieved through evolution by disabling the insertion of new statements in the mutation process. Finally, we
+rearrange the statements manually, assign clear and descriptive names to variables, and convert the program
+into its simpler, mathematically equivalent form.
+6
+3 Derivation and Analysis of Lion
+WearriveattheoptimizerLionduetoitssimplicity,memoryeﬃciency,andstrongperformanceinsearch
+and meta-validation. Note that the search also discovers other existing or novel algorithms shown in
+Appendix D, e.g., some with better regularization and some resembling AdaBelief (Zhuang et al., 2020) and
+AdaGrad (Duchi et al., 2011).
+3.1 Derivation
+The search and funnel selection process lead to Program 4, which is obtained by automatically removing
+redundant statements from the raw Program 8 (in the Appendix). We further simplify it to get the ﬁnal
+algorithm (Lion) in Program 1. Several unnecessary elements are removed from Program 4 during the
+simpliﬁcation process. The coshfunction is removed since mwould be reassigned in the next iteration (line
+3). Thestatementsusing arcsinand cliparealsoremovedasweobservenoqualitydropwithoutthem.
+Thethreeredstatementstranslatetoasingle signfunction. Althoughboth mandvareutilizedinProgram4,
+vonly changes how the momentum is updated (two interpfunctions with constants 0.9 and1.1 is
+equivalent to one with 0.99) and does not need to be separately tracked. Note that the bias correction is no
+longer needed, as it does not change the direction. Algorithm 2 shows the pseudocode.
+3.2 Analysis
+Sign update and regularization TheLionalgorithmproducesupdatewithuniformmagnitudeacrossall
+dimensionsbytakingthesignoperation,whichisinprinciplediﬀerentfromvariousadaptiveoptimizers.
+Intuitively,thesignoperationaddsnoisetotheupdates,whichactsasaformofregularizationandhelps
+with generalization(Chen et al., 2022;Foret et al., 2021;Neelakantan et al., 2017). An evidenceis shown in
+Figure11(Right)intheAppendix,wheretheViT-B/16trainedbyLiononImageNethasahighertraining
+errorcomparedtoAdamWbuta2%higheraccuracyonthevalidationset(asshowninTable2). Additionally,
+theresultsinAppendixGdemonstratethatLionleadstotheconvergenceinsmootherregions,whichusually
+results in better generalization.
+Momentum tracking ThedefaultEMAfactorusedtotrackthemomentuminLionis0.99( 2),compared
+to the commonly used 0.9 in AdamW and momentum SGD. The current gradient and momentum are
+interpolated with a factor of 0.9 ( 1) before the sign operation is applied. This choice of EMA factor and
+interpolationallowsLiontobalancebetweenrememberinga 10xlongerhistoryofthegradientinmomentum
+andputtingmoreweightonthecurrentgradientintheupdate. Thenecessityofboth 1and2isfurther
+discussed in Section 4.6.
+Hyperparameterandbatchsizechoices LionissimplerandhasfewerhyperparameterscomparedtoAdamW
+and Adafactor as it does not require and factorization-related ones. The update is an element-wise binary
+1ifweomittheweightdecayterm,withlargernormthanthoseproducedbyotheroptimizerslikeSGD
+andadaptivealgorithms. Asaresult,Lionneedsa smallerlearningrateandinturna largerdecoupledweight
+decaytoachieveasimilareﬀectiveweightdecaystrength( lr *). DetailedinformationontuningLioncan
+be found in Section 5. Additionally, the advantage of Lion over AdamW enlarges as the batch size increases,
+which ﬁts the common practice of scaling up model training through data parallelism (Section 4.6).
+Memory and runtime beneﬁts Lion only saves the momentum thus has smaller memory footprint than
+popular adaptive optimizers like AdamW, which is beneﬁcial when training large models and / or using
+alargebatchsize. Asanexample,AdamWneedsatleast16TPUV4chipstotrainaViT-B/16withimage
+resolution 224 and batch size 4,096, while Lion only needs 8 (both with bfloat16 momentum). Another
+practical beneﬁt is that Lion has faster runtime (steps / sec) in our experiments due to its simplicity, usually
+2-15% speedup compared to AdamW and Adafactor depending on the task, codebase, and hardware.
+Relation to existing optimizers The sign operation has been explored in previous optimizers (Bernstein
+7
+Table2: AccuracyonImageNet, ImageNetReaL,andImageNetV2. Numbersin ()arefromDaietal.(2021);
+Dosovitskiy et al. (2021). Results are averaged from three runs.
+Model #Params OptimizerRandAug
++ MixupImageNet ReaL V2
+Train from scratch on ImageNet
+ResNet-50 25.56MSGD
+776.22 82.39 63.93
+AdamW 76.34 82.72 64.24
+Lion 76.45 82.72 64.02
+Mixer-S/16 18.53MAdamW769.26 75.71 55.01
+Lion 69.92 76.19 55.75
+Mixer-B/16 59.88MAdamW768.12 73.92 53.37
+Lion 70.11 76.60 55.94
+ViT-S/16 22.05MAdamW776.12 81.94 63.09
+Lion 76.70 82.64 64.14
+AdamW378.89 84.61 66.73
+Lion 79.46 85.25 67.68
+ViT-B/16 86.57MAdamW775.48 80.64 61.87
+Lion 77.44 82.57 64.81
+AdamW380.12 85.46 68.14
+Lion 80.77 86.15 69.19
+CoAtNet-1 42.23MAdamW383.36 (83.3) - -
+Lion 84.07 - -
+CoAtNet-3 166.97MAdamW384.45 (84.5) - -
+Lion 84.87 - -
+Pre-train on ImageNet-21K then ﬁne-tune on ImageNet
+ViT-B/16 38486.86MAdamW784.12 (83.97) 88.61 (88.35) 73.81
+Lion 84.45 88.84 74.06
+ViT-L/16 384304.72MAdamW785.07 (85.15) 88.78 (88.40) 75.10
+Lion 85.59 89.35 75.84
+etal.,2018;RiedmillerandBraun,1993). TheclosesttooursisthehandcraftedoptimizersignSGD(Bernstein
+et al., 2018) (and its momentum variant) that also utilizes the sign operation to calculate the update but
+has a diﬀerent momentum update rule from Lion. Their focus is to mitigate communication costs between
+agents in distributed training, and they observe inferior performance when training ConvNets on image
+classiﬁcationtasks. Ontheotherhand,NAdam(Dozat,2016)combinestheupdatedﬁrstmomentand the
+gradienttocomputetheupdate,butLiondecouplesthemomentumtrackingandhowitisappliedtothe
+update through 2. A comparison of Lion with related optimizers can be found in Section 4.5.
+4 Evaluation of Lion
+Inthissection, wepresentevaluationsofLion, onvariousbenchmarks. WemainlycompareittoAdamW(or
+Adafactorwhenmemoryisabottleneck)asitisexceedinglypopularandthedefactostandardoptimizerona
+majority of learning tasks. The result of momentum SGD is only included for ResNet since it performs worse
+than AdamW elsewhere. We also benchmark other popular optimizers in Section 4.5, including handcrafted
+and automatically discovered ones. We make sure that every optimizer is well-tuned for each task (see
+Section5 fortuning details). Bydefault, the learningrate scheduleiscosine decaywith 10Ksteps warmup,
+and the momentum is saved as bfloat16 to reduce the memory footprint.
+4.1 Image Classiﬁcation
+Weperformexperimentsincludingvariousdatasetsandarchitecturesontheimageclassiﬁcationtask(see
+AppendixBfordatasetdetails). ApartfromtrainingfromscratchonImageNet,wealsopre-trainontwo
+8
+Table 3: Model performance when pre-trained on JFT then ﬁne-tuned on ImageNet. Two giant ViT models
+are pre-trained on JFT-3B while smaller ones are pre-trained on JFT-300M. The ViT-G/14 results are directly
+from Zhai et al. (2021).
+Model ViT-L/16 512 ViT-H/14 518 ViT-g/14 518 ViT-G/14 518
+#Params 305.18M 633.47M 1.04B 1.88B
+Optimizer AdamW Lion AdamW Lion Adafactor Lion Adafactor Lion
+ImageNet 87.72 88.50 88.55 89.09 90.25 90.52 90.45 90.71/90.71?
+ReaL 90.46 90.91 90.62 91.02 90.84 91.11 90.81 91.06/91.25?
+V2 79.80 81.13 81.12 82.24 83.10 83.39 83.33 83.54/83.83?
+A 52.72 58.80 60.64 63.78 - - - -
+R 66.95 72.49 72.30 75.07 - - - -
+?We observe overﬁtting in ﬁne-tuning, therefore report both the last and oracle results.
+larger well-established datasets, ImageNet-21K and JFT (Sun et al., 2017). The image size is 2242by default
+otherwise speciﬁed by the subscript.
+Train from scratch on ImageNet Following previous works (Dosovitskiy et al., 2021; He et al., 2016), we
+train ResNet-50 for 90 epochs with a batch size of 1,024, and other models for 300 epochs with a batch size of
+4,096. AsshowninTable2,LionsigniﬁcantlyoutperformsAdamWonvariousarchitectures. Empirically,the
+improvement is more substantial on models with larger capacity, with accuracy increases of 1.96% and 0.58%
+forViT-B/16andViT-S/16,respectively. Theperformancegapsalsotendtoenlargerwithfewerinductive
+biases. Whenstrongaugmentationsareapplied,thegainofLionoverAdamWshrinks,butitstilloutperforms
+AdamW by 0.42% on CoAtNet-3, despite the strong regularization during training (Dai et al., 2021).
+Pre-trainonImageNet-21K Wepre-trainViT-B/16andViT-L/16onImageNet-21Kfor90epochswithabatch
+size of 4,096. Table 2 shows that Lion still surpasses AdamW even when the training set is enlarged for 10x.
+The gaps on larger models are consistently bigger, with +0.52% vs. +0.33% (ImageNet), +0.57% vs. +0.23%
+(ReaL), and +0.74% vs. +0.25% (V2) for ViT-L/16 and ViT-B/16, respectively.
+Pre-trainonJFT To push the limit, we conduct extensive experiments on JFT. We followthe settings ofDoso-
+vitskiyetal.(2021)andZhaietal.(2021)forbothpre-trainingandﬁne-tuning. Figure1(Left)and4present
+theaccuracyofthreeViTmodels(ViT-B/16,ViT-L/16,andViT-H/14)underdiﬀerentpre-trainingbudgetson
+JFT-300M. LionenablestheViT-L/16tomatch theperformanceof ViT-H/14trainedbyAdamWon ImageNet
+andImageNetV2butwith3xlesspre-trainingcost. OnImageNetReaL,thecomputesavingfurtherbecomes
+5x. Another evidence is that even when a ViT-L/16 is trained by AdamW for 4M steps by Zhai et al. (2021),
+its performance still lags behind the same model trained by Lion for 1M steps.
+Table3showstheﬁne-tuningresults,withhigherresolutionandPolyakaveraging. OurViT-L/16matches
+the previous ViT-H/14 results trained by AdamW, while being 2x smaller. The advantage is larger on more
+challenging benchmarks, such as +1.33% (V2), +6.08% (A), +5.54% (R) for ViT-L/16. After we scale up the
+pre-training dataset to JFT-3B, the ViT-g/14 trained by Lion outperforms the previous ViT-G/14 results (Zhai
+et al., 2021), with 1.8x fewer parameters. Our ViT-G/14 further achieves a 90.71% accuracy on ImageNet.
+4.2 Vision-Language Contrastive Learning
+This section focuses on the vision-language contrastive training (Radford et al., 2021). We compare Lion
+with AdamW (Adafactor) on zero-shot image classiﬁcation and image-text retrieval benchmarks. Instead of
+learning all the parameters from scratch, we initialize the image encoder with a strong pre-trained model as
+it is suggested to be more eﬃcient (Zhai et al., 2022).
+Locked-image textTuning (LiT) WeperformacomparisonbetweenLionandAdamWonLiT(Zhaietal.,
+2022)bytrainingthetextencoder(Zhaietal.,2022)inacontrastivemannerusingthesamefrozenpre-trained
+ViT.Allmodelsaretrainedfor1Bimage-textpairswithabatchsizeof16,384. Table4showsthezero-shot
+9
+Figure4: ImageNetReaL( Left)andImageNetV2( Right)
+accuracy after we pre-train ViT models on JFT-300M then
+ﬁne-tune on ImageNet. See Table 8 (in the Appendix) for
+the detailed numbers.
+Table4: Zero-shotaccuracyofLiTsonImageNet,
+CIFAR-100, and Oxford-IIIT Pet. As a reference,
+thezero-shotaccuracyofCLIP(Radfordetal.,
+2021) on ImageNet is 76.2%.
+Model Optimizer ImageNet C100 Pet
+LiT-B/32-BAdamW 68.78 71.41 86.62
+Lion 69.88 71.78 87.36
+LiT-B/16-BAdamW 74.26 72.25 89.83
+Lion 75.39 72.49 91.20
+LiT-g/14 288-LAdamW 83.43 80.93 94.88
+Lion 84.09 81.43 95.86
+Figure5: Thezero-shotImageNetaccuracycurveofLiT-B/16-B( Left). FIDcomparisonon 6464(Middle)
+and128128(Right)image generationwhentraining diﬀusionmodels. Wedecode imagew/oguidance.
+imageclassiﬁcationresultson threemodelscales,withthe namespeciﬁesthesize,e.g., LiT-B/16-Bdenotes
+a ViT-B/16 and a base size Transformer as the text encoder. Our method, Lion, demonstrates consistent
+improvement over AdamW with gains of +1.10%, +1.13%, and +0.66% on zero-shot ImageNet accuracy
+for LiT-B/32-B, LiT-B/16-B, and LiT-g/14 288-L, respectively. Figure 5 (Left) depicts an example zero-shot
+learningcurveofLiT-B/16-B.Similarresultsareobtainedontheothertwodatasets. Thezero-shotimage-text
+retrieval results on MSCOCO (Lin et al., 2014) and Flickr30K (Plummer et al., 2015) can be found in Figure 9
+(intheAppendix). TheevaluationmetricisRecall@K,calculatedbasedonifthegroundtruthlabelofthe
+queryappearsinthetop-Kretrievedexamples. LionoutperformsAdamWonbothdatasets,withalarger
+gain in Recall@1 than Recall@10 on Flicker30K, implying more accurate retrieval results: +1.70% vs. +0.60%
+for image!text and +2.14% vs. +0.20% for text !image.
+BASICPham et al. (2021) propose to scale up batch size, dataset, and model size simultaneously, achieving
+drastic improvements overCLIP. It uses asophisticated CoAtNet (Daiet al., 2021)pre-trainedon JFT-5B as
+the image encoder. Furthermore, the contrastive training is performed on 6.6B image-text pairs with a larger
+65,536 batch size. To push the limit, we only experiment on the largest BASIC-L, and use Lion on bothimage
+encoder pre-trainingand contrastivelearning stages. As illustratedin Table1, we achieve a signiﬁcant2.6%
+gain over the baseline, striking a 88.3% accuracy on zero-shot ImageNet classiﬁcation. Note that this result is
+2.0% higher than the previous best result (Yu et al., 2022). The performance gain is consistent on ﬁve other
+robustness benchmarks. After ﬁne-tuning the image encoder (CoAtNet-7) in BASIC-L obtained by Lion, we
+further achieve a 91.1% top-1 accuracy on ImageNet, which is 0.1% better than the previous SOTA.
+4.3 Diﬀusion Model
+Recently, diﬀusion models achieve a huge success on image generation (Dhariwal and Nichol, 2021; Ho and
+Salimans,2022;Hoetal.,2020;Sahariaetal.,2022;Songetal.,2021). Givenitsenormouspotential,wetest
+the performance of Lion on unconditional image synthesis and multimodal text-to-image generation.
+10
+Figure6: EvaluationoftheImagentext-to-image 642
+(Left) and the 642!2562diﬀusion models ( Right).
+Figure 7: Log perplexity on Wiki-40B ( Left) and PG-
+19 (Right). The speedup brought by Lion tends to
+increasewiththemodelscale. Thelargestmodelon
+Wiki-40B is omitted as we observe severe overﬁtting.
+Image synthesis on ImageNet We utilize the improved U-Net architecture introduced in Dhariwal and
+Nichol(2021)andperform 6464,128128,and 256256imagegenerationonImageNet. Thebatchsizeis
+set as 2,048 and the learning rate remains constant throughout training. For decoding, we apply DDPM (Ho
+et al., 2020) for 1K sampling steps withoutclassiﬁer-free guidance.The evaluation metric is the standard FID
+score. Illustrated by Figure 1 (Right) and 5 (Middle and Right), Lion enables both better quality and faster
+convergence on the FID score. Note that the gap between Lion and AdamW tends to increase with the image
+resolution,wherethegenerationtaskbecomesmorechallenging. Whengenerating 256256images,Lion
+achieves the ﬁnal performance of AdamW at 440K steps, reducing 2.3x iterations. The ﬁnal FID scores are 4.1
+(Lion) vs. 4.7 (AdamW), and for reference, the FID of ADM (Dhariwal and Nichol, 2021) is 10.94.
+Text-to-image generation WefollowtheImagen(Sahariaetal.,2022)setuptotrainabase 6464text-to-
+imagemodelanda 6464!256256super-resolutionmodel. Allmodelsaretrainedonahigh-quality
+internal image-text dataset with a batch size of 2,048 and a constant learning rate. Due to computational
+constraints,ourbaseU-Nethasawidthof192comparedto512intheoriginal2Bmodel,whilethe600M
+super-resolution model is identical to the original Imagen setup. Along with the training, 2K images are
+sampled from the MSCOCO (Lin et al., 2014) validation set for real-time evaluation. We use the CLIP
+score to measure image-text alignment and the zero-shot FID-30K to measure image ﬁdelity. Classiﬁer-free
+guidance(HoandSalimans,2022)withaweightof5.0isappliedasithasbeenshowntoimproveimage-text
+alignment. Figure 6 depicts the learning curve. While there is no clear improvement on the base 6464
+model, Lion outperforms AdamW on the text-conditional super-resolution model. It achieves a higher CLIP
+score and has a less noisy FID metric compared to AdamW.
+4.4 Language Modeling and Fine-tuning
+This section focuses on language modeling and ﬁne-tuning. On language-only tasks, we ﬁnd that tuning 1
+and2can improve the quality for both AdamW and Lion. See Section 5 for tuning details.
+Autoregressive language modeling We ﬁrst experiment on two smaller-scale academic datasets Wiki-
+40B(Guoetal.,2020)andPG-19(Raeetal.,2020)followingHuaetal.(2022). TheemployedTransformer
+spans three scales: small (110M), medium (336M), and large (731M). The architecture details can be found
+inAppendixE.Allmodelsaretrainedwith 218tokensperbatchfor125Ksteps,withalearningrateschedule
+of10Kstepswarmupfollowedbylineardecay. Thecontextlengthissetto512forWiki-40Band1,024for
+PG-19. Figure 7 illustrates the token-level perplexity for Wiki-40B and word-level perplexity for PG-19. Lion
+consistently achieves lower validation perplexity than AdamW. It achieves 1.6x and 1.5x speedup when
+trainingthemediumsizemodelonWiki-40BandPG-19,respectively. Whenthemodelisincreasedtothe
+large size, the speedup on PG-19 further increases to 2x.
+Scalingupthescaleoflanguagemodelsandpre-trainingdatasetshasrevolutionizedtheﬁeldofNLP.So
+wefurtherperformlarger-scaleexperiments. Ourpre-trainingdataset,similartothatusedinGLaM(Du
+11
+Table 5: One-shot evaluation averaged over three NLG and 21 NLU tasks. The results of GPT-3 (Brown et al.,
+2020) and PaLM (Chowdhery et al., 2022) are included for reference. The LLMs trained by Lion have better
+in-context learning ability. See Table 11 (in the Appendix) for detailed results on all tasks.
+Task1.1B 2.1B 7.5B 6.7B
+GPT-38B
+PaLM Adafactor Lion Adafactor Lion Adafactor Lion
+#Tokens 300B 300B 780B
+Avg NLG 11.1 12.1 15.6 16.5 24.1 24.723.1 23.9
+Avg NLU 53.2 53.9 56.8 57.4 61.3 61.758.5 59.4
+Table 6: Fine-tuning performance of the T5 Base, Large, and 11B on the GLUE dev set. Results reported are
+the peak validation scores per task.
+Model Optimizer CoLA SST-2 MRPC STS-B QQPMNLI
+-mMNLI
+-mmQNLI RTE Avg
+BaseAdamW 60.87 95.18 92.39 / 89.22 90.70/90.5189.23 / 92.00 86.77 86.91 93.70 81.59 87.42
+Lion 61.07 95.18 92.52 /89.4690.61 / 90.40 89.52/92.20 87.27 87.25 93.85 85.56 87.91
+LargeAdamW 63.89 96.10 93.50 / 90.93 91.69 / 91.56 90.08 / 92.57 89.69 89.92 94.45 89.17 89.46
+Lion 65.12 96.22 94.06 /91.67 91.79 /91.60 90.23 /92.67 89.85 89.94 94.89 90.25 89.86
+11BAdamW 69.50 97.02 93.75 / 91.18 92.57 / 92.61 90.45 / 92.85 92.17 91.99 96.41 92.42 91.08
+Lion 71.31 97.13 94.58 /92.65 93.04 /93.04 90.57 /92.9591.88 91.65 96.56 93.86 91.60
+etal.,2022),consistsof1.6trilliontokensspanningawiderangeofnaturallanguageusecases. Following
+GPT-3(Brownetal.,2020),wetrainthreemodels,rangingfrom1.1Bto7.5Bparameters,for300Btokenswith
+a batch size of 3M tokens and a context length of 1K. We evaluate them on three natural language generative
+(NLG) and 21 natural language understanding (NLU) tasks (see Appendix C for task details). On this
+massivedataset,weobservenoperplexitydiﬀerencethroughout training. Nevertheless,Lionoutperforms
+Adafactorontheaveragein-contextlearningability,asshowninTable5. Our7.5Bbaselinemodel,trained
+for 300B tokens, outperforms the 8B PaLM, trained for 780B tokens, demonstrating the strength of our setup.
+LionoutperformsAdafactoronbothNLGandNLUtasks,particularlyontheNLGtasks,withanexactmatch
+improvement of +1.0, +0.9, and +0.6 for the 1.1B, 2.1B, and 7.5B models, respectively.
+Maskedlanguagemodeling WealsoperformBERTtrainingontheC4dataset(Raﬀeletal.,2020). Itrequires
+thelanguagemodelstoreconstructrandomlymaskedouttokensintheinputsequence. Weusethesame
+architectures and training setupsas thesmaller-scale autoregressiveexperiments. Lionperformsslightly
+better than AdamW regarding the validation perplexity: 4.18 vs. 4.25 (small), 3.42 vs. 3.54 (medium), and
+3.18 vs. 3.25 (large). See Figure 11 (Left) in the Appendix for the learning curves.
+Fine-tuning We ﬁne-tune Base (220M), Large (770M), and the largest 11B T5 (Raﬀel et al., 2020) models on
+the GLUE benchmark (Wang et al., 2019a). Every model is ﬁne-tuned for 500K steps with a batch size of 128
+and a constant learning rate. Table 6 shows the results on the GLUE dev set. For MRPC and QQP, we report
+the F1 / Accuracy scores, for STS-B, we report the Pearson / Spearman correlation, and for the other datasets,
+wereporttheirdefaultmetric. Onaverage,LionbeatsAdamWacrossallthreemodelscales. Itachieves10,
+12, and 10 wins out of 12 scores for T5 Base, Large, and 11B models, respectively.
+4.5 Comparison with Other Popular Optimizers
+We also employ four popular handcrafted optimizers: RAdam (Liu et al., 2020), NAdam (Dozat, 2016),
+AdaBelief (Zhuang et al., 2020), AMSGrad (Reddiet al., 2018) and two optimizers discovered by AutoML:
+PowerSign(Belloetal.,2017)andAddSign(Belloetal.,2017)totrainViT-S/16andViT-B/16onImageNet
+(with RandAug and Mixup). We thoroughly tune the peak learning rate lrand decoupled weight decay
+(Loshchilov and Hutter, 2019) of every optimizer, while other hyperparameters are set as the default
+12
+Table 7: The performance of various optimizers to train ViT-S/16 and ViT-B/16 on ImageNet (with RandAug
+and Mixup). Lion is still the best performing one, and there is no clear winner amongst the baselines.
+Model Task AdamW RAdam NAdamAda-
+BeliefAMSGradPower-
+SignAdd-
+SignAblation 0.9Ablation 0.99Lion
+ViT-S/16ImageNet 78.89 78.59 78.91 78.71 79.01 77.36 77.37 78.23 78.19 79.46
+ReaL 84.61 84.47 84.62 84.56 85.01 83.39 83.36 84.28 84.17 85.25
+V2 66.73 66.39 66.02 66.35 66.82 65.17 64.52 66.13 65.96 67.68
+ViT-B/16ImageNet 80.12 80.26 80.32 80.29 79.85 78.95 78.50 79.54 79.90 80.77
+ReaL 85.46 85.45 85.44 85.48 85.16 84.76 84.49 85.10 85.36 86.15
+V2 68.14 67.76 68.46 68.19 68.48 67.46 65.95 68.07 68.20 69.19
+Figure 8: Left: Ablation for the eﬀect of batch size. Lion prefers a larger batch than AdamW. ImageNet
+accuracyofViT-B/16trainedfromscratchwhenwevary lrandforAdamW( Middle)andLion( Right).
+Lion is more robust to diﬀerent hyperparameter choices.
+values in Optax.2As shown in Table 7, Lion is still the best performing one. We notice that there is no clear
+winner amongst the baselines. AMSGrad performs the best on ViT-S/16 but the worst on ViT-B/16. The
+inferiorperformanceofPowerSignandAddSigncomparedtootheroptimizersisconsistentwithprevious
+observations that automatically discovered optimizers have diﬃculty generalizing to real-world learning
+tasks. Figure 10 (in the Appendix) further shows that the learning curves of the ﬁve adaptive optimizers are
+pretty similar, whereas Lion has a unique one that learns faster.
+4.6 Ablations
+Momentum tracking To ablate the eﬀects of both 1and2, we compare to a simple update rule: m =
+interp(g, m, ); update = sign(m) . Twooptimizers,Ablation 0.9andAblation 0.99,arecreatedwith val-
+uesof0.9and0.99respectively. IllustratedbyTable7,thetwoablatedoptimizationalgorithmsperformworse
+than all ﬁve compared baselines, let alone our Lion. Further ablation studies on the language modeling task
+(as depicted in Figure 12 in the Appendix) yield similar conclusions. Those results validate the eﬀectiveness
+andnecessityofusingtwolinearinterpolationfunctions,lettingLiontorememberlongergradienthistory
+meanwhile assign a higher weight to the current gradient.
+Eﬀect of batch size Some may question whether Lion requires a large batch size to accurately determine the
+directionduetotheaddednoisefromthesignoperation. Toaddressthisconcern,wetrainaViT-B/16model
+on ImageNet using various batch sizes while maintaining the total training epoch as 300, and incorporating
+RandAug and Mixup techniques. As shown in Figure 8 (Left), the optimal batch size for AdamW is 256,
+whileforLionis4,096. ThisindicatesthatLionindeedprefersalargerbatchsize,butitsperformanceremains
+robustevenwithasmall64batchsize. Furthermore,whenthebatchsizeenlargesto32K,leadingtoonly11K
+trainingsteps,Lionachievesasigniﬁcant2.5%accuracygainoverAdamW(77.9%vs. 75.4%),demonstrating
+its eﬀectiveness in the large batch training setting.
+2https://github.com/deepmind/optax
+13
+5 Hyperparameter Tuning
+To ensure a fair comparison, we tune the peak learning rate lrand decoupled weight decay for both
+AdamW(Adafactor)andourLionusingalogarithmicscale. Thedefaultvaluesfor 1and2inAdamW
+aresetas0.9and0.999,respectively,withan of1e 8,whileinLion,thedefaultvaluesfor 1and2are
+discovered through the program search process and set as 0.9 and 0.99, respectively. We only tune those
+hyperparametersinSection4.4,where 1= 0:9,2= 0:99inAdamW,and 1= 0:95,2= 0:98inLion. In
+ourexperience,reducing 2resultsinshortermemorizationofhistoricalinformationand enhancedtraining
+stability. Additionally, the in AdamW is set as 1e 6instead of the default 1e 8as it improves stability in
+our experiments, similar to the observations in RoBERTa (Liu et al., 2019b).
+The update generated by Lion is an element-wise binary 1, as a result of the sign operation, therefore it has
+a largernorm than thosegeneratedby other optimizers. Basedon our experience, a suitablelearning rate for
+Lion is typically 3-10x smaller than that for AdamW. Note that the initial value, peak value, and end value of the
+learning rate shouldbe changed simultaneously with the same ratiocompared to AdamW. We do notmodify
+other training settings such as thelearning rate schedule, gradient and update clipping. Sincethe eﬀective
+weightdecayis lr *:update += w * ;update *= lr ,thevalueofusedforLionis3-10xlargerthanthat
+for AdamW in order to maintain a similar strength. For instance,
+•lr= 1e 4,= 10:0in Lion and lr= 1e 3,= 1:0in AdamW when training ViT-B/16 on ImageNet
+with strong augmentations,
+•lr= 3e 5,= 0:1in Lion and lr= 3e 4,= 0:01in AdamW for diﬀusion models,
+•lr= 1e 4,= 0:01in Lion and lr= 1e 3,= 0:001in Adafactor for the 7.5B language modeling.
+Please see Table 12 (in the Appendix) for all hyperparameters.
+Apart from the peak performance, the sensitivity to hyperparameters and the diﬃculty in tuning them are
+also critical for the adoption of an optimizer in practice. In Figure 8 (Middle and Right), we alter both lrand
+when training ViT-B/16 from scratch on ImageNet. Suggested by the heatmaps, Lion is more robust to
+diﬀerent hyperparameter choices compared to AdamW.
+6 Limitations
+Limitations of search Despite the eﬀorts to make the search space less restrictive, it remains inspired by
+thepopularﬁrst-orderoptimizationalgorithms,leadingtoabiastowardssimilaralgorithms. Italsolacks
+thefunctionsrequiredtoconstructadvancedsecond-orderalgorithms(Aniletal.,2020;Guptaetal.,2018;
+Martens and Grosse, 2015). The search cost is still quite large and the algorithm simpliﬁcation requires
+manualintervention. Furtherreducingthebiasinthesearchspacetodiscovermorenovelalgorithmsand
+improving the search eﬃciency are important future directions. The current program structure is quite
+simplistic,aswedonotﬁndagoodusageofmoreadvancedprogramconstructssuchasconditional,loop
+statements,anddeﬁningnewfunctions. Exploringhowtoincorporatetheseelementshasthepotentialto
+unlock new possibilities.
+Limitations of Lion While we endeavour to evaluate Lion on as many tasks as possible, the assessment
+islimitedtothechosentasks. Onvisiontasks,thediscrepanciesbetweenLion,AdamW,andmomentum
+SGDareprettysmallonResNets,likelyduetothefactthatConvNetsareeasiertooptimizecomparedto
+Transformers. The performance gain brought by Lion decreases when strong augmentations are utilized.
+TherearealsoseveraltaskswhereLionperformssimilarlytoAdamW,including: (1)theImagentext-to-image
+base model, (2) the perplexity of autoregressive language model trained on the large-scale internal dataset,
+which is arguably a more reliable metric the in-context learning benchmarks, and (3) masked language
+modeling on C4. These tasks have a common characteristic in that the datasets are massive and of high
+quality, which results in a reduced diﬀerence between optimizers. Another potential limitation is the batch
+size. Though people often scale up the batch size to enable more parallelism, it is likely that Lion performs
+nobetterthanAdamWifthebatchsizeissmall( <64). Additional,Lionstillrequiresmomentumtracking
+14
+inbfloat16 , which can be expensive for training giant models. One potential solution is to factorize the
+momentum to save memory.
+7 Related Work
+Our work lies in the area of AutoML and meta-learning that includes learning to learn (Andrychowicz et al.,
+2016; Bello et al., 2017; Metz et al., 2019, 2022; Ravi and Larochelle, 2017; Wichrowska et al., 2017; Xiong
+et al., 2022), neural architecture search (Chen and Hsieh, 2020; Chen et al., 2021; Liu et al., 2019a; Pham
+etal.,2018;Realetal.,2019;Soetal.,2019;Wangetal.,2021a,b;Yangetal.,2022;ZophandLe,2017)and
+hyperparameteroptimization(Dongetal.,2021;Hutteretal.,2011;JamiesonandTalwalkar,2016;Lietal.,
+2017),etc. Thereisalsoalonghistoryofusingevolutionarymethodstosearchforprograms,i.e.,genetic
+programming (Brameier et al., 2007; Holland, 1992; Koza, 1994). Our approach builds upon a symbolic
+searchspacesimilartoAutoML-Zero(Pengetal.,2020;Realetal.,2020). However,insteadofdiscovering
+programs with ﬁxed dimensional matrices, vector, and scalars for toy tasks, our goal is to develop programs
+thatoperateonn-dimensionalarraysandcangeneralizetostate-of-the-arttasks. Otherrelatedworksinclude
+numerous handcrafted optimizers (Anil et al., 2020; Bernstein et al., 2018; Dozat, 2016; Duchi et al., 2011;
+Gupta et al., 2018; Kingma and Ba, 2014; Liu et al., 2020; Ma and Yarats, 2019; Reddi et al., 2018; Riedmiller
+and Braun, 1993; Shazeer and Stern, 2018; Zhuang et al., 2020), which we discuss in Section 3.2.
+8 Conclusion
+This paper proposes to discover optimization algorithms via program search. We propose techniques
+to address the challenges in searching an inﬁnite and sparse search space, and large generalization gap
+between the proxy and target tasks. Our method discovers a simple and eﬀective optimizer, Lion, that is
+memory-eﬃcient and achieves strong generalization across architectures, datasets and tasks.
+Acknowledgements
+Wewouldliketothank(inalphabeticalorder)AngelYu,BoqingGong, ChenCheng, ChitwanSaharia,Daiyi
+Peng, David So, Hanxiao Liu, Hanzhao Lin, Jeﬀ Lund, Jiahui Yu, Jingru Xu, Julian Grady, Junyang Shen,
+Kevin Regan, Li Sheng, Liu Yang, Martin Wicke, Mingxing Tan, Mohammad Norouzi, Qiqi Yan, Rakesh
+Shivanna,RohanAnil,RuiqiGao,SteveLi,VladFeinberg,WenboZhang,WilliamChan,XiaoWang,Xiaohua
+Zhai, Yaguang Li, Yang Li, Zhuoshu Li, Zihang Dai, Zirui Wang for helpful discussions, and the Google
+Brain team at large for providing a supportive research environment.
+References
+Marcin Andrychowicz, Misha Denil, Sergio Gómez, Matthew W Hoﬀman, David Pfau, Tom Schaul, Brendan
+Shillingford, and Nando de Freitas. Learning to learn by gradient descent by gradient descent. In D. Lee,
+M. Sugiyama, U. Luxburg, I. Guyon, and R. Garnett, editors, Advances in Neural Information Processing
+Systems, volume 29. Curran Associates, Inc., 2016.
+RohanAnil,VineetGupta,TomerKoren,KevinRegan,andYoramSinger. Scalablesecondorderoptimization
+for deep learning, 2020.
+LukasBallesandPhilippHennig. Dissectingadam: Thesign,magnitudeandvarianceofstochasticgradients.
+In Jennifer Dy and Andreas Krause, editors, Proceedings of the 35th International Conference on Machine
+Learning, volume 80 of Proceedings of Machine Learning Research , pages 404–413. PMLR, 10–15 Jul 2018.
+15
+AndreiBarbu,DavidMayo,JulianAlverio,WilliamLuo,ChristopherWang,DanGutfreund,JoshTenenbaum,
+and Boris Katz. Objectnet: A large-scale bias-controlled dataset for pushing the limits of object recognition
+models. In H. Wallach, H. Larochelle, A. Beygelzimer, F. d /quotesingle.ts1Alché-Buc, E. Fox, and R. Garnett, editors,
+Advances in Neural Information Processing Systems , volume 32. Curran Associates, Inc., 2019.
+IrwanBello,BarretZoph,VijayVasudevan,andQuocV.Le. Neuraloptimizersearchwithreinforcement
+learning. In Proceedingsofthe34thInternationalConferenceonMachineLearning-Volume70 ,ICML’17,page
+459–468. JMLR.org, 2017.
+Jonathan Berant, Andrew Chou, Roy Frostig, and Percy Liang. Semantic parsing on Freebase from question-
+answerpairs. In Proceedingsofthe2013ConferenceonEmpiricalMethodsinNaturalLanguageProcessing ,pages
+1533–1544, Seattle, Washington, USA, October 2013. Association for Computational Linguistics.
+Jeremy Bernstein, Yu-Xiang Wang, Kamyar Azizzadenesheli, and Animashree Anandkumar. signSGD:
+Compressedoptimisationfornon-convexproblems.InJenniferDyandAndreasKrause,editors, Proceedings
+ofthe35thInternationalConferenceonMachineLearning ,volume80of ProceedingsofMachineLearningResearch ,
+pages 560–569. PMLR, 10–15 Jul 2018.
+Lucas Beyer, Olivier J. Hénaﬀ, Alexander Kolesnikov, Xiaohua Zhai, and Aäron van den Oord. Are we done
+with imagenet?, 2020.
+YonatanBisk, RowanZellers,Ronan Lebras,JianfengGao, andYejinChoi. Piqa: Reasoningabout physical
+commonsense in natural language. Proceedings of the AAAI Conference on Artiﬁcial Intelligence , 34(05):
+7432–7439, Apr. 2020. doi: 10.1609/aaai.v34i05.6239.
+JamesBradbury,RoyFrostig,PeterHawkins,MatthewJamesJohnson,ChrisLeary,DougalMaclaurin,George
+Necula, Adam Paszke, Jake VanderPlas, Skye Wanderman-Milne, and Qiao Zhang. JAX: composable
+transformations of Python+NumPy programs, 2018. URL http://github.com/google/jax .
+Markus Brameier, Wolfgang Banzhaf, and Wolfgang Banzhaf. Linear genetic programming , volume 1. Springer,
+2007.
+Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Nee-
+lakantan,PranavShyam, GirishSastry,AmandaAskell, SandhiniAgarwal,ArielHerbert-Voss, Gretchen
+Krueger,TomHenighan,RewonChild,AdityaRamesh,DanielM.Ziegler,JeﬀreyWu,ClemensWinter,
+ChristopherHesse,MarkChen,EricSigler,MateuszLitwin,ScottGray,BenjaminChess,JackClark,Christo-
+pher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are
+few-shot learners, 2020.
+Ciprian Chelba, Tomas Mikolov, Mike Schuster, Qi Ge, Thorsten Brants, and Phillipp Koehn. One billion
+word benchmark for measuring progress in statistical language modeling. CoRR, abs/1312.3005, 2013.
+Xiangning Chen and Cho-Jui Hsieh. Stabilizing diﬀerentiable architecture search via perturbation-based
+regularization. In Hal Daumé III and Aarti Singh, editors, Proceedings of the 37th International Conference on
+MachineLearning ,volume119of ProceedingsofMachineLearningResearch ,pages1554–1565.PMLR,13–18
+Jul 2020.
+Xiangning Chen, Ruochen Wang, Minhao Cheng, Xiaocheng Tang, and Cho-Jui Hsieh. DrNAS: Dirichlet
+neural architecture search. In International Conference on Learning Representations , 2021.
+XiangningChen,Cho-JuiHsieh,andBoqingGong. Whenvisiontransformersoutperformresnetswithout
+pre-training or strong data augmentations. In International Conference on Learning Representations , 2022.
+Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts,
+Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha
+Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prab-
+hakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard,
+Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk
+Michalewski,XavierGarcia,VedantMisra,KevinRobinson,LiamFedus,DennyZhou,DaphneIppolito,
+16
+DavidLuan, HyeontaekLim,BarretZoph, AlexanderSpiridonov,RyanSepassi, DavidDohan, Shivani
+Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor
+Lewkowycz,EricaMoreira,RewonChild,OleksandrPolozov,KatherineLee,ZongweiZhou,XuezhiWang,
+Brennan Saeta, Mark Diaz, Orhan Firat, MicheleCatasta, Jason Wei, KathyMeier-Hellstern, Douglas Eck,
+Jeﬀ Dean, Slav Petrov, and Noah Fiedel. Palm: Scaling language modeling with pathways, 2022.
+ChristopherClark,KentonLee,Ming-WeiChang,TomKwiatkowski,MichaelCollins,andKristinaToutanova.
+BoolQ: Exploring the surprising diﬃculty of natural yes/no questions. In Proceedings of the 2019 Conference
+oftheNorthAmericanChapteroftheAssociationforComputationalLinguistics: HumanLanguageTechnologies,
+Volume 1 (Long and Short Papers) , pages 2924–2936, Minneapolis, Minnesota, June 2019. Association for
+Computational Linguistics. doi: 10.18653/v1/N19-1300.
+PeterClark,IsaacCowhey,OrenEtzioni,TusharKhot,AshishSabharwal,CarissaSchoenick,andOyvind
+Tafjord. Think you have solved question answering? try arc, the ai2 reasoning challenge, 2018.
+Ido Dagan, Oren Glickman, and Bernardo Magnini. The pascal recognising textual entailment challenge. In
+JoaquinQuiñonero-Candela,IdoDagan,BernardoMagnini,andFlorenced’AlchéBuc,editors, Machine
+Learning Challenges. Evaluating Predictive Uncertainty, Visual Object Classiﬁcation, and Recognising Tectual
+Entailment , pages 177–190, Berlin, Heidelberg, 2006. Springer Berlin Heidelberg.
+Zihang Dai, Hanxiao Liu, Quoc V Le, and Mingxing Tan. Coatnet: Marrying convolution and attention for
+alldatasizes. InM.Ranzato,A.Beygelzimer,Y.Dauphin,P.S.Liang,andJ.WortmanVaughan,editors,
+Advances in Neural Information Processing Systems , volume 34, pages 3965–3977. Curran Associates, Inc.,
+2021.
+Marie-CatherinedeMarneﬀe,MandySimons,andJudithTonhauser. Thecommitmentbank: Investigating
+projectionin naturally occurringdiscourse. Proceedingsof SinnundBedeutung , 23(2):107–124, Jul. 2019. doi:
+10.18148/sub/2019.v23i2.601.
+JacobDevlin,Ming-WeiChang,KentonLee,andKristinaToutanova. BERT:Pre-trainingofdeepbidirectional
+transformers for language understanding. In Proceedings of the 2019 Conference of the North American Chapter
+oftheAssociationforComputationalLinguistics: HumanLanguageTechnologies,Volume1(LongandShortPapers) ,
+pages 4171–4186, Minneapolis, Minnesota, June 2019. Association for Computational Linguistics. doi:
+10.18653/v1/N19-1423.
+PrafullaDhariwalandAlexanderNichol. Diﬀusionmodelsbeatgansonimagesynthesis. InM.Ranzato,
+A.Beygelzimer,Y.Dauphin,P.S.Liang,andJ.WortmanVaughan,editors, AdvancesinNeuralInformation
+Processing Systems , volume 34, pages 8780–8794. Curran Associates, Inc., 2021.
+XuanyiDong,MingxingTan,AdamsWeiYu,DaiyiPeng,BogdanGabrys,andQuocVLe. AutoHAS:Eﬃcient
+hyperparameter and architecture search. In 2nd Workshop on Neural Architecture Search at ICLR , 2021.
+Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Un-
+terthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil
+Houlsby. An image is worth 16x16 words: Transformers for image recognition at scale. In International
+Conference on Learning Representations , 2021.
+TimothyDozat.IncorporatingNesterovMomentumintoAdam.In Proceedingsofthe4thInternationalConference
+on Learning Representations , pages 1–4, 2016.
+NanDu,YanpingHuang,AndrewMDai,SimonTong,DmitryLepikhin,YuanzhongXu,MaximKrikun,
+Yanqi Zhou, Adams Wei Yu, Orhan Firat, Barret Zoph, Liam Fedus, Maarten P Bosma, Zongwei Zhou, Tao
+Wang, EmmaWang,KellieWebster, MariePellat, KevinRobinson,Kathleen Meier-Hellstern,TojuDuke,
+LucasDixon,KunZhang,QuocLe,YonghuiWu,ZhifengChen,andClaireCui. GLaM:Eﬃcientscaling
+oflanguagemodelswithmixture-of-experts. InKamalikaChaudhuri,StefanieJegelka,LeSong,Csaba
+Szepesvari, Gang Niu, and Sivan Sabato, editors, Proceedings of the 39th International Conference on Machine
+Learning, volume 162 of Proceedings of Machine Learning Research , pages 5547–5569. PMLR, 17–23 Jul 2022.
+17
+JohnDuchi,EladHazan,andYoramSinger. Adaptivesubgradientmethodsforonlinelearningandstochastic
+optimization. Journal of Machine Learning Research , 12(61):2121–2159, 2011.
+Pierre Foret, Ariel Kleiner, Hossein Mobahi, and Behnam Neyshabur. Sharpness-aware minimization for
+eﬃciently improving generalization. In International Conference on Learning Representations , 2021.
+Ryan Gillard, Stephen Jonany, Yingjie Miao, Michael Munn, Connal de Souza, Jonathan Dungay, Chen Liang,
+David R. So, Quoc V. Le, and Esteban Real. Uniﬁed functional hashing in automatic machine learning,
+2023.
+David E Goldberg and Kalyanmoy Deb. A comparative analysis of selection schemes used in genetic
+algorithms. FOGA, 1991.
+Andrew Gordon, Zornitsa Kozareva, and Melissa Roemmele. SemEval-2012 task 7: Choice of plausible
+alternatives: An evaluation of commonsense causal reasoning. In *SEM 2012: The First Joint Conference
+onLexicalandComputationalSemantics–Volume1: Proceedingsofthemainconferenceandthesharedtask,and
+Volume2: ProceedingsoftheSixthInternationalWorkshoponSemanticEvaluation(SemEval2012) ,pages394–398,
+Montréal, Canada, 7-8 June 2012. Association for Computational Linguistics.
+Mandy Guo, Zihang Dai, Denny Vrandečić, and Rami Al-Rfou. Wiki-40B: Multilingual language model
+dataset. In ProceedingsoftheTwelfthLanguageResourcesandEvaluationConference ,pages2440–2452,Marseille,
+France, May 2020. European Language Resources Association. ISBN 979-10-95546-34-4.
+Vineet Gupta, Tomer Koren, and Yoram Singer. Shampoo: Preconditioned stochastic tensor optimization. In
+JenniferDyandAndreasKrause,editors, Proceedingsofthe35thInternationalConferenceonMachineLearning ,
+volume 80 of Proceedings of Machine Learning Research , pages 1842–1850. PMLR, 10–15 Jul 2018.
+CharlesR.Harris,K.JarrodMillman,StéfanJ.vanderWalt,RalfGommers,PauliVirtanen,DavidCournapeau,
+Eric Wieser, Julian Taylor, Sebastian Berg, Nathaniel J. Smith, Robert Kern, Matti Picus, Stephan Hoyer,
+Marten H. van Kerkwijk, Matthew Brett, Allan Haldane, Jaime Fernández del Río, Mark Wiebe, Pearu
+Peterson, Pierre Gérard-Marchant, Kevin Sheppard, Tyler Reddy, Warren Weckesser, Hameer Abbasi,
+Christoph Gohlke, and Travis E. Oliphant. Array programming with NumPy. Nature, 585(7825):357–362,
+September 2020. doi: 10.1038/s41586-020-2649-2.
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition.
+In2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , pages 770–778, 2016. doi:
+10.1109/CVPR.2016.90.
+DanHendrycks,StevenBasart,NormanMu,SauravKadavath,FrankWang,EvanDorundo,RahulDesai,
+TylerZhu,SamyakParajuli,MikeGuo,DawnSong,JacobSteinhardt,andJustinGilmer. Themanyfaces
+of robustness: A critical analysis of out-of-distribution generalization. In Proceedings of the IEEE/CVF
+International Conference on Computer Vision (ICCV) , pages 8340–8349, October 2021a.
+Dan Hendrycks, Kevin Zhao, Steven Basart, Jacob Steinhardt, and Dawn Song. Natural adversarial examples.
+InProceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 15262–
+15271, June 2021b.
+Jonathan Ho and Tim Salimans. Classiﬁer-free diﬀusion guidance, 2022.
+Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diﬀusion probabilistic models. In H. Larochelle,
+M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin, editors, Advances in Neural Information Processing Systems ,
+volume 33, pages 6840–6851. Curran Associates, Inc., 2020.
+John HHolland. Adaptationin natural andartiﬁcial systems: anintroductory analysiswith applicationsto biology,
+control, and artiﬁcial intelligence . MIT press, 1992.
+Weizhe Hua, Zihang Dai, Hanxiao Liu, and Quoc Le. Transformer quality in linear time. In Kamalika
+Chaudhuri,StefanieJegelka,LeSong,CsabaSzepesvari,GangNiu,andSivanSabato,editors, Proceedingsof
+the 39th International Conference on Machine Learning , volume 162 of Proceedings of Machine Learning Research ,
+pages 9099–9117. PMLR, 17–23 Jul 2022.
+18
+Frank Hutter, Holger H. Hoos, and Kevin Leyton-Brown. Sequential model-based optimization for general
+algorithm conﬁguration. In Carlos A. Coello Coello, editor, Learning and Intelligent Optimization , pages
+507–523, Berlin, Heidelberg, 2011. Springer Berlin Heidelberg.
+Kevin Jamieson and Ameet Talwalkar. Non-stochastic best arm identiﬁcation and hyperparameter optimiza-
+tion. InArthur Gretton andChristian C.Robert,editors, Proceedings ofthe 19th InternationalConferenceon
+Artiﬁcial Intelligence and Statistics , volume 51 of Proceedings of Machine Learning Research , pages 240–248,
+Cadiz, Spain, 09–11 May 2016. PMLR.
+MandarJoshi,EunsolChoi,DanielWeld,andLukeZettlemoyer. TriviaQA:Alargescaledistantlysupervised
+challengedatasetforreadingcomprehension. In Proceedingsofthe55thAnnualMeetingoftheAssociation
+for Computational Linguistics (Volume 1: Long Papers) , pages 1601–1611, Vancouver, Canada, July 2017.
+Association for Computational Linguistics. doi: 10.18653/v1/P17-1147.
+NitishShirishKeskar,DheevatsaMudigere,JorgeNocedal,MikhailSmelyanskiy,andPingTakPeterTang.
+Onlarge-batchtrainingfordeeplearning: Generalizationgapandsharpminima. In InternationalConference
+on Learning Representations , 2017.
+Daniel Khashabi, Snigdha Chaturvedi, Michael Roth, Shyam Upadhyay, and Dan Roth. Looking beyond
+the surface: A challenge set for reading comprehension over multiple sentences. In Proceedings of the 2018
+Conference of the North American Chapter of the Association for Computational Linguistics: Human Language
+Technologies,Volume1(LongPapers) ,pages252–262,NewOrleans,Louisiana,June2018.Associationfor
+Computational Linguistics. doi: 10.18653/v1/N18-1023.
+Diederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization, 2014.
+John R Koza. Genetic programming as a means for programming computers by natural selection. Statistics
+and computing , 4:87–112, 1994.
+Alex Krizhevsky. Learning multiple layers of features from tiny images. Technical report, 2009.
+Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redﬁeld, Michael Collins, Ankur Parikh, Chris Alberti,
+Danielle Epstein, Illia Polosukhin, Jacob Devlin, Kenton Lee, Kristina Toutanova, Llion Jones, Matthew
+Kelcey,Ming-WeiChang,AndrewM.Dai,JakobUszkoreit,QuocLe,andSlavPetrov. Naturalquestions:
+A benchmark for question answering research. Transactions of the Association for Computational Linguistics , 7:
+452–466, 2019.
+Guokun Lai, Qizhe Xie, Hanxiao Liu, Yiming Yang, and Eduard Hovy. RACE: Large-scale ReAding compre-
+hensiondatasetfromexaminations. In Proceedingsofthe2017ConferenceonEmpiricalMethodsinNatural
+LanguageProcessing ,pages785–794,Copenhagen,Denmark,September2017.AssociationforComputational
+Linguistics. doi: 10.18653/v1/D17-1082.
+Hector J. Levesque, Ernest Davis, and Leora Morgenstern. The winograd schema challenge. In Proceedings of
+theThirteenthInternationalConferenceonPrinciplesofKnowledgeRepresentationandReasoning ,KR’12,page
+552–561. AAAI Press, 2012. ISBN 9781577355601.
+Ke Li and Jitendra Malik. Learning to optimize. In International Conference on Learning Representations , 2017.
+Lisha Li, Kevin Jamieson, Giulia DeSalvo, Afshin Rostamizadeh, and Ameet Talwalkar. Hyperband: A novel
+bandit-basedapproachtohyperparameteroptimization. J.Mach.Learn.Res. ,18(1):6765–6816,jan2017.
+ISSN 1532-4435.
+Tsung-YiLin,MichaelMaire,SergeBelongie,JamesHays,PietroPerona,DevaRamanan,PiotrDollár,and
+C. Lawrence Zitnick. Microsoft coco: Common objects in context. In David Fleet, Tomas Pajdla, Bernt
+Schiele, and Tinne Tuytelaars, editors, Computer Vision – ECCV 2014 , pages 740–755, Cham, 2014. Springer
+International Publishing.
+Hanxiao Liu, Karen Simonyan, and Yiming Yang. DARTS: Diﬀerentiable architecture search. In International
+Conference on Learning Representations , 2019a.
+19
+Liyuan Liu, Haoming Jiang, Pengcheng He, Weizhu Chen, Xiaodong Liu, Jianfeng Gao, and Jiawei Han. On
+thevarianceoftheadaptivelearningrateandbeyond. In InternationalConferenceonLearningRepresentations ,
+2020.
+Yinhan Liu,Myle Ott, NamanGoyal, Jingfei Du,Mandar Joshi, DanqiChen, Omer Levy,Mike Lewis, Luke
+Zettlemoyer, and Veselin Stoyanov. Roberta: A robustly optimized bert pretraining approach, 2019b.
+Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. In International Conference on
+Learning Representations , 2019.
+Jerry Ma and Denis Yarats. Quasi-hyperbolic momentum and adam for deep learning. In International
+Conference on Learning Representations , 2019.
+James Martens and Roger Grosse. Optimizing neural networks with kronecker-factored approximate curva-
+ture. InInternational conference on machine learning , pages 2408–2417. PMLR, 2015.
+Luke Metz, Niru Maheswaranathan, Jeremy Nixon, Daniel Freeman, and Jascha Sohl-Dickstein. Understand-
+ing and correcting pathologies in the training of learned optimizers. In Kamalika Chaudhuri and Ruslan
+Salakhutdinov, editors, Proceedings of the 36th International Conference on Machine Learning , volume 97 of
+Proceedings of Machine Learning Research , pages 4556–4565. PMLR, 09–15 Jun 2019.
+Luke Metz, James Harrison, C. Daniel Freeman, Amil Merchant, Lucas Beyer, James Bradbury, Naman
+Agrawal, Ben Poole, Igor Mordatch, AdamRoberts, and JaschaSohl-Dickstein. Velo: Training versatile
+learned optimizers by scaling up, 2022.
+Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish Sabharwal. Can a suit of armor conduct electricity? a
+new dataset for open book question answering. In Proceedings of the 2018 Conference on Empirical Methods in
+Natural Language Processing , pages 2381–2391, Brussels, Belgium, October-November 2018. Association for
+Computational Linguistics. doi: 10.18653/v1/D18-1260.
+Nasrin Mostafazadeh,Nathanael Chambers,Xiaodong He,Devi Parikh,Dhruv Batra,LucyVanderwende,
+PushmeetKohli,andJamesAllen.Acorpusandclozeevaluationfordeeperunderstandingofcommonsense
+stories. In Proceedings of the 2016 Conference of the North American Chapter of the Association for Computational
+Linguistics: Human Language Technologies , pages 839–849, San Diego, California, June 2016. Association for
+Computational Linguistics. doi: 10.18653/v1/N16-1098.
+ArvindNeelakantan,LukeVilnis,QuocV.Le,LukaszKaiser,KarolKurach,IlyaSutskever,andJamesMartens.
+Adding gradient noise improves learning for very deep networks, 2017.
+YixinNie,AdinaWilliams,EmilyDinan,MohitBansal,JasonWeston,andDouweKiela. AdversarialNLI:
+A new benchmark for natural language understanding. In Proceedings of the 58th Annual Meeting of the
+Association for Computational Linguistics , pages 4885–4901, Online, July 2020. Association for Computational
+Linguistics. doi: 10.18653/v1/2020.acl-main.441.
+O.M.Parkhi,A.Vedaldi,A.Zisserman,andC.V.Jawahar. Catsanddogs. In IEEEConferenceonComputer
+Vision and Pattern Recognition , 2012.
+Daiyi Peng, Xuanyi Dong, Esteban Real, Mingxing Tan, Yifeng Lu, Gabriel Bender, Hanxiao Liu, Adam
+Kraft,ChenLiang,andQuocLe. Pyglove: Symbolicprogrammingforautomatedmachinelearning. In
+H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin, editors, Advances in Neural Information
+Processing Systems , volume 33, pages 96–108. Curran Associates, Inc., 2020.
+Hieu Pham, Melody Guan, Barret Zoph, Quoc Le, and Jeﬀ Dean. Eﬃcient neural architecture search via
+parameters sharing. In Jennifer Dy and Andreas Krause, editors, Proceedings of the 35th International
+Conference on Machine Learning , volume 80 of Proceedings of Machine Learning Research , pages 4095–4104.
+PMLR, 10–15 Jul 2018.
+Hieu Pham, Zihang Dai, Golnaz Ghiasi, Kenji Kawaguchi, Hanxiao Liu, Adams Wei Yu, Jiahui Yu, Yi-
+Ting Chen, Minh-Thang Luong, Yonghui Wu, Mingxing Tan, and Quoc V. Le. Combined scaling for
+open-vocabulary image classiﬁcation, 2021.
+20
+MohammadTaherPilehvarandJoseCamacho-Collados. WiC:theword-in-contextdatasetforevaluating
+context-sensitivemeaningrepresentations. In Proceedingsofthe2019ConferenceoftheNorthAmericanChapter
+oftheAssociationforComputationalLinguistics: HumanLanguageTechnologies,Volume1(LongandShortPapers) ,
+pages 1267–1273, Minneapolis, Minnesota, June 2019. Association for Computational Linguistics. doi:
+10.18653/v1/N19-1128.
+Bryan A. Plummer, Liwei Wang, Chris M. Cervantes, Juan C. Caicedo, Julia Hockenmaier, and Svetlana
+Lazebnik. Flickr30kentities: Collectingregion-to-phrasecorrespondencesforricherimage-to-sentence
+models. In 2015 IEEE International Conference on Computer Vision (ICCV) , pages 2641–2649, 2015. doi:
+10.1109/ICCV.2015.303.
+Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry,
+Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. Learning transferable
+visual models from natural language supervision. In Marina Meila and Tong Zhang, editors, Proceedings of
+the 38th International Conference on Machine Learning , volume 139 of Proceedings of Machine Learning Research ,
+pages 8748–8763. PMLR, 18–24 Jul 2021.
+Jack W. Rae, Anna Potapenko, Siddhant M. Jayakumar, Chloe Hillier, and Timothy P. Lillicrap. Compressive
+transformers for long-range sequence modelling. In International Conference on Learning Representations ,
+2020.
+ColinRaﬀel,NoamShazeer,AdamRoberts,KatherineLee,SharanNarang,MichaelMatena,YanqiZhou,
+WeiLi,andPeterJ.Liu. Exploringthelimitsoftransferlearningwithauniﬁedtext-to-texttransformer.
+Journal of Machine Learning Research , 21(140):1–67, 2020.
+Sachin Ravi and Hugo Larochelle. Optimization as a model for few-shot learning. In International Conference
+on Learning Representations , 2017.
+EstebanReal,AlokAggarwal,YanpingHuang,andQuocV.Le. Regularizedevolutionforimageclassiﬁer
+architecture search. Proceedings of the AAAI Conference on Artiﬁcial Intelligence , 33(01):4780–4789, Jul. 2019.
+doi: 10.1609/aaai.v33i01.33014780.
+EstebanReal,ChenLiang,DavidSo,andQuocLe. Automl-zero: Evolvingmachinelearningalgorithmsfrom
+scratch. In International Conference on Machine Learning , pages 8007–8019. PMLR, 2020.
+BenjaminRecht,RebeccaRoelofs,LudwigSchmidt,andVaishaalShankar. DoImageNetclassiﬁersgeneralize
+toImageNet? InKamalikaChaudhuriandRuslanSalakhutdinov,editors, Proceedingsofthe36thInternational
+Conference on Machine Learning , volume 97 of Proceedings of Machine Learning Research , pages 5389–5400.
+PMLR, 09–15 Jun 2019.
+Sashank J. Reddi, Satyen Kale, and Sanjiv Kumar. On the convergence of adam and beyond. In International
+Conference on Learning Representations , 2018.
+M. Riedmiller and H. Braun. A direct adaptive method for faster backpropagation learning: the rprop
+algorithm. In IEEE International Conference on Neural Networks , pages 586–591 vol.1, 1993. doi: 10.1109/
+ICNN.1993.298623.
+ChitwanSaharia,WilliamChan,SaurabhSaxena,LalaLi,JayWhang,EmilyDenton,SeyedKamyarSeyed
+Ghasemipour,RaphaelGontijo-Lopes,BurcuKaragolAyan,TimSalimans,JonathanHo,DavidJ.Fleet,and
+MohammadNorouzi. Photorealistictext-to-imagediﬀusionmodelswithdeeplanguageunderstanding. In
+AliceH.Oh,AlekhAgarwal,DanielleBelgrave,andKyunghyunCho,editors, AdvancesinNeuralInformation
+Processing Systems , 2022.
+Keisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. Winogrande: An adversarial
+winograd schema challenge at scale. Proceedings of the AAAI Conference on Artiﬁcial Intelligence , 34(05):
+8732–8740, Apr. 2020. doi: 10.1609/aaai.v34i05.6399.
+21
+Noam Shazeer and Mitchell Stern. Adafactor: Adaptive learning rates with sublinear memory cost. In
+JenniferDyandAndreasKrause,editors, Proceedingsofthe35thInternationalConferenceonMachineLearning ,
+volume 80 of Proceedings of Machine Learning Research , pages 4596–4604. PMLR, 10–15 Jul 2018.
+DavidSo,QuocLe,andChenLiang. Theevolvedtransformer. In InternationalConferenceonMachineLearning ,
+pages 5877–5886. PMLR, 2019.
+Jiaming Song, Chenlin Meng, and Stefano Ermon. Denoising diﬀusion implicit models. In International
+Conference on Learning Representations , 2021.
+Chen Sun, Abhinav Shrivastava, Saurabh Singh, and Abhinav Gupta. Revisiting unreasonable eﬀectiveness
+ofdataindeeplearningera. In ProceedingsoftheIEEEInternationalConferenceonComputerVision(ICCV) ,
+Oct 2017.
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser,
+and Illia Polosukhin. Attention is all you need. Advances in neural information processing systems , 30, 2017.
+Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, and Samuel R. Bowman. GLUE: A
+multi-taskbenchmarkandanalysisplatformfornaturallanguageunderstanding. In InternationalConference
+on Learning Representations , 2019a.
+Haohan Wang, Songwei Ge, Zachary Lipton, and Eric P Xing. Learning robust global representations by
+penalizing local predictive power. In H. Wallach, H. Larochelle, A. Beygelzimer, F. d /quotesingle.ts1Alché-Buc, E. Fox,
+andR.Garnett,editors, AdvancesinNeuralInformationProcessingSystems ,volume32.CurranAssociates,
+Inc., 2019b.
+Ruochen Wang, Xiangning Chen, Minhao Cheng, Xiaocheng Tang, and Cho-Jui Hsieh. Rank-nosh: Eﬃcient
+predictor-basedarchitecturesearchvianon-uniformsuccessivehalving. In ProceedingsoftheIEEE/CVF
+International Conference on Computer Vision (ICCV) , pages 10377–10386, October 2021a.
+RuochenWang,MinhaoCheng,XiangningChen,XiaochengTang,andCho-JuiHsieh.Rethinkingarchitecture
+selection in diﬀerentiable NAS. In International Conference on Learning Representations , 2021b.
+Ruochen Wang, Yuanhao Xiong, Minhao Cheng, and Cho-Jui Hsieh. Eﬃcient non-parametric optimizer
+search for diverse tasks. arXiv preprint arXiv:2209.13575 , 2022.
+Olga Wichrowska, Niru Maheswaranathan, Matthew W. Hoﬀman, Sergio Gómez Colmenarejo, Misha Denil,
+Nando de Freitas, and Jascha Sohl-Dickstein. Learned optimizers that scale and generalize. In Proceedings
+ofthe34thInternationalConference onMachine Learning-Volume70 , ICML’17, page3751–3760.JMLR.org,
+2017.
+Yuanhao Xiong, Li-Cheng Lan, Xiangning Chen, Ruochen Wang, and Cho-JuiHsieh. Learning to schedule
+learning rate with graph neural networks. In International Conference on Learning Representations , 2022.
+ChengrunYang,GabrielBender,HanxiaoLiu,Pieter-JanKindermans,MadeleineUdell, YifengLu, QuocV
+Le, and Da Huang. TabNAS: Rejection sampling for neural architecture search on tabular datasets. In
+AliceH.Oh,AlekhAgarwal,DanielleBelgrave,andKyunghyunCho,editors, AdvancesinNeuralInformation
+Processing Systems , 2022.
+Chris Ying, Aaron Klein, Esteban Real, Eric Christiansen, Kevin Murphy, and Frank Hutter. Nas-bench-101:
+Towards reproducible neural architecture search. ICML, 2019.
+Jiahui Yu, Zirui Wang, Vijay Vasudevan, Legg Yeung, Mojtaba Seyedhosseini, and Yonghui Wu. Coca:
+Contrastive captioners are image-text foundation models. Transactions on Machine Learning Research , 2022.
+Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. HellaSwag: Can a machine
+really ﬁnish your sentence? In Proceedings of the 57th Annual Meeting of the Association for Computational
+Linguistics , pages 4791–4800, Florence, Italy, July 2019. Association for Computational Linguistics. doi:
+10.18653/v1/P19-1472.
+22
+Xiaohua Zhai, Alexander Kolesnikov, Neil Houlsby, and Lucas Beyer. Scaling vision transformers, 2021.
+Xiaohua Zhai, Xiao Wang, Basil Mustafa, Andreas Steiner, Daniel Keysers, Alexander Kolesnikov, and Lucas
+Beyer. Lit: Zero-shot transfer with locked-image text tuning. In Proceedings of the IEEE/CVF Conference on
+Computer Vision and Pattern Recognition (CVPR) , pages 18123–18133, June 2022.
+Sheng Zhang, Xiaodong Liu, Jingjing Liu, Jianfeng Gao, Kevin Duh, and Benjamin Van Durme. Record:
+Bridging the gap between human and machine commonsense reading comprehension, 2018.
+JuntangZhuang,TommyTang,YifanDing,SekharCTatikonda,NichaDvornek,XenophonPapademetris,
+and James Duncan. Adabelief optimizer: Adapting stepsizes by the belief in observed gradients. In
+H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin, editors, Advances in Neural Information
+Processing Systems , volume 33, pages 18795–18806. Curran Associates, Inc., 2020.
+Barret Zoph and Quoc V. Le. Neural architecture search with reinforcement learning. In International
+Conference on Learning Representations (ICLR) , 2017.
+23
+Table8: Modelperformancewhenpre-trainedonJFT-300Mthenﬁne-tunedonImageNet. Thosenumbers
+correspondtoFigure1(Left)andFigure4. Theﬁne-tuningresolutionis 3842forViT-B/16andViT-L/16,and
+3922for ViT-H/14. Following Dosovitskiy et al. (2021), Polyak averaging is not applied here.
+Model #Params Epochs / Steps Optimizer ImageNet ReaL V2 A R
+ViT-B/16 38486.86M 7 / 517,791AdamW 84.24 89.04 74.89 27.39 53.71
+Lion 84.72 89.14 75.83 29.65 55.86
+ViT-L/16 384304.72M7 / 517,791AdamW 86.69 89.95 78.03 40.55 64.47
+Lion 87.32 90.43 79.29 47.13 68.49
+14 / 1,035,583AdamW 87.29 90.11 78.91 42.56 64.34
+Lion 88.09 90.62 80.48 51.55 70.72
+ViT-H/14 392632.72M 14 / 1,035,583AdamW 88.02 90.27 80.10 53.14 69.48
+Lion 88.78 90.68 81.41 58.21 73.09
+A Pseudocode for AdamW and Lion
+Algorithm 1 AdamW Optimizer
+given1,2,,,,f
+initialize0,m0 0,v0 0,t 0
+whiletnot converged do
+t t+ 1
+gt rf(t 1)
+update EMA of gtandg2
+t
+mt 1mt 1+ (1 1)gt
+vt 2vt 1+ (1 2)g2
+t
+bias correction
+^mt mt=(1 t
+1)
+^vt vt=(1 t
+2)
+update model parameters
+t t 1 t( ^mt=(p^vt+) +t 1)
+end while
+returntAlgorithm 2 Lion Optimizer (ours)
+given1,2,,,f
+initialize0,m0 0
+whiletnot converged do
+gt rf(t 1)
+update model parameters
+ct 1mt 1+ (1 1)gt
+t t 1 t(sign(ct) +t 1)
+update EMA of gt
+mt 2mt 1+ (1 2)gt
+end while
+returnt
+B Image Classiﬁcation Tasks
+Our evaluation covers various benchmarks: ImageNet, ImageNet ReaL (Beyer et al., 2020), ImageNet
+V2 (Recht et al., 2019), ImageNet A (Hendrycks et al., 2021b), ImageNet R (Hendrycks et al., 2021a),
+ImageNetSketch(Wangetal.,2019b),ObjectNet(Barbuetal.,2019),CIFAR-100(Krizhevsky,2009),and
+Oxford-IIIT Pet (Parkhi et al., 2012).
+C NLP Tasks
+This sectionshowsall the naturallanguage generation (NLG) andnatural language understanding(NLU)
+taskswhereweevaluatethelarge-scalelanguagemodelsinSection4.4. Thosetasksinclude Open-Domain
+Question Answering ,Cloze and Completion Tasks ,Winograd-Style Tasks ,Common Sense Reasoning ,In-Context
+Reading Comprehension ,SuperGLUE , andNatural Language Inference .
+24
+Figure9: Zero-shot image-textretrieval resultson MSCOCO( Top)and Flickr30K( Bottom) forLiT-B/16-B.
+Recall@Kiscalculatedbasedonifthegroundtruthlabelofthequeryappearsinthetop-Kretrievedexamples.
+•NLG:TriviaQA(Joshietal.,2017),NaturalQuestions(Kwiatkowskietal.,2019),WebQuestions(Berant
+et al., 2013).
+•NLU:HellaSwag(Zellersetal.,2019),StoryCloze(Mostafazadehetal.,2016),Winograd(Levesque
+et al., 2012), Winogrande (Sakaguchi et al., 2020), RACE (Lai et al., 2017), PIQA (Bisk et al., 2020),
+ARC(Clarketal.,2018),OpenbookQA(Mihaylovetal.,2018),BoolQ(Clarketal.,2019),Copa(Gordon
+et al., 2012), RTE (Dagan et al., 2006), WiC (Pilehvar and Camacho-Collados, 2019), Multirc (Khashabi
+etal., 2018),WSC(Levesque etal., 2012),ReCoRD (Zhanget al.,2018), CB(de Marneﬀeet al.,2019),
+Adversarial NLI (Nie et al., 2020).
+Program 5: Algorithm with
+a better regularization. It dy-
+namically calculates the dot
+product between the weight
+and gradient, before comput-
+ing the weight decay.
+def train(w, g, m, v, lr):
+m = interp(m, g, 0.16)
+g2 = square(g)
+v = interpolate(v, g2, 0.001)
+v753 = dot(g, w)
+sqrt_v = sqrt(v)
+update = m / sqrt_v
+wd = v753 * w
+update = sin(update)
+update = update + wd
+lr = lr * 0.0216
+update = update * lr
+v = sin(v)
+return update, m, vProgram 6: Algorithm that
+tracksthesecondmoment
+without EMA decay, which
+is the same as AdaGrad.
+def train(w, g, m, v, lr):
+m = interp(m, g, 0.1)
+g2 = square(g)
+g2 = v + g2
+v = interp(v, g2, 0.0015)
+sqrt_v = sqrt(v)
+update = m / sqrt_v
+v70 = get_pi()
+v = min(v, v70)
+update = sinh(update)
+lr = lr * 0.0606
+update = update * lr
+return update, m, vProgram7: Algorithmuses
+the diﬀerence between gra-
+dient and momentum to
+track the second moment,
+resembling AdaBelief.
+def train(w, g, m, v, lr):
+m = interp(m, g, 0.1)
+g = g - m
+g2 = square(g)
+v = interp(v, g2, 0.001)
+sqrt_v = sqrt(v)
+update = m / sqrt_v
+wd = w * 0.0238
+update = update + wd
+lr = lr * 0.03721
+update = update * lr
+return update, m, v
+25
+Table 9: Architecture details for language modeling.
+Model #Params nlayersdmodelnheadsdhead
+Small-scale
+Small 110M 12 768 12 64
+Medium 336M 24 1024 16 64
+Large 731M 24 1536 16 96
+Large-scale
+1.1B 1.07B 24 1536 16 96
+2.1B 2.14B 32 2048 16 128
+7.5B 7.49B 32 4096 32 128Table 10: Training error Ltrainand land-
+scape ﬂatness LN
+trainof ViT-B/16 trained
+from scratch on ImageNet.
+Optimizer AdamW Lion
+ImageNet 75.48 77.44
+ReaL 80.64 82.57
+V2 61.87 64.81
+Ltrain 0.61 0.75
+LN
+train 3.74 1.37
+Figure10: LearningcurveofViT-S/16( Left)andViT-B/16( Right)associatedwithTable7. Thecurvesof
+the ﬁve adaptive optimizers are similar to each other.
+D Other Discovered Programs
+By varying the task setting, diﬀerent types of algorithms can be discovered. For example, if we reduce
+theamountofdataintheproxytask,wearemorelikelytodiscoveralgorithmswithbetterregularization
+(Program5),andifwereducethesearchprogress,wearelikelytoﬁndsimplevariantsofAdamW(Program6
+and 7). Future work can explore this potential to discover optimizers specialized for diﬀerent tasks.
+E Architecture Details for Language Modeling
+Table9showstheTransformerarchitecturedetailsforlanguagemodeling(Section4.4). Thedimensionofthe
+feed-forward layer is 4dmodel. We use vocabulary size 32K for small-scale and 256K for large-scale models.
+F Details of Proxy Tasks
+For vision tasks, we train a ViT with three layers, 96 hidden units and three heads, on 10% ImageNet for 30k
+steps with batch size 64. The image size is 6464and the patch size is 16. For language tasks, we train a
+Transformerwithtwolayers,128hiddenunitsandtwoheadsonLM1B(Chelbaetal.,2013)for20Ksteps
+withbatchsize64,sequencelength32andvocabularysize3K.Theevaluationtimemayvaryfordiﬀerent
+programs, but typically a evaluation can be done on one TPU V2 chip within 20min. The validation accuracy
+or perplexity is used as the ﬁtness.
+26
+Figure11: Left: ValidationperplexitywhenweperformmaskedlanguagemodelingontheC4dataset. Right:
+Training loss of ViT-B/16 on ImageNet.
+G Analysis of Loss Landscape
+Inthissection,wetrytounderstandwhyourLionoptimizerachievesbettergeneralizationthanAdamW
+from the lens of loss geometry. The convergence to a smooth landscape has been shown to beneﬁt the
+generalizationofdeepneuralnetworks(ChenandHsieh,2020;Chenetal.,2022;Foretetal.,2021;Keskar
+et al., 2017). Following Chen et al. (2022), we measure the landscape ﬂatness at convergence by LN
+train =
+EN[Ltrain(w+)](average over 1K randomnoises) in Table 10. We observe thatthe ViT-B/16 trained by
+AdamWenjoysasmallertrainingerror Ltrain. However,LioncanenableViTtoconvergetoﬂatterregions,
+as it helps the model retain comparably lower error against Gaussian perturbations.
+H Available Functions
+Program8: RawprogramofLionbe-
+fore removing redundent statements.
+def train(w, g, m, v, lr):
+g = clip(g, lr)
+m = clip(m, lr)
+v845 = sqrt(0.6270633339881897)
+v968 = sign(v)
+v968 = v - v
+g = arcsin(g)
+m = interp(g, v, 0.8999999761581421)
+v1 = m * m
+v = interp(g, m, 1.109133005142212)
+v845 = tanh(v845)
+lr = lr * 0.0002171761734643951
+update = m * lr
+v1 = sqrt(v1)
+update = update / v1
+wd = lr * 0.4601978361606598
+v1 = square(v1)
+wd = wd * w
+m = cosh(update)
+lr = tan(1.4572199583053589)
+update = update + wd
+lr = cos(v845)
+return update, m, vWe include 43 available functions that can be used in the program
+during search. Note that the input of the functions can be one
+n-dimensionalarray,dictionariesorlistsofarrays,similartothe
+pytreesin JAX.
+Basic math functions from NumPy / JAX This includes unary
+functions like abs,cos,sin,tan,arcsin,arccos,arctan,exp,
+log,sinh,cosh,tanh,arcsinh,arccosh,arctanh,sign,exp2,
+exp10,expm1,log10,log2,log1p,square,sqrt,cube,cbrt,sign,
+reciprocal and binary functions like +,-,*,/,power,maximum,
+minimum with the same semantic as the corresponding function in
+NumPy / JAX.
+Linear algebra functions commonly used in ﬁrst-order opti-
+mization algorithms This includes: (1) unary function normthat
+computes the norm of each arrays in the input; (2) unary func-
+tion global_norm that computes the global norm by treating all
+the numbers in the input as one vector; (3) binary function dot
+thattreatsthetwoinputsastwovectorsandcomputestheirdot
+product;(4)binaryfunction cosine_sim thattreatsthetwoinputs
+as two vectors and computes their cosine similarity; (5) binary
+clip_by_global_norm (clip) that clips the global norm of the
+ﬁrst input to the value of the second input that is required to be
+a scalar; (6) ternary function interpolate (interp) that uses the
+thirdargument a,requiredtobeascalar,tocomputealinearinter-
+27
+Figure 12: Log perplexity of the small ( Left), medium ( Middle), and large ( Right) size Transformer on
+PG-19. Since 1= 0:95;2= 0:98in Lion when performing language modeling, we compare to Ablation 0.95
+and Ablation 0.98with= 0:95and= 0:98, respectively (see Section 4.6 for the deﬁnition). Lion is still the
+best-performing one.
+polation of the ﬁrst two arguments xandywith (1 - a) * x + a * y .
+Functions producing commonly used constants This includes get_pi,get_e,get_eps that generates ,e
+and= 10 8respectively.
+I Abstract Execution
+We propose to prune the large search space with abstract execution. Our approach is motivated by the fact
+that a largenumber of programs are invalid, functionally equivalent, orcontain redundant statements that
+wastecomputeduringevaluation. Toaddressthis,weintroduceanabstractexecutionstepthatchecksthe
+typeandshapeofeachvariable,andcomputesahashforeachuniquecomputationfrominputstooutputsto
+detect redundant statements. The abstract execution can be seen as a static analysis of the program, achieved
+by replacing functions and inputs with customized values. We outline the speciﬁcs of the customized values
+and abstract execution procedure for three use cases below. The cost of the abstract execution is usually
+negligible compared to the actual execution of the program.
+Detecting errors with type / shape inference Todetectprogramscontainingerrors,weinferthetypeand
+shapeofeachvariableintheprogramthroughthefollowingsteps: (1)replaceeachinputwithanabstract
+object that only contains type and shape information, and replace each statement with a type and shape
+inferencefunction;(2)iteratethroughallstatements. Insteadofexecutingtheoriginalstatement,wevalidate
+a function call by checking the function signature and type and shape information of its arguments. If valid,
+wecomputethetypeandshapeinformationoftheoutputandassignittothenewvariable;(3)verifythe
+validity of the derived type and shape of the output. This process essentially performs a static analysis of the
+program, exposing errors caused by type and shape mismatch. Note that there are still run-time errors, such
+as division by zero, that cannot be detected in this manner. Without such ﬁltering of invalid programs, the
+search would be overwhelmed with invalid programs, making it diﬃcult to achieve meaningful progress.
+Deduplicating with functional hash Among the valid programs that execute without errors, there are
+still lots of duplicates due to functionally equivalent programs that have diﬀerent surface forms but the
+same underlyingfunctionality. Toaddress this issue,we calculate afunctional hash valuefor every unique
+computation from the inputs to the outputs as follows: (1) a unique hash value is assigned to each input
+and function; (2) iterate through all statements, calculating the hash value of the outputs by combining the
+hash values of the functions and arguments; (3) compute the hash value of program by combining the hash
+values of all outputs. We then build a hash table that maps each unique functional hash value to the ﬁtness
+of the corresponding program. When a new program is generated, we ﬁrst look up its hash value and only
+perform evaluation if it is not found or if we want to evaluate it multiple times to reduce measurement noise.
+In our experiments, this technique reduces the search cost by 10x, as depicted in Figure 2 (Right).
+28
+Table 11: One-shot evaluation on English NLP tasks. TriviaQA, NQs, and WebQs are NLG tasks and the rest
+are NLU tasks. This corresponds to Table 5 in the main text.
+Task1.1B 2.1B 7.5B 6.7B
+GPT-38B
+PaLM Adafactor Lion Adafactor Lion Adafactor Lion
+#Tokens 300B 300B 780B
+TriviaQA (EM) 21.5 25.1 32.0 33.4 47.9 48.844.4 48.5
+NQs (EM) 4.3 4.8 6.3 7.3 12.3 12.1 9.8 10.6
+WebQs (EM) 7.5 6.3 8.4 8.7 12.1 13.315.1 12.6
+HellaSwag 50.7 50.3 59.4 59.3 68.2 68.366.5 68.2
+StoryCloze 74.8 74.4 78.2 78.3 81.2 81.578.7 78.7
+Winograd 75.1 80.2 81.3 82.1 85.3 84.284.6 85.3
+Winogrande 59.7 60.5 64.8 65.7 71.4 71.065.8 68.3
+RACE-m 52.0 50.8 55.1 53.8 59.1 61.354.7 57.7
+RACE-h 36.8 35.4 40.3 40.7 44.5 43.944.3 41.6
+PIQA 69.4 69.9 71.3 72.1 75.5 74.576.3 76.1
+ARC-e 64.3 62.0 69.5 68.9 72.4 72.762.6 71.3
+ARC-c 31.2 32.9 37.3 38.0 43.3 42.641.5 42.3
+OpenbookQA 44.8 48.0 48.4 49.0 51.4 52.453.0 47.4
+BoolQ 54.3 56.7 64.1 62.9 73.5 73.968.7 64.7
+Copa 75.0 78.0 83.0 84.0 85.0 87.082.0 82.0
+RTE 55.6 52.4 49.8 59.2 63.9 62.554.9 57.8
+WiC 47.6 47.3 46.1 48.1 50.9 48.150.3 47.3
+Multirc (F1a) 35.9 44.3 45.0 48.8 44.7 59.264.5 50.6
+WSC 76.5 75.4 79.6 79.3 86.7 85.660.6 81.4
+ReCoRD 73.4 73.7 77.8 77.7 81.0 81.188.0 87.8
+CB 46.4 44.6 48.2 44.6 51.8 46.433.9 41.1
+ANLI R1 33.3 30.1 32.4 31.2 31.5 34.031.6 32.4
+ANLI R2 29.8 31.8 29.8 30.6 32.4 31.933.9 31.4
+ANLI R3 29.8 31.8 31.4 31.9 33.6 34.233.1 34.5
+Avg NLG 11.1 12.1 15.6 16.5 24.1 24.723.1 23.9
+Avg NLU 53.2 53.9 56.8 57.4 61.3 61.758.5 59.4
+Identifying redundant statements bytracking dependencies In program evolution, redundant statements
+are included to enable combining multiple mutations to make larger program changes. However, these
+redundant statements increase the evaluation cost and make program analysis more challenging. To identify
+redundant statements, we need to determine the set of statements that the outputs depend on, which can be
+computedinarecursivemannerusingthefollowingsteps: (1)replacethevalueofeachinputwithanempty
+set, as they do not depend on any statement; (2) iterate through each statement. Note that each statement is
+an assignment that calls a function and assigns the result to a variable, which in turn depends on the current
+statement and all the depending statements of the function arguments. Therefore we replace the value of the
+variable with its dependency, i.e., a set of all depending statements; (3) compute the union of all statements
+that each output depends on, which contains all non-redundant statements. By ﬁltering out redundant
+statements, we obtain a simpliﬁed version of the program that is cheaper to execute and easier to analyze. In
+our experiments, this reduces the program length by 3x on average, as shown in Figure 2 (Right).
+29
+Table 12: Hyperparameters for all the experiments.
+Model DropoutStoch
+DepthAugmentations Optimizer 12lr 
+Train from scratch on ImageNet
+ResNet-50 - - -AdamW 0.9 0.999 3e 30.1
+Lion 0.9 0.99 3e 41.0
+Mixer-S/16 - 0.1 -AdamW 0.9 0.999 1e 20.3
+Lion 0.9 0.99 3e 31.0
+Mixer-B/16 - 0.1 -AdamW 0.9 0.999 1e 20.3
+Lion 0.9 0.99 3e 33.0
+ViT-S/160.1 0.1 -AdamW 0.9 0.999 1e 20.1
+Lion 0.9 0.99 1e 31.0
+- -RandAug: 2, 15
+Mixup: 0.5AdamW 0.9 0.999 3e 30.1
+Lion 0.9 0.99 3e 41.0
+ViT-B/160.1 0.1 -AdamW 0.9 0.999 3e 30.3
+Lion 0.9 0.99 1e 31.0
+- -RandAug: 2, 15
+Mixup: 0.5AdamW 0.9 0.999 1e 31.0
+Lion 0.9 0.99 1e 410.0
+CoAtNet-1 - 0.3RandAug: 2, 15
+Mixup: 0.8AdamW 0.9 0.999 1e 30.05
+Lion 0.9 0.99 2e 41.0
+CoAtNet-3 - 0.7RandAug: 2, 15
+Mixup: 0.8AdamW 0.9 0.999 1e 30.05
+Lion 0.9 0.99 2e 41.0
+Pre-train on ImageNet-21K
+ViT-B/16 0.1 0.1 -AdamW 0.9 0.999 1e 30.1
+Lion 0.9 0.99 1e 40.3
+ViT-L/16 0.1 0.1 -AdamW 0.9 0.999 1e 30.3
+Lion 0.9 0.99 1e 41.0
+Pre-train on JFT
+ViT-B/16 - - -AdamW 0.9 0.999 6e 40.1
+Lion 0.9 0.99 1e 40.3
+ViT-L/16 - - -AdamW 0.9 0.999 3e 40.1
+Lion 0.9 0.99 1e 40.3
+ViT-H/14 - - -AdamW 0.9 0.999 3e 40.1
+Lion 0.9 0.99 3e 50.3
+ViT-g/14 & ViT-G/14 - - -Adafactor 0.9 0.999 8e 40.03
+Lion 0.9 0.99 3e 50.3
+Vision-language contrastive learning
+LiT-B/-B - - -AdamW 0.9 0.999 1e 3-Lion 0.9 0.99 3e 4
+LiT-g/14-L - - -AdamW 0.9 0.999 1e 30.1
+Lion 0.9 0.99 2e 40.5
+BASIC-L - - -Adafactor 0.9 0.999 5e 40.01
+Lion 0.9 0.99 2e 40.1
+Diﬀusion model
+Imagen base & super-resolution - - -AdamW 0.9 0.999 1e 3-Lion 0.9 0.99 1e 4
+Image generation on ImageNet6464: 0.1
+128128&256256: 0.2- -AdamW 0.9 0.999 3e 40.01
+Lion 0.9 0.99 3e 50.1
+Autoregressive & masked language modeling
+Small & Medium (PG-19, C4) & Large - - -AdamW 0.9 0.99 3e 3-Lion 0.95 0.98 3e 4
+Medium (Wiki-40B) - - -AdamW 0.9 0.99 3e 30.001
+Lion 0.95 0.98 3e 40.01
+1.1B & 2.1B - - -Adafactor 0.9 0.99 2e 3 0:0005
+Lion 0.95 0.98 2e 4 0:005
+7.5B - - -Adafactor 0.9 0.99 1e 30.001
+Lion 0.95 0.98 1e 40.01
+Language model ﬁne-tuning
+T5-Base & Large & 11B 0.1 - -AdamW 0.9 0.99 3e 5-Lion 0.95 0.98 3e 6
+30
