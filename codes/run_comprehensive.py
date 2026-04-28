@@ -1,7 +1,7 @@
 """
-Synthetic benchmark: validates all optimizers on a controlled problem.
-Produces the full comparison without needing GPU training time.
-Generates publication-quality figures for the README.
+Final comprehensive benchmark: 16 strategies across 5 generations.
+Tracks convergence milestones (epochs and time to reach accuracy thresholds).
+Generates publication-quality figures.
 """
 
 import sys
@@ -16,7 +16,6 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 import json
 import time
 from collections import OrderedDict
@@ -26,12 +25,11 @@ from optimizers import (
     AdamW, AdaBound, Adafactor,
     DiscriminativeLR, LARS, LAMB,
     RAdam, Lookahead, SAM, Sophia, Lion, ScheduleFree,
-    Grokfast, DALS,
+    Grokfast, DALS, DALSFast, DALSAcc,
     STLRScheduler, build_discriminative_param_groups,
     build_discriminative_stlr_param_groups,
 )
 
-DEVICE = torch.device("cpu")
 FIGS_DIR = Path(__file__).parent / "figs"
 RESULTS_DIR = Path(__file__).parent / "results"
 FIGS_DIR.mkdir(exist_ok=True)
@@ -58,15 +56,10 @@ class BenchmarkModel(nn.Module):
 def make_data(n=8000, d=64, nc=10):
     torch.manual_seed(42)
     X = torch.randn(n, d)
-    # Strong hierarchical label structure tied to input features
-    # Lower dims → more universal features, higher dims → task-specific
-    base = X[:, :nc] * 3.0  # amplify signal
+    base = X[:, :nc] * 3.0
     y = base.argmax(dim=1) % nc
-    # Add noise to make it non-trivial
     X = X + torch.randn_like(X) * 0.1
     return X, y
-
-h_dim = 128
 
 def evaluate(model, X, y, bs=512):
     model.eval()
@@ -79,210 +72,263 @@ def evaluate(model, X, y, bs=512):
             total += len(yb)
     return 100.0 * correct / total
 
-def train_and_evaluate(name, epochs=30, lr=0.01):
+EPOCHS = 80
+BATCH_SIZE = 64
+N_TRAIN = 6400
+STEPS_PER_EPOCH = N_TRAIN // BATCH_SIZE
+
+def train_and_evaluate(name, epochs=EPOCHS, base_lr=0.03):
     seed_all(42)
     n, d, nc = 8000, 64, 10
     X, y = make_data(n, d, nc)
     X_train, y_train = X[:6400], y[:6400]
     X_test, y_test = X[6400:], y[6400:]
-    
-    model = BenchmarkModel(d, h_dim, nc)
-    total_steps = epochs * (6400 // 64)
-    
-    opt = create_optimizer(name, model, lr, total_steps)
-    if isinstance(opt, tuple):
-        optimizer, scheduler = opt
-    else:
-        optimizer, scheduler = opt, None
-    
-    is_sam = isinstance(optimizer, SAM)
-    is_dals = isinstance(optimizer, DALS)
-    
+
+    model = BenchmarkModel(d, 128, nc)
+    total_steps = epochs * STEPS_PER_EPOCH
+
+    opt, scheduler, is_sam = create_optimizer(name, model, base_lr, total_steps)
+
     history = {'train_acc': [], 'test_acc': [], 'train_loss': [], 'lr': []}
+    milestones = {}
     best_acc = 0
-    
-    for ep in range(epochs):
+    t0 = time.time()
+
+    for ep in range(1, epochs + 1):
         model.train()
         indices = torch.randperm(len(X_train))
         epoch_loss = 0
-        for i in range(0, len(X_train), 64):
-            idx = indices[i:i+64]
+
+        for i in range(0, len(X_train), BATCH_SIZE):
+            idx = indices[i:i+BATCH_SIZE]
             xb, yb = X_train[idx], y_train[idx]
-            
+
             if is_sam:
                 def closure():
-                    optimizer.zero_grad()
+                    opt.zero_grad()
                     out = model(xb)
                     loss = F.cross_entropy(out, yb)
                     loss.backward()
                     return loss
                 loss = closure()
-                optimizer.first_step(zero_grad=True)
+                opt.first_step(zero_grad=True)
                 with torch.enable_grad():
                     closure()
-                optimizer.second_step()
-            elif is_dals:
-                optimizer.zero_grad()
+                opt.second_step()
+            elif isinstance(opt, (DALS, DALSFast, DALSAcc)):
+                opt.zero_grad()
                 loss = F.cross_entropy(model(xb), yb)
                 loss.backward()
-                optimizer.step()
+                opt.update_phase(loss.item())
+                opt.step()
             else:
-                optimizer.zero_grad()
+                opt.zero_grad()
                 loss = F.cross_entropy(model(xb), yb)
                 loss.backward()
-                optimizer.step()
-            
-            if scheduler and not isinstance(scheduler, STLRScheduler):
+                opt.step()
+
+            if scheduler is not None and not isinstance(scheduler, STLRScheduler):
                 scheduler.step()
+
             epoch_loss += loss.item()
-        
+
         if isinstance(scheduler, STLRScheduler):
-            for _ in range(6400 // 64):
+            for _ in range(STEPS_PER_EPOCH):
                 scheduler.step()
-        
+
         train_acc = evaluate(model, X_train, y_train)
         test_acc = evaluate(model, X_test, y_test)
-        lr_now = optimizer.param_groups[0].get('lr', lr) if hasattr(optimizer, 'param_groups') else lr
+        lr_now = opt.param_groups[0].get('lr', base_lr)
+        t_now = time.time() - t0
+
+        for thr in [60, 70, 75, 80, 82, 84, 85, 86, 87, 88]:
+            if test_acc >= thr and thr not in milestones:
+                milestones[thr] = (ep, round(t_now, 2))
+
+        best_acc = max(best_acc, test_acc)
         history['train_acc'].append(train_acc)
         history['test_acc'].append(test_acc)
-        history['train_loss'].append(epoch_loss / (6400 // 64))
+        history['train_loss'].append(epoch_loss / STEPS_PER_EPOCH)
         history['lr'].append(lr_now)
-        best_acc = max(best_acc, test_acc)
-    
-    return history, best_acc
+
+    total_time = time.time() - t0
+    return history, best_acc, milestones, total_time
 
 def create_optimizer(name, model, lr, total_steps):
+    is_sam = False
+    scheduler = None
+
     if name == 'Gen1_FixedSGD':
-        return FixedLRSGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-4)
+        opt = FixedLRSGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-4)
+
     elif name == 'Gen2_CosineSGD':
-        return CosineAnnealingSGD(model.parameters(), lr=lr, T_max=total_steps, momentum=0.9, weight_decay=1e-4)
+        opt = CosineAnnealingSGD(model.parameters(), lr=0.03, T_max=total_steps, momentum=0.9, weight_decay=1e-4)
+
     elif name == 'Gen2_SGDR':
-        return SGDRWithRestarts(model.parameters(), lr=lr, T_0=5, momentum=0.9, weight_decay=1e-4)
+        opt = SGDRWithRestarts(model.parameters(), lr=0.05, T_0=10, T_mult=2, momentum=0.9, weight_decay=1e-4)
+
     elif name == 'Gen3_Adam':
-        return optim.Adam(model.parameters(), lr=3e-4)
+        opt = optim.Adam(model.parameters(), lr=3e-4)
+
     elif name == 'Gen3_AdamW':
-        return AdamW(model.parameters(), lr=3e-4, weight_decay=0.01)
+        opt = AdamW(model.parameters(), lr=3e-4, weight_decay=0.01)
+
     elif name == 'Gen3_AdaBound':
-        return AdaBound(model.parameters(), lr=3e-4, final_lr=0.01)
+        opt = AdaBound(model.parameters(), lr=3e-4, final_lr=0.01)
+
     elif name == 'Gen4_LARS':
-        return LARS(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-4)
+        opt = LARS(model.parameters(), lr=0.03, momentum=0.9, weight_decay=1e-4, trust_coef=0.02)
+
     elif name == 'Gen4_Discriminative':
         pg = build_discriminative_param_groups(model, base_lr=0.05, decay_factor=2.6)
-        return DiscriminativeLR(pg, momentum=0.9, weight_decay=1e-4)
+        opt = DiscriminativeLR(pg, momentum=0.9, weight_decay=1e-4)
+
     elif name == 'Gen5_RAdam':
-        return RAdam(model.parameters(), lr=3e-4)
+        opt = RAdam(model.parameters(), lr=3e-4)
+
     elif name == 'Gen5_Lion':
-        return Lion(model.parameters(), lr=1e-4, weight_decay=0.01)
+        opt = Lion(model.parameters(), lr=1e-4, weight_decay=0.01)
+
     elif name == 'Gen5_Lookahead':
-        return Lookahead(AdamW(model.parameters(), lr=3e-4, weight_decay=0.01), k=5, alpha=0.5)
+        opt = Lookahead(AdamW(model.parameters(), lr=3e-4, weight_decay=0.01), k=5, alpha=0.5)
+
     elif name == 'Gen5_SAM':
-        return SAM(model.parameters(), optim.SGD, rho=0.05, adaptive=True, lr=lr, momentum=0.9, weight_decay=1e-4)
+        opt = SAM(model.parameters(), optim.SGD, rho=0.05, adaptive=True, lr=0.03, momentum=0.9, weight_decay=1e-4)
+        is_sam = True
+
     elif name == 'Gen5_Grokfast':
-        return Grokfast(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-4, alpha=0.98)
+        opt = Grokfast(model.parameters(), lr=0.03, momentum=0.9, weight_decay=1e-4, alpha=0.98)
+
     elif name == 'Gen5_STLR':
         pg = build_discriminative_stlr_param_groups(model, base_lr=0.05, decay_factor=2.6)
         opt = optim.SGD(pg, momentum=0.9, weight_decay=1e-4)
-        sched = STLRScheduler(opt, T=total_steps, decay_factor=2.6)
-        return opt, sched
+        scheduler = STLRScheduler(opt, T=total_steps, decay_factor=2.6)
+
     elif name == 'SOTA_SAM_Discrim':
         pg = build_discriminative_param_groups(model, base_lr=0.05, decay_factor=2.6)
-        return SAM(pg, optim.SGD, rho=0.05, adaptive=True, lr=0.05, momentum=0.9, weight_decay=1e-4)
-    elif name == 'SOTA_DALS':
-        return DALS(model, lr=0.05, momentum=0.9, weight_decay=1e-4, decay_factor=2.6,
-                   trust_coef=0.02, T_max=total_steps, sam_rho=0.05)
+        opt = SAM(pg, optim.SGD, rho=0.05, adaptive=True, lr=0.05, momentum=0.9, weight_decay=1e-4)
+        is_sam = True
 
+    elif name == 'SOTA_DALS':
+        opt = DALS(model, lr=0.03, momentum=0.9, weight_decay=1e-4,
+                   trust_coef=0.02, grokfast_alpha=0.6,
+                   warmup_frac=0.05, T_max=total_steps)
+
+    elif name == 'SOTA_DALS_Fast':
+        opt = DALSFast(model, lr=0.05, momentum=0.85, weight_decay=1e-4,
+                        trust_coef=0.02, grokfast_alpha=0.6,
+                        warmup_frac=0.02, T_max=total_steps)
+
+    elif name == 'SOTA_DALS_Acc':
+        opt = DALSAcc(model, lr=0.03, momentum=0.9, weight_decay=5e-4,
+                       trust_coef=0.02, grokfast_alpha=0.7,
+                       T_0=STEPS_PER_EPOCH * 10, T_mult=2)
+
+    else:
+        raise ValueError(f"Unknown strategy: {name}")
+
+    return opt, scheduler, is_sam
 
 if __name__ == '__main__':
-    optimizers = [
+    strategies = [
         'Gen1_FixedSGD', 'Gen2_CosineSGD', 'Gen2_SGDR',
         'Gen3_Adam', 'Gen3_AdamW', 'Gen3_AdaBound',
         'Gen4_LARS', 'Gen4_Discriminative',
-        'Gen5_RAdam', 'Gen5_Lion', 'Gen5_Lookahead', 'Gen5_SAM',
-        'Gen5_Grokfast', 'Gen5_STLR',
-        'SOTA_SAM_Discrim', 'SOTA_DALS',
+        'Gen5_RAdam', 'Gen5_Lion', 'Gen5_Lookahead', 'Gen5_SAM', 'Gen5_Grokfast',
+        'Gen5_STLR', 'SOTA_SAM_Discrim', 'SOTA_DALS',
+        'SOTA_DALS_Fast', 'SOTA_DALS_Acc',
     ]
-    
-    print(f"\n{'='*60}")
-    print(f"  Comprehensive LR Benchmark — {len(optimizers)} strategies, 30 epochs")
-    print(f"{'='*60}\n")
-    
+
+    gen_map = {
+        'Gen1': 'G1: Fixed', 'Gen2': 'G2: Schedule', 'Gen3': 'G3: Adaptive',
+        'Gen4': 'G4: Layer', 'Gen5': 'G5: Layer\u00d7Time', 'SOTA': 'SOTA',
+    }
+    gen_colors = {
+        'Gen1': '#e74c3c', 'Gen2': '#f39c12', 'Gen3': '#3498db',
+        'Gen4': '#2ecc71', 'Gen5': '#9b59b6', 'SOTA': '#e91e63',
+    }
+
+    print(f"\n{'='*100}")
+    print(f"  FINAL COMPREHENSIVE BENCHMARK \u2014 {len(strategies)} strategies, {EPOCHS} epochs")
+    print(f"{'='*100}\n")
+
     all_results = {}
     all_histories = {}
-    
-    for name in optimizers:
+
+    for name in strategies:
         print(f"  Training: {name}...", end=" ", flush=True)
         t0 = time.time()
         try:
-            history, best_acc = train_and_evaluate(name, epochs=30)
+            history, best_acc, milestones, total_time = train_and_evaluate(name)
             elapsed = time.time() - t0
             all_histories[name] = history
             all_results[name] = {
                 'best_acc': best_acc,
                 'final_acc': history['test_acc'][-1],
-                'total_time': elapsed,
+                'milestones': milestones,
+                'total_time': total_time,
             }
-            print(f"Best={best_acc:.1f}% Final={history['test_acc'][-1]:.1f}% ({elapsed:.1f}s)")
+            ms_str = "  ".join([f"{thr}%:{v[0]}ep" for thr, v in sorted(milestones.items()) if thr <= 86])
+            print(f"Best={best_acc:.1f}%  {ms_str}  ({total_time:.1f}s)")
         except Exception as e:
-            print(f"FAILED: {e}")
             import traceback
             traceback.print_exc()
-    
+            print(f"FAILED: {e}")
+
     # ==================== Summary Table ====================
-    gen_colors = {
-        'Gen1': '#e74c3c', 'Gen2': '#f39c12', 'Gen3': '#3498db',
-        'Gen4': '#2ecc71', 'Gen5': '#9b59b6', 'SOTA': '#e91e63'
-    }
-    gen_labels = {
-        'Gen1': 'G1: Fixed', 'Gen2': 'G2: Schedule', 'Gen3': 'G3: Adaptive',
-        'Gen4': 'G4: Layer-wise', 'Gen5': 'G5: Layer×Time', 'SOTA': 'SOTA',
-    }
-    
-    print(f"\n{'='*80}")
-    print(f"  RESULTS SUMMARY — Hierarchical Learning Rate Evolution")
-    print(f"{'='*80}")
-    print(f"{'Optimizer':<28} {'Generation':>12} {'Best':>7} {'Final':>7} {'Time':>7}")
-    print("-"*80)
-    
-    for name in optimizers:
+    print(f"\n{'='*110}")
+    print(f"  CONVERGENCE & ACCURACY COMPARISON TABLE")
+    print(f"{'='*110}")
+    header = f"{'Strategy':<25s} {'Gen':>6s} {'Best':>6s}"
+    for thr in [80, 84, 86, 87]:
+        header += f" {'->'+str(thr)+'%':>8s}"
+    header += f" {'Time':>6s}"
+    print(header)
+    print("-" * 110)
+
+    sorted_strategies = sorted(strategies, key=lambda n: all_results.get(n, {}).get('best_acc', 0), reverse=True)
+    for name in sorted_strategies:
         if name not in all_results:
             continue
         r = all_results[name]
         gen = name.split('_')[0]
-        print(f"{name:<28} {gen_labels.get(gen, gen):>12} {r['best_acc']:>6.1f}% "
-              f"{r['final_acc']:>6.1f}% {r['total_time']:>6.1f}s")
-    
-    best_name = max(all_results, key=lambda n: all_results[n]['best_acc'])
-    print(f"\n  BEST: {best_name} = {all_results[best_name]['best_acc']:.1f}%")
-    
+        gen_label = gen_map.get(gen, gen)
+        row = f"{name:<25s} {gen_label:>6s} {r['best_acc']:>5.1f}%"
+        for thr in [80, 84, 86, 87]:
+            if thr in r['milestones']:
+                row += f" {r['milestones'][thr][0]:>5d}ep"
+            else:
+                row += f" {'n/a':>8s}"
+        row += f" {r['total_time']:>5.1f}s"
+        print(row)
+
     # ==================== Figure 1: Training Curves ====================
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-    
-    for name in optimizers:
+    for name in strategies:
         if name not in all_histories:
             continue
         h = all_histories[name]
         gen = name.split('_')[0]
         color = gen_colors.get(gen, '#95a5a6')
-        epochs = range(1, len(h['test_acc'])+1)
-        axes[0, 0].plot(epochs, h['test_acc'], label=name, color=color, linewidth=1.5, alpha=0.8)
-        axes[0, 1].plot(epochs, h['train_loss'], label=name, color=color, linewidth=1.5, alpha=0.8)
-        axes[1, 0].plot(epochs, h['lr'], label=name, color=color, linewidth=1.5, alpha=0.8)
-    
+        epochs_range = range(1, len(h['test_acc']) + 1)
+        axes[0, 0].plot(epochs_range, h['test_acc'], label=name, color=color, linewidth=1.5, alpha=0.8)
+        axes[0, 1].plot(epochs_range, h['train_loss'], label=name, color=color, linewidth=1.5, alpha=0.8)
+        axes[1, 0].plot(epochs_range, h['lr'], label=name, color=color, linewidth=1.5, alpha=0.8)
+
     axes[0, 0].set_title('Test Accuracy Over Training', fontsize=13, fontweight='bold')
     axes[0, 0].set_xlabel('Epoch'); axes[0, 0].set_ylabel('Accuracy (%)')
     axes[0, 0].legend(fontsize=7, ncol=2); axes[0, 0].grid(True, alpha=0.3)
-    
+
     axes[0, 1].set_title('Training Loss', fontsize=13, fontweight='bold')
     axes[0, 1].set_xlabel('Epoch'); axes[0, 1].set_ylabel('Loss')
     axes[0, 1].legend(fontsize=7, ncol=2); axes[0, 1].grid(True, alpha=0.3)
     axes[0, 1].set_yscale('log')
-    
+
     axes[1, 0].set_title('Learning Rate Schedule', fontsize=13, fontweight='bold')
     axes[1, 0].set_xlabel('Epoch'); axes[1, 0].set_ylabel('Learning Rate')
     axes[1, 0].legend(fontsize=7, ncol=2); axes[1, 0].grid(True, alpha=0.3)
     axes[1, 0].set_yscale('log')
-    
-    # Bar chart
+
     names_sorted = sorted(all_results.keys(), key=lambda n: all_results[n]['best_acc'])
     accs = [all_results[n]['best_acc'] for n in names_sorted]
     colors_bar = [gen_colors.get(n.split('_')[0], '#95a5a6') for n in names_sorted]
@@ -292,47 +338,67 @@ if __name__ == '__main__':
     axes[1, 1].set_xlabel('Best Test Accuracy (%)')
     axes[1, 1].set_title('Accuracy Comparison', fontsize=13, fontweight='bold')
     for i, v in enumerate(accs):
-        axes[1, 1].text(v+0.2, i, f'{v:.1f}%', va='center', fontsize=7)
+        axes[1, 1].text(v + 0.2, i, f'{v:.1f}%', va='center', fontsize=7)
     axes[1, 1].grid(True, axis='x', alpha=0.3)
-    
-    plt.suptitle('Learning Rate Strategy Comprehensive Comparison\n(Gen1→Gen5 + SOTA)',
+
+    plt.suptitle('Learning Rate Strategy Comprehensive Comparison\n(Gen1\u2192Gen5 + SOTA)',
                  fontsize=15, fontweight='bold', y=1.02)
     plt.tight_layout()
     fig.savefig(FIGS_DIR / 'comprehensive_comparison.png', dpi=150, bbox_inches='tight')
     print(f"\nSaved: {FIGS_DIR / 'comprehensive_comparison.png'}")
     plt.close(fig)
-    
-    # ==================== Figure 2: Generation Evolution ====================
+
+    # ==================== Figure 2: Convergence Speed ====================
+    fig, ax = plt.subplots(figsize=(14, 7))
+    top_names = sorted(all_results.keys(), key=lambda n: all_results[n]['best_acc'], reverse=True)[:8]
+    for name in top_names:
+        h = all_histories[name]
+        gen = name.split('_')[0]
+        color = gen_colors.get(gen, '#95a5a6')
+        lw = 3.0 if name == 'SOTA_DALS' else 1.5
+        ls = '--' if name == 'SOTA_DALS' else '-'
+        ax.plot(range(1, len(h['test_acc']) + 1), h['test_acc'], ls, label=name, color=color, linewidth=lw, alpha=0.9)
+    ax.axhline(y=86, color='gray', linestyle=':', alpha=0.5, label='86% threshold')
+    ax.set_xlabel('Epoch', fontsize=12)
+    ax.set_ylabel('Test Accuracy (%)', fontsize=12)
+    ax.set_title('Convergence Speed: Top 8 Strategies', fontsize=14, fontweight='bold')
+    ax.legend(fontsize=9, loc='lower right')
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    fig.savefig(FIGS_DIR / 'convergence_speed.png', dpi=150, bbox_inches='tight')
+    print(f"Saved: {FIGS_DIR / 'convergence_speed.png'}")
+    plt.close(fig)
+
+    # ==================== Figure 3: Generation Evolution ====================
     gen_groups = OrderedDict()
-    for name in optimizers:
+    for name in strategies:
         gen = name.split('_')[0]
         if gen not in gen_groups:
             gen_groups[gen] = []
         if name in all_results:
             gen_groups[gen].append(all_results[name]['best_acc'])
-    
+
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-    
     gen_order = ['Gen1', 'Gen2', 'Gen3', 'Gen4', 'Gen5', 'SOTA']
     gen_names_display = ['G1: Fixed LR', 'G2: LR Schedule', 'G3: Adaptive',
-                         'G4: Layer-wise', 'G5: Layer×Time', 'SOTA Combined']
+                         'G4: Layer-wise', 'G5: Layer\u00d7Time', 'SOTA Combined']
     gen_avgs = [np.mean(gen_groups.get(g, [0])) for g in gen_order if g in gen_groups]
     gen_maxs = [np.max(gen_groups.get(g, [0])) for g in gen_order if g in gen_groups]
-    gen_orders_filtered = [g for g in gen_order if g in gen_groups]
-    
-    x = range(len(gen_orders_filtered))
+    gen_filtered = [g for g in gen_order if g in gen_groups]
+
+    x = range(len(gen_filtered))
     width = 0.35
-    ax1.bar([i - width/2 for i in x], gen_avgs, width, label='Average', color='#3498db', alpha=0.7)
-    ax1.bar([i + width/2 for i in x], gen_maxs, width, label='Best', color='#e74c3c', alpha=0.7)
+    ax1.bar([i - width / 2 for i in x], gen_avgs, width, label='Average', color='#3498db', alpha=0.7)
+    ax1.bar([i + width / 2 for i in x], gen_maxs, width, label='Best', color='#e74c3c', alpha=0.7)
     ax1.set_xticks(x)
-    ax1.set_xticklabels([gen_names_display[gen_order.index(g)] for g in gen_orders_filtered], fontsize=9)
+    ax1.set_xticklabels([gen_names_display[gen_order.index(g)] for g in gen_filtered], fontsize=9)
     ax1.set_ylabel('Test Accuracy (%)')
     ax1.set_title('5 Generations of Learning Rate Evolution', fontsize=12, fontweight='bold')
     ax1.legend()
     ax1.grid(True, alpha=0.3)
-    
-    improvements = [0] + [gen_maxs[i] - gen_maxs[i-1] for i in range(1, len(gen_maxs))]
-    ax2.plot([gen_names_display[gen_order.index(g)] for g in gen_orders_filtered], improvements,
+
+    improvements = [0] + [gen_maxs[i] - gen_maxs[i - 1] for i in range(1, len(gen_maxs))]
+    ax2.plot([gen_names_display[gen_order.index(g)] for g in gen_filtered], improvements,
              'o-', color='#2ecc71', linewidth=2, markersize=8)
     ax2.fill_between(range(len(improvements)), improvements, alpha=0.2, color='#2ecc71')
     ax2.set_ylabel('Accuracy Improvement (%)')
@@ -341,43 +407,24 @@ if __name__ == '__main__':
     for i, v in enumerate(improvements):
         ax2.annotate(f'+{v:.1f}%' if v > 0 else f'{v:.1f}%',
                      (i, v), textcoords="offset points", xytext=(0, 10), ha='center', fontsize=9)
-    
     plt.tight_layout()
     fig.savefig(FIGS_DIR / 'generation_evolution.png', dpi=150, bbox_inches='tight')
     print(f"Saved: {FIGS_DIR / 'generation_evolution.png'}")
     plt.close(fig)
-    
-    # ==================== Figure 3: LR Schedule Comparison ====================
-    fig, ax = plt.subplots(figsize=(12, 6))
-    for name in optimizers:
-        if name not in all_histories:
-            continue
-        h = all_histories[name]
-        gen = name.split('_')[0]
-        color = gen_colors.get(gen, '#95a5a6')
-        style = '-' if 'SOTA' not in name else '--'
-        lw = 1.5 if 'SOTA' not in name else 2.5
-        ax.plot(range(1, len(h['lr'])+1), h['lr'], style, label=name, color=color, linewidth=lw, alpha=0.8)
-    ax.set_xlabel('Epoch', fontsize=12)
-    ax.set_ylabel('Learning Rate', fontsize=12)
-    ax.set_title('Learning Rate Schedules Across 5 Generations', fontsize=14, fontweight='bold')
-    ax.set_yscale('log')
-    ax.legend(fontsize=7, ncol=2, loc='upper right')
-    ax.grid(True, alpha=0.3)
-    plt.tight_layout()
-    fig.savefig(FIGS_DIR / 'lr_schedule_comparison.png', dpi=150, bbox_inches='tight')
-    print(f"Saved: {FIGS_DIR / 'lr_schedule_comparison.png'}")
-    plt.close(fig)
-    
-    # Save results
+
+    # ==================== Save Results ====================
     serializable = {}
     for name in all_results:
+        r = all_results[name]
         serializable[name] = {
-            **all_results[name],
-            'history': {k: [float(v) for v in vs] for k, vs in all_histories[name].items()}
+            'best_acc': r['best_acc'],
+            'final_acc': r['final_acc'],
+            'total_time': r['total_time'],
+            'milestones': {str(k): list(v) for k, v in r['milestones'].items()},
+            'history': {k: [float(x) for x in vs] for k, vs in all_histories[name].items()},
         }
     with open(RESULTS_DIR / 'comprehensive_results.json', 'w') as f:
         json.dump(serializable, f, indent=2)
-    
+
     print(f"\nAll results saved to {RESULTS_DIR}")
     print("All figures saved to", FIGS_DIR)

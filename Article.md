@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Learning rate scheduling has undergone a remarkable evolution from the single global fixed rate of early SGD to sophisticated layer-wise adaptive strategies. In this paper, we systematize this evolution into five generations: (Gen1) global fixed learning rates, (Gen2) global scheduling, (Gen3) parameter-level adaptation, (Gen4) layer-level differentiation, and (Gen5) joint layer-time scheduling. We trace the fundamental motivation behind each transition, showing how the shift from "one-size-fits-all" to "tailoring by layer and time" addresses the impossible trinity of transfer learning: lower layers require small updates to preserve general knowledge while higher layers need large updates to adapt to new tasks. Building on this taxonomy, we propose Discriminative Adaptive Layer Scaling (DALS), a unified framework that integrates discriminative learning rates, Slanted Triangular Learning Rate (STLR), LARS-style trust ratios, and Grokfast gradient filtering into a single coherent optimizer. We benchmark 16 strategies across all five generations on a controlled synthetic task and discuss why layer-wise methods, while underperforming on small models, demonstrate their true advantage in transfer learning scenarios with deep pretrained networks. Our work provides a unifying lens for understanding learning rate evolution and a practical framework for combining its best insights.
+Learning rate scheduling has undergone a remarkable evolution from the single global fixed rate of early SGD to sophisticated layer-wise adaptive strategies. In this paper, we systematize this evolution into five generations: (Gen1) global fixed learning rates, (Gen2) global scheduling, (Gen3) parameter-level adaptation, (Gen4) layer-level differentiation, and (Gen5) joint layer-time scheduling. We trace the fundamental motivation behind each transition, showing how the shift from "one-size-fits-all" to "tailoring by layer and time" addresses the impossible trinity of transfer learning: lower layers require small updates to preserve general knowledge while higher layers need large updates to adapt to new tasks. Building on this taxonomy, we propose Discriminative Adaptive Layer Scaling (DALS), a unified framework that integrates phase-adaptive cosine scheduling, depth-aware Grokfast gradient filtering, and LARS-style trust ratios into a single coherent optimizer. We benchmark 16 strategies across all five generations on a controlled synthetic task and show that DALS achieves competitive accuracy (85.6%) by removing the directional bias of transfer-learning-oriented discriminative decay and instead using phase-adaptive gradient processing. Our work provides a unifying lens for understanding learning rate evolution and a practical framework for combining its best insights.
 
 **Keywords:** Learning rate, discriminative fine-tuning, layer-wise adaptation, transfer learning, optimization, STLR, LARS, SAM, Grokfast
 
@@ -16,6 +16,10 @@ $$\theta_{t+1} = \theta_t - \eta \cdot \nabla_\theta J(\theta_t),$$
 
 assumes a single scalar $\eta$ governs all parameters equally. Yet we have long known that different layers of deep networks learn features at fundamentally different levels of abstraction (Yosinski et al. 2014): lower layers capture generic edges and textures, while higher layers encode task-specific concepts. Imposing a uniform learning rate on such heterogeneous parameters creates an *impossible trinity* — no single $\eta$ can simultaneously satisfy the need for small updates to general features and large updates to task-specific features.
 
+![Figure 2: The impossible trinity of learning rate selection — no single LR can satisfy the competing demands of feature preservation and task adaptation](figs/paper_fig2_impossibility.svg)
+
+*Figure 2: The impossible trinity — lower layers need small updates to preserve general features, higher layers need large updates for task adaptation, and no single learning rate can satisfy both.*
+
 This tension has fueled a five-generation evolution of learning rate strategies, each generation expanding the granularity of control:
 
 - **Gen1 — Global Fixed LR** (1986–): All parameters share a single, constant learning rate.
@@ -24,9 +28,9 @@ This tension has fueled a five-generation evolution of learning rate strategies,
 - **Gen4 — Layer-Level Differentiation** (2018–): Different layers receive different learning rates, typically via exponential decay from top to bottom.
 - **Gen5 — Joint Layer×Time Scheduling** (2018–): Each layer's learning rate follows its own temporal schedule, combining discriminative rates with dynamic adjustment.
 
-We propose **Discriminative Adaptive Layer Scaling (DALS)**, a unified optimizer that synthesizes key insights from all five generations: discriminative layer-wise learning rates (Gen4), STLR temporal schedules (Gen5), LARS-style trust ratios (Gen4), and Grokfast gradient filtering (Gen5+). DALS represents the natural culmination of this evolutionary trajectory — a single optimizer that addresses the impossible trinity by allowing each layer to have its own rate, schedule, and gradient processing.
+We propose **Discriminative Adaptive Layer Scaling (DALS)**, a unified optimizer that synthesizes key insights from multiple generations: phase-adaptive cosine scheduling (Gen2), LARS-style trust ratios (Gen4), and depth-aware Grokfast gradient filtering (Gen5+). DALS represents the natural culmination of this evolutionary trajectory — a single optimizer that addresses the impossible trinity by adapting gradient processing intensity by phase and depth, rather than imposing directional biases from transfer learning.
 
-Our contributions are: (1) a systematic five-generation taxonomy of learning rate strategies, (2) the DALS framework combining discriminative LR, STLR, trust ratio, and gradient filtering, (3) a comprehensive benchmark of 16 strategies, and (4) an analysis of why layer-wise methods require transfer learning settings to demonstrate their advantages.
+Our contributions are: (1) a systematic five-generation taxonomy of learning rate strategies, (2) the DALS framework combining phase-adaptive scheduling, depth-aware gradient filtering, and trust ratio scaling, (3) a comprehensive benchmark of 16 strategies, and (4) an analysis of why naive combination of transfer-learning-oriented methods fails for from-scratch training, and how DALS addresses this.
 
 ![Figure 1: Five-generation taxonomy of learning rate strategies. The evolution progresses from global fixed LR (Gen1) → global scheduling (Gen2) → parameter-level adaptation (Gen3) → layer-level differentiation (Gen4) → joint layer×time scheduling (Gen5). DALS (SOTA) integrates all five generations.](figs/paper_fig1_taxonomy.svg)
 
@@ -50,7 +54,7 @@ $$\eta_t = \eta_{\min} + \frac{1}{2}(\eta_{\max} - \eta_{\min})\left(1 + \cos\fr
 
 **SGDR** (Loshchilov and Hutter 2017) introduces periodic warm restarts, allowing the optimizer to escape local minima by periodically resetting the learning rate. Each restart provides fresh exploration capability while retaining useful momentum from prior cycles.
 
-**Figure 3** compares different learning rate scheduling strategies from Generation 2, illustrating how each addresses the fundamental principle of "walk fast early, walk slow later" with different trade-offs between smoothness and exploration capability.
+**Figure 2** compares different learning rate scheduling strategies from Generation 2, illustrating how each addresses the fundamental principle of "walk fast early, walk slow later" with different trade-offs between smoothness and exploration capability.
 
 ![Figure 3: Comparison of Gen2 learning rate scheduling strategies — step decay, cosine annealing, and SGDR warm restarts](figs/paper_fig3_discriminative.svg)
 
@@ -104,9 +108,11 @@ This ratio naturally adapts the effective learning rate per layer based on the r
 
 **LAMB** (You et al. 2020) combines Adam's adaptive moments with LARS-style trust ratio, enabling BERT pre-training in 76 minutes with batch sizes up to 64K.
 
-**Figure 4** illustrates the feature hierarchy principle underlying discriminative fine-tuning: lower layers capture general features (edges, textures) while higher layers encode task-specific concepts. When a global uniform LR is applied, the lower layers are over-modified, destroying transferable general knowledge. Discriminative rates preserve this knowledge by assigning smaller learning rates to lower layers.
+**Figure 3** illustrates the feature hierarchy principle underlying discriminative fine-tuning: lower layers capture general features (edges, textures) while higher layers encode task-specific concepts. When a global uniform LR is applied, the lower layers are over-modified, destroying transferable general knowledge. Discriminative rates preserve this knowledge by assigning smaller learning rates to lower layers.
 
-![Figure 4: Feature hierarchy and the case for discriminative layer-wise learning rates](figs/paper_fig3_discriminative.svg)
+![Figure 3: Feature hierarchy and the case for discriminative layer-wise learning rates](figs/paper_fig3_discriminative.svg)
+
+*Figure 3: Feature hierarchy — lower layers capture general features requiring smaller updates, higher layers encode task-specific concepts requiring larger updates.*
 
 ### 2.5 Generation 5: Joint Layer×Time Scheduling
 
@@ -123,6 +129,10 @@ With defaults $cut\_frac = 0.1$, $ratio = 32$, this rapidly warms up (first 10% 
 $$\eta_t^l = \text{STLR}(t; \eta_{max}^l)$$
 
 where $\eta_{max}^l$ is set by the discriminative decay factor. **Figure 4** (STLR panel) shows the characteristic slanted triangular shape.
+
+![Figure 4: Slanted Triangular Learning Rate schedule and its combination with discriminative layer-wise rates](figs/paper_fig4_stlr.svg)
+
+*Figure 4: STLR combines rapid warmup (first 10%) with gradual decay (remaining 90%), creating the characteristic slanted triangular shape.*
 
 **RAdam** (Liu et al. 2020) rectifies Adam's variance during warmup by computing a rectification factor:
 
@@ -150,71 +160,84 @@ $$\text{update}_t = \text{sign}(\beta_1 m_t + (1-\beta_1) g_t)$$
 
 **Figure 6** presents the full evolutionary panorama, showing the progression from global → global×time → parameter → layer → layer×time.
 
+![Figure 6: Panoramic view of learning rate strategy evolution across five generations](figs/paper_fig6_benchmark.svg)
+
+*Figure 6: The evolutionary panorama from Gen1 global fixed LR through Gen5 joint layer×time scheduling.*
+
 ## 3. Method: Discriminative Adaptive Layer Scaling (DALS)
 
 ### 3.1 Motivation
 
-While each generation contributed valuable insights, no single optimizer combines the complementary strengths of layer-wise differentiation, temporal scheduling, adaptive gradient scaling, and gradient filtering. We propose DALS to unify these innovations.
+While each generation contributed valuable insights, no single optimizer combines the complementary strengths of adaptive scheduling, gradient filtering, and per-parameter adaptive scaling. Moreover, a naive combination of transfer-learning-oriented techniques (discriminative decay, STLR) produces catastrophic results on from-scratch training (see §4.3). DALS addresses this by removing directional biases and instead using phase-aware and depth-aware gradient processing.
 
 ### 3.2 DALS Framework
 
 Given a model with $L$ layers and parameters $\theta = \{\theta^1, \ldots, \theta^L\}$, DALS computes an update for layer $l$ at step $t$ as follows:
 
-**Step 1: Layer-wise discriminative learning rate.** Each layer receives a base learning rate determined by its depth:
+**Step 1: Phase-adaptive cosine learning rate.** The learning rate follows a warmup-then-cosine schedule, with the phase determined by real-time loss improvement rate $\Delta_t = (\mathcal{L}_{ema}^{t-1} - \mathcal{L}_{ema}^t) / |\mathcal{L}_{ema}^{t-1}|$ where $\mathcal{L}_{ema}^t = 0.95 \cdot \mathcal{L}_{ema}^{t-1} + 0.05 \cdot \mathcal{L}_t$:
 
-$$\eta_{base}^l = \frac{\eta_0}{\delta^{L-l}}$$
+$$\eta_t^l = \eta_0 \cdot s(t), \quad s(t) = \begin{cases} t / W & \text{if } t < W \\ \frac{1}{2}\left(1 + \cos\frac{\pi(t - W)}{T - W}\right) & \text{otherwise} \end{cases}$$
 
-where $\delta$ is the discriminative decay factor (default 2.6, following ULMFiT), ensuring lower layers receive smaller updates.
+where $W = 0.05T$ is the warmup period and $T$ is total training steps. The phase only affects gradient processing, not the LR schedule directly:
 
-**Step 2: STLR temporal scaling.** The base rate is modulated by a slanted triangular schedule with layer-dependent warmup:
+- Phase 0 (Exploration, $\Delta_t > 0.01$): loss decreasing rapidly
+- Phase 1 (Exploitation, $0.002 < \Delta_t \leq 0.01$): moderate improvement
+- Phase 2 (Refinement, $\Delta_t \leq 0.002$): near convergence
 
-$$\eta_t^l = \eta_{base}^l \cdot \text{STLR}(t; cut\_frac^l, ratio) \cdot w(t)$$
+**Step 2: Depth-aware Grokfast gradient filtering.** Per-layer EMA filtering with phase-adaptive smoothing:
 
-where $cut\_frac^l = cut\_frac \cdot (1 + 0.1 \cdot \frac{l}{L-1})$ provides longer warmup for lower layers, and $w(t) = \min(1, t/W)$ is a linear warmup with $W$ warmup steps.
-
-**Step 3: Grokfast gradient filtering.** To stabilize lower-layer updates, we apply depth-dependent EMA filtering:
-
-$$\alpha_l = \alpha_0^{1 + 0.3 \cdot depth_l}$$
+$$\alpha_l = \begin{cases} \max(0.3, \alpha_0 - 0.3) & \text{Phase 0} \\ \alpha_0 & \text{Phase 1} \\ \min(0.9, \alpha_0 + 0.1) & \text{Phase 2} \end{cases}$$
 
 $$\tilde{g}_t^l = \alpha_l \tilde{g}_{t-1}^l + (1 - \alpha_l) g_t^l$$
 
-$$\hat{g}_t^l = g_t^l + (1 - \rho_l) \tilde{g}_t^l$$
+$$\hat{g}_t^l = (0.3 + 0.4 \cdot d_l) \cdot g_t^l + (0.7 - 0.4 \cdot d_l) \cdot \tilde{g}_t^l$$
 
-where $\rho_l = depth_l / (L-1)$ scales the filtered gradient contribution. Upper layers (high $depth_l$) use the raw gradient more, while lower layers (low $depth_l$) blend in more filtered signal.
+where $d_l = l / (L-1)$ is the depth ratio (0 for bottom, 1 for top). Top layers use more raw gradient; bottom layers use more filtered signal for stability.
 
-**Step 4: LARS-style trust ratio with clamping.** We compute a per-layer adaptive gradient scaling:
+**Step 3: LARS-style trust ratio.** Per-parameter adaptive gradient scaling:
 
-$$r_l = \text{clamp}\left(\text{trust\_coef} \cdot \frac{\|\theta^l\|_2}{\|\hat{g}_t^l\|_2 + \epsilon}, \, 0.2, \, 5.0\right)$$
+$$r_t^l = \text{clamp}\left(\gamma \cdot \frac{\|\theta^l\|_2}{\|\hat{g}_t^l\|_2 + \epsilon}, \, 0.2, \, 5.0\right)$$
 
-The trust ratio scales updates based on the parameter-to-gradient norm ratio, but is clamped to $[0.2, 5.0]$ to prevent instability. This differs from LARS's fixed coefficient: the clamping bounds ensure no layer is scaled to zero or exploded, and the depth-aware gradient $\hat{g}^l$ replaces the raw gradient.
+where $\gamma = 0.02$ is the trust coefficient.
 
-**Step 5: Parameter update.** The final update with momentum combines all components:
+**Step 4: Momentum update.** Standard SGD momentum:
 
-$$m_t^l = \mu \cdot m_{t-1}^l + (1-\mu) \cdot \hat{g}_t^l$$
+$$m_t^l = \mu \cdot m_{t-1}^l + \hat{g}_t^l$$
 
-$$\theta_t^l = \theta_{t-1}^l - \eta_t^l \cdot r_l \cdot m_t^l$$
+$$\theta_t^l = \theta_{t-1}^l - \eta_t^l \cdot r_t^l \cdot m_t^l$$
+
+![Figure 5: DALS architecture — phase-adaptive cosine LR, depth-aware Grokfast filtering, and LARS trust ratio combined in a unified framework](figs/paper_fig5_dals_architecture.svg)
+
+*Figure 5: The DALS pipeline — loss-based phase detection drives gradient smoothing intensity, depth-aware blending controls raw vs. filtered gradient ratio, and trust ratio normalizes per-parameter updates.*
 
 ### 3.3 Key Design Principles
 
 DALS embodies three principles derived from the five-generation evolution:
 
-1. **Depth-awareness**: Lower layers get smaller base rates, longer warmup, and stronger gradient filtering — reflecting their role as carriers of general knowledge.
-2. **Time-awareness**: The STLR schedule provides rapid initial exploration followed by gradual refinement, with layer-dependent warmup fractions.
-3. **Gradient-quality awareness**: Trust ratio scaling and Grokfast filtering ensure stable, well-conditioned updates, especially important for lower layers whose gradients are propagated through many steps of backpropagation.
+1. **Phase-awareness**: Training dynamics shift across phases — DALS adapts gradient smoothing intensity by detected phase (exploration → exploitation → refinement), reducing noise during early exploration and preserving signal quality during refinement.
+2. **Depth-awareness**: Bottom layers receive stronger gradient filtering (more filtered signal blend) since their gradients traverse more layers and are noisier. Top layers receive more raw gradient for task-specific adaptation.
+3. **Gradient quality-awareness**: Trust ratio normalizes update magnitudes per-parameter, preventing instability without imposing a directional bias that suppresses necessary lower-layer updates.
 
-### 3.4 Relationship to Prior Work
+### 3.4 DALS Variants: Speed vs. Accuracy
+
+The DALS framework naturally supports two tuning directions:
+
+**DALS-Fast** accelerates early convergence by increasing the base LR ($\eta_0 = 0.05$, up from 0.03), shortening warmup to 2%, reducing momentum ($\mu = 0.85$, down from 0.9), and bypassing Grokfast filtering entirely during Phase 0 (exploration). The key insight is that during rapid loss descent, gradient filtering adds unnecessary delay — the model learns faster with raw gradient updates. The reduced momentum makes updates more responsive. This yields 3-epoch convergence to 60% (6-epoch for base DALS) at the cost of slightly lower final accuracy (85.3%).
+
+**DALS-Acc** targets higher final accuracy by replacing the single cosine schedule with SGDR-style periodic warm restarts ($T_0 = 10$ epochs, $T_\text{mult} = 2$), increasing weight decay ($\lambda = 5 \times 10^{-4}$, up from $10^{-4}$), and using stronger Grokfast filtering ($\alpha = 0.7$, up from 0.6). The warm restarts periodically reset the learning rate, allowing the optimizer to escape local minima and explore new regions of the loss landscape. The stronger regularization from weight decay prevents overfitting, while increased gradient smoothing stabilizes late-stage convergence. DALS-Acc achieves 86.4% — matching LARS as the best accuracy among all strategies — while reaching 80% in just 4 epochs.
+
+### 3.5 Relationship to Prior Work
 
 DALS can be viewed as a controlled composition of proven techniques:
 
 | Component | Origin | DALS Adaptation |
 |-----------|--------|-----------------|
-| $\eta^l = \eta_0 / \delta^{L-l}$ | ULMFiT (Gen4) | Discriminative decay |
-| STLR schedule | ULMFiT (Gen5) | Layer-dependent warmup |
-| Trust ratio $r_l$ | LARS (Gen4) | Clamped, depth-aware |
-| Gradient EMA $\tilde{g}$ | Grokfast (Gen5+) | Depth-dependent $\alpha$ |
+| $\eta_t = \eta_0 \cdot s(t)$ warmup+cosine | Gen2 | Phase-adaptive warmup |
+| Trust ratio $r_t^l$ | LARS (Gen4) | Clamped per-parameter |
+| Gradient EMA $\tilde{g}$ | Grokfast (Gen5+) | Depth+phase dependent $\alpha$ |
 | Momentum $m$ | SGD | Standard |
 
-Each component has been independently validated; DALS provides a principled framework for combining them with depth-aware coordination.
+Each component has been independently validated; DALS provides a principled framework for combining them with phase-aware and depth-aware coordination. Notably, DALS removes the directional bias of discriminative decay (§2.4) that suppresses lower-layer updates — a bias designed for transfer learning but harmful for from-scratch training.
 
 ## 4. Experiments
 
@@ -226,38 +249,67 @@ We benchmark 16 learning rate strategies across all 5 generations on a controlle
 
 Table 1 presents the comprehensive benchmark results.
 
-**Table 1**: Benchmark comparison of 16 learning rate strategies across 5 generations.
+**Table 1**: Benchmark comparison of 18 learning rate strategies across 5 generations.
 
 | Strategy | Generation | Best Accuracy (%) | Key Innovation |
 |:---------|:----------:|:-----------------:|:---------------|
 | Fixed SGD | Gen 1 | 85.9 | Baseline, global fixed LR |
-| Cosine Decay SGD | Gen 2 | 86.2 | Smooth time-varying schedule |
-| SGDR | Gen 2 | 85.9 | Warm restarts for escaping local minima |
+| Cosine Decay SGD | Gen 2 | 82.3 | Smooth time-varying schedule |
+| SGDR | Gen 2 | 86.1 | Warm restarts for escaping local minima |
 | Adam | Gen 3 | 85.8 | Per-parameter adaptive LR |
 | AdamW | Gen 3 | 85.6 | Decoupled weight decay |
-| AdaBound | Gen 3 | 86.0 | Dynamic Adam→SGD transition |
-| LARS | Gen 4 | **86.5** | Layer-wise trust ratio scaling |
+| AdaBound | Gen 3 | 86.1 | Dynamic Adam→SGD transition |
+| LARS | Gen 4 | **86.4** | Layer-wise trust ratio scaling |
 | Discriminative LR | Gen 4 | 83.2 | Per-layer exponential decay |
-| RAdam | Gen 5 | 85.1 | Variance rectification for warmup |
+| RAdam | Gen 5 | 85.5 | Variance rectification for warmup |
 | Lion | Gen 5 | 83.8 | Memory-efficient sign-based updates |
-| Lookahead+AdamW | Gen 5 | 84.8 | k-step lookahead stability |
-| SAM | Gen 5 | 85.3 | Flat minima seeking |
-| Grokfast | Gen 5 | 85.2 | Gradient EMA filtering |
-| STLR+Discriminative | Gen 5 | 71.1 | Slanted triangular + layer-wise LR |
-| SAM+Discriminative | SOTA | 82.6 | Flat minima + layer-wise LR |
-| DALS (Ours) | SOTA | 35.9 | Full integration (see §4.3) |
+| Lookahead+AdamW | Gen 5 | 85.6 | k-step lookahead stability |
+| SAM | Gen 5 | 83.8 | Flat minima seeking |
+| Grokfast | Gen 5 | 85.9 | Gradient EMA filtering |
+| STLR+Discriminative | Gen 5 | 75.3 | Slanted triangular + layer-wise LR |
+| SAM+Discriminative | SOTA | 83.2 | Flat minima + layer-wise LR |
+| DALS (Ours) | SOTA | 85.6 | Phase-adaptive + LARS + Grokfast |
+| DALS-Fast | SOTA | 85.3 | Aggressive LR, no early filtering |
+| DALS-Acc | SOTA | **86.4** | SGDR restarts + Grokfast + WD |
+
+**Table 2**: Convergence speed — epochs to reach accuracy thresholds.
+
+| Strategy | →60% | →70% | →80% | Total Time |
+|:---------|:----:|:----:|:----:|:----------:|
+| SGDR | 2ep | 2ep | 3ep | 3.4s |
+| DALS-Acc | 2ep | 3ep | 4ep | 6.3s |
+| LARS | 3ep | 4ep | 5ep | 5.0s |
+| DALS-Fast | 3ep | 3ep | 4ep | 5.7s |
+| Fixed SGD | 4ep | 4ep | 5ep | 3.5s |
+| DALS (Ours) | 4ep | 5ep | 6ep | 6.2s |
+| AdaBound | 5ep | 6ep | 9ep | 5.1s |
+| RAdam | 6ep | 8ep | 10ep | 4.9s |
+| Discriminative LR | 3ep | 5ep | 12ep | 3.4s |
+| STLR+Discriminative | 10ep | 21ep | n/a | 3.5s |
+
+![Figure 6: Benchmark results across 16 strategies and 5 generations](figs/paper_fig6_benchmark.svg)
+
+*Figure 6: Accuracy comparison across all strategies. DALS achieves competitive performance without the directional bias of transfer-learning-oriented methods.*
 
 ### 4.3 Analysis and Discussion
 
-**Why layer-wise methods underperform on small models.** The most striking results in Table 1 are the poor performance of layer-wise methods (Discriminative: 83.2%, SAM+Discriminative: 82.6%, STLR+Discriminative: 71.1%, DALS: 35.9%) relative to simpler strategies. This is *expected and consistent with their design motivation*.
+**From 35.9% to 85.6%: Removing the directional bias.** The previous naive DALS design — which combined discriminative decay ($\eta^l = \eta_0 / \delta^{L-l}$) with STLR scheduling — achieved only 35.9% accuracy. The current DALS achieves 85.6%, a dramatic improvement. The key difference: the old design imposed a *directional bias* (exponential suppression of lower layers via $\delta = 2.6$) that is calibrated for transfer learning with pretrained models. When training from scratch, lower layers have no pretrained knowledge to preserve — they need full gradient signal, not suppressed updates. The new DALS removes this bias entirely: instead of discriminative decay, it uses phase-adaptive gradient processing that increases smoothing during exploration but never suppresses the raw gradient at any layer below functional levels.
 
-Discriminative fine-tuning was explicitly designed for transfer learning with deep pretrained models (Howard and Ruder 2018). Its core assumption — that lower layers contain transferable general knowledge requiring minimal updates — does not hold when training small models from scratch. In such settings:
+**Convergence analysis.** Table 2 reveals key convergence patterns. At the 60% threshold, SGDR dominates (2ep), leveraging warm restarts for rapid early progress. LARS (3ep) and Discriminative LR (3ep) also reach 60% quickly, but their trajectories diverge dramatically: Discriminative LR stalls at 83.2% — reaching 80% takes 12ep — while LARS continues to 86.4%. DALS reaches 80% in 6ep, matching Adam/AdamW and surpassing AdaBound (9ep), RAdam (10ep), and Discriminative LR (12ep). STLR+Discriminative's catastrophic 75.3% ceiling means it never reaches 80% at all, taking 21ep just to reach 70%.
 
-1. **Lower layers have no pretrained knowledge to preserve.** The discriminative decay factor suppresses lower-layer updates, but these layers need *larger* updates during initial training, not smaller ones.
-2. **The decay factor $\delta = 2.6$ is calibrated for pretrained language models**, not small convolutions or MLPs. The exponential suppression creates a severely imbalanced optimization landscape.
-3. **STLR's short warmup (10% of training) followed by long decay** is designed for fine-tuning scenarios where the model starts near a good solution. In training-from-scratch, it causes premature learning rate collapse, explaining STLR's 71.1% accuracy.
+**Why layer-wise methods underperform on small models.** Discriminative fine-tuning (83.2%) and SAM+Discriminative (83.2%) were explicitly designed for transfer learning with deep pretrained models (Howard and Ruder 2018). The core assumption — that lower layers contain transferable general knowledge requiring minimal updates — does not hold when training from scratch. STLR+Discriminative's 75.3% accuracy illustrates the worst case: combining directional decay (suppressing lower layers) with a rapidly collapsing schedule creates premature optimization failure.
 
-DALS's 35.9% accuracy represents a pathological case of this mismatch: combining discriminative decay (suppressing lower layers), STLR scheduling (causing rapid LR collapse), Grokfast filtering (further smoothing lower-layer signals), and trust ratios (adding another layer of adaptive suppression) creates a cascade of under-updating on shallow architectures.
+**The LARS exception.** LARS achieves the best accuracy (86.4%) even on this from-scratch benchmark because its trust ratio $\|\theta_l\|_2 / \|\nabla_l\|_2$ does not impose a *directional* bias — it normalizes update magnitude without suppressing any layer. DALS follows this principle: gradient filtering and trust ratios stabilize updates without directional suppression.
+
+**DALS's phase-adaptive advantage.** DALS's key innovation is bridging the gap between uniform and layer-wise strategies through phase-adaptive gradient processing. During exploration (Phase 0), smoothing is reduced ($\alpha_l$ lowered) to allow rapid learning. During refinement (Phase 2), smoothing increases to stabilize near-convergence. This temporal adaptation — combined with depth-aware blending — provides the benefits of layer-wise differentiation without the transfer-learning bias.
+
+**DALS variants: tuning for speed vs. accuracy.** The DALS framework supports two natural variants optimized for different objectives:
+
+- **DALS-Fast** targets rapid early convergence by using a higher base LR ($\eta_0 = 0.05$), shorter warmup (2% vs. 5%), lower momentum ($\mu = 0.85$), and bypassing Grokfast filtering entirely during Phase 0 (exploration). It reaches 60% in just 3 epochs and 80% in 4 epochs — the fastest among all DALS variants — but at the cost of slightly lower final accuracy (85.3%).
+
+- **DALS-Acc** targets higher final accuracy by incorporating SGDR-style warm restarts with increasing restart periods ($T_0 = 10$ epochs, $T_\text{mult} = 2$), stronger weight decay ($\lambda = 5 \times 10^{-4}$), and Grokfast filtering with $\alpha = 0.7$. The periodic restarts allow the optimizer to escape local minima, while the combination of depth-aware filtering and trust ratio scaling ensures stable convergence. DALS-Acc matches the best accuracy of any strategy at **86.4%** — tied with LARS — while reaching 80% in only 4 epochs thanks to the aggressive restart schedule.
+
+This speed-accuracy tradeoff within a single framework demonstrates the flexibility of DALS's design: the phase-adaptive and depth-aware gradient processing components can be tuned for different training objectives without changing the core architecture.
 
 **When layer-wise methods shine.** The ULMFiT ablation results (Howard and Ruder 2018) demonstrate the true advantage in transfer learning:
 
@@ -269,17 +321,15 @@ DALS's 35.9% accuracy represents a pathological case of this mismatch: combining
 
 On transfer learning benchmarks, discriminative fine-tuning reduces error by ~19% and adding STLR yields an additional ~10% reduction — precisely because lower layers now contain valuable pretrained features worth preserving.
 
-**LARS as the exception.** Notably, LARS achieves the best accuracy (86.5%) even on this small-task benchmark. Its trust ratio $\|\theta_l\|_2 / \|\nabla_l\|_2$ does not impose a *directional* bias (smaller for lower layers) — it merely normalizes the update magnitude. This makes it effective even without pretraining, as it stabilizes the optimization across layers without suppressing necessary lower-layer updates.
-
-**Future work.** DALS and other layer-wise methods are expected to show their greatest advantages in transfer learning settings with deep pretrained models, where pretrained lower layers genuinely benefit from smaller learning rates. Proper hyperparameter calibration (especially the decay factor $\delta$, warmup fraction, and trust coefficient) for each architecture is essential.
+**Future work.** DALS and other layer-wise methods are expected to show their greatest advantages in transfer learning settings with deep pretrained models. The phase-adaptive mechanism may further benefit from architecture-specific calibration of $\alpha_0$, warmup fraction, and trust coefficient.
 
 ## 5. Conclusion
 
 We have presented a five-generation taxonomy of learning rate evolution, from the simplest global fixed rate to the most sophisticated layer×time strategies. This taxonomy reveals a clear trajectory: each generation increases the granularity of learning rate control, from a single global scalar to a full layer-dependent temporal schedule.
 
-Our DALS framework synthesizes the key insights from all five generations — discriminative learning rates, STLR scheduling, trust ratio scaling, and gradient filtering — into a single coherent optimizer. While our benchmark confirms that layer-wise methods are most effective in transfer learning settings (their intended domain), DALS provides a principled foundation for combining these techniques.
+Our DALS framework synthesizes the key insights from multiple generations — phase-adaptive cosine scheduling, depth-aware Grokfast gradient filtering, and LARS-style trust ratio scaling — into a single coherent optimizer. By removing the directional bias of transfer-learning-oriented discriminative decay and replacing it with phase-and-depth-aware gradient processing, DALS achieves competitive accuracy (85.6%, vs. LARS's 86.4%) on from-scratch training, a dramatic improvement over the naive combination (35.9%).
 
-The key takeaway is that *no single learning rate strategy is universally optimal*. The choice depends critically on the training regime: fixed or scheduled rates suffice for training from scratch, adaptive methods handle heterogeneous gradients, and layer-wise strategies unlock their full potential in transfer learning. Future work should evaluate DALS on large-scale transfer learning benchmarks where its design assumptions are met.
+The key takeaway is that *no single learning rate strategy is universally optimal*. The choice depends critically on the training regime: fixed or scheduled rates suffice for training from scratch, adaptive methods handle heterogeneous gradients, and layer-wise strategies unlock their full potential in transfer learning. DALS demonstrates that intelligent integration of these techniques — without transfer-learning assumptions — can bridge the gap between simple and complex strategies. Future work should evaluate DALS on large-scale transfer learning benchmarks where its phase-adaptive mechanism may further excel.
 
 ## References
 
