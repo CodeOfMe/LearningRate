@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" font-family="'Segoe UI', Arial, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="320" fill="#fafafa"/>
+  
+  <!-- Title row -->
+  <text x="150" y="28" text-anchor="middle" font-size="14" fill="#D32F2F" font-weight="bold">LR Too Large</text>
+  <text x="450" y="28" text-anchor="middle" font-size="14" fill="#1976D2" font-weight="bold">LR Too Small</text>
+  <text x="750" y="28" text-anchor="middle" font-size="14" fill="#388E3C" font-weight="bold">LR Just Right</text>
+  
+  <!-- Loss landscapes -->
+  <!-- Panel 1: Too Large -->
+  <g transform="translate(0,40)">
+    <rect x="10" y="10" width="280" height="250" fill="white" stroke="#e0e0e0" rx="8"/>
+    <!-- Valley -->
+    <path d="M30,200 Q70,220 100,225 Q140,230 170,220 Q210,210 270,200" fill="none" stroke="#90CAF9" stroke-width="2"/>
+    <path d="M30,200 Q70,240 100,250 Q140,260 170,245 Q210,230 270,200" fill="#E3F2FD" stroke="none"/>
+    <!-- Oscillating path -->
+    <path d="M40,180 L70,230 L90,160 L120,240 L150,155 L180,245 L210,165 L240,250 L260,170" 
+          fill="none" stroke="#D32F2F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Start point -->
+    <circle cx="40" cy="180" r="4" fill="#D32F2F"/>
+    <!-- Arrows showing oscillation -->
+    <text x="140" y="280" font-size="11" fill="#777" text-anchor="middle">Oscillates around minimum</text>
+  </g>
+  
+  <!-- Panel 2: Too Small -->
+  <g transform="translate(300,40)">
+    <rect x="10" y="10" width="280" height="250" fill="white" stroke="#e0e0e0" rx="8"/>
+    <path d="M30,200 Q70,240 100,250 Q140,260 170,245 Q210,230 270,200" fill="#E3F2FD" stroke="#90CAF9" stroke-width="2"/>
+    <!-- Very slow progress -->
+    <path d="M40,185 L55,182 L70,180 L85,178 L100,177 L115,176 L130,175 L145,174.5 L160,174 L175,173.8 L190,173.7 L205,173.6 L220,173.55 L235,173.5 L250,173.48" 
+          fill="none" stroke="#1976D2" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="40" cy="185" r="4" fill="#1976D2"/>
+    <!-- Target minimum -->
+    <circle cx="260" cy="170" r="5" fill="none" stroke="#FF9800" stroke-width="2" stroke-dasharray="3,3"/>
+    <text x="140" y="280" font-size="11" fill="#777" text-anchor="middle">Progress is extremely slow</text>
+  </g>
+  
+  <!-- Panel 3: Just Right -->
+  <g transform="translate(600,40)">
+    <rect x="10" y="10" width="280" height="250" fill="white" stroke="#e0e0e0" rx="8"/>
+    <path d="M30,200 Q70,240 100,250 Q140,260 170,245 Q210,230 270,200" fill="#E3F2FD" stroke="#90CAF9" stroke-width="2"/>
+    <!-- Smooth descent -->
+    <path d="M40,185 Q80,200 100,210 Q130,225 155,230 Q180,225 210,210 Q240,195 260,185" 
+          fill="none" stroke="#388E3C" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="40" cy="185" r="4" fill="#388E3C"/>
+    <circle cx="260" cy="185" r="4" fill="#388E3C"/>
+    <!-- Star at optimum -->
+    <text x="155" y="238" font-size="16" fill="#FF9800" text-anchor="middle">★</text>
+    <text x="140" y="280" font-size="11" fill="#777" text-anchor="middle">Reaches minimum smoothly</text>
+  </g>
+</svg>

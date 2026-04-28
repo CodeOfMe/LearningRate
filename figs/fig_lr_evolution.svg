@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 520" font-family="'Segoe UI', Arial, sans-serif">
+  <rect width="860" height="520" fill="#fafafa"/>
+  
+  <!-- Title -->
+  <text x="430" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">Learning Rate Evolution: Five Generations</text>
+  
+  <!-- Gen 1: Global Fixed LR -->
+  <g transform="translate(20,50)">
+    <rect width="240" height="78" rx="8" fill="white" stroke="#9E9E9E" stroke-width="1.5"/>
+    <rect width="240" height="22" rx="8" fill="#9E9E9E"/>
+    <rect y="10" width="240" height="12" fill="#9E9E9E"/>
+    <text x="120" y="16" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Gen 1: Global Fixed LR</text>
+    
+    <!-- Three layers with same LR bar -->
+    <rect x="12" y="28" width="65" height="18" rx="3" fill="#E0E0E0" stroke="#9E9E9E" stroke-width="1"/>
+    <text x="44" y="40" text-anchor="middle" font-size="9" fill="#555">Layer 1</text>
+    <rect x="82" y="28" width="65" height="18" rx="3" fill="#E0E0E0" stroke="#9E9E9E" stroke-width="1"/>
+    <text x="114" y="40" text-anchor="middle" font-size="9" fill="#555">Layer 2</text>
+    <rect x="152" y="28" width="65" height="18" rx="3" fill="#E0E0E0" stroke="#9E9E9E" stroke-width="1"/>
+    <text x="184" y="40" text-anchor="middle" font-size="9" fill="#555">Layer 3</text>
+    
+    <!-- Same LR arrows -->
+    <line x1="44" y1="48" x2="44" y2="62" stroke="#9E9E9E" stroke-width="3"/>
+    <line x1="114" y1="48" x2="114" y2="62" stroke="#9E9E9E" stroke-width="3"/>
+    <line x1="184" y1="48" x2="184" y2="62" stroke="#9E9E9E" stroke-width="3"/>
+    
+    <text x="120" y="74" text-anchor="middle" font-size="10" fill="#757575">All layers: η (same size)</text>
+  </g>
+  
+  <!-- Arrow 1→2 -->
+  <path d="M270,89 L290,89" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+  
+  <!-- Gen 2: LR Decay -->
+  <g transform="translate(300,50)">
+    <rect width="240" height="78" rx="8" fill="white" stroke="#1976D2" stroke-width="1.5"/>
+    <rect width="240" height="22" rx="8" fill="#1976D2"/>
+    <rect y="10" width="240" height="12" fill="#1976D2"/>
+    <text x="120" y="16" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Gen 2: LR Decay</text>
+    
+    <rect x="12" y="28" width="65" height="18" rx="3" fill="#BBDEFB" stroke="#1976D2" stroke-width="1"/>
+    <text x="44" y="40" text-anchor="middle" font-size="9" fill="#0D47A1">Layer 1</text>
+    <rect x="82" y="28" width="65" height="18" rx="3" fill="#BBDEFB" stroke="#1976D2" stroke-width="1"/>
+    <text x="114" y="40" text-anchor="middle" font-size="9" fill="#0D47A1">Layer 2</text>
+    <rect x="152" y="28" width="65" height="18" rx="3" fill="#BBDEFB" stroke="#1976D2" stroke-width="1"/>
+    <text x="184" y="40" text-anchor="middle" font-size="9" fill="#0D47A1">Layer 3</text>
+    
+    <!-- Decreasing arrows (same start, time-varying) -->
+    <line x1="44" y1="48" x2="44" y2="62" stroke="#1976D2" stroke-width="3"/>
+    <line x1="114" y1="48" x2="114" y2="62" stroke="#1976D2" stroke-width="3"/>
+    <line x1="184" y1="48" x2="184" y2="62" stroke="#1976D2" stroke-width="3"/>
+    
+    <!-- Time arrow -->
+    <text x="120" y="74" text-anchor="middle" font-size="10" fill="#0D47A1">Same η(t) decreases over time</text>
+  </g>
+  
+  <!-- Arrow 2→3 -->
+  <path d="M550,89 L570,89" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+  
+  <!-- Gen 3: Adaptive -->
+  <g transform="translate(580,50)">
+    <rect width="250" height="78" rx="8" fill="white" stroke="#F57C00" stroke-width="1.5"/>
+    <rect width="250" height="22" rx="8" fill="#F57C00"/>
+    <rect y="10" width="250" height="12" fill="#F57C00"/>
+    <text x="125" y="16" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Gen 3: Adaptive (Adam/RMSProp)</text>
+    
+    <rect x="12" y="28" width="65" height="18" rx="3" fill="#FFE0B2" stroke="#F57C00" stroke-width="1"/>
+    <text x="44" y="40" text-anchor="middle" font-size="9" fill="#E65100">Param a</text>
+    <rect x="82" y="28" width="65" height="18" rx="3" fill="#FFE0B2" stroke="#F57C00" stroke-width="1"/>
+    <text x="114" y="40" text-anchor="middle" font-size="9" fill="#E65100">Param b</text>
+    <rect x="152" y="28" width="65" height="18" rx="3" fill="#FFE0B2" stroke="#F57C00" stroke-width="1"/>
+    <text x="184" y="40" text-anchor="middle" font-size="9" fill="#E65100">Param c</text>
+    
+    <!-- Different size arrows per parameter -->
+    <line x1="44" y1="48" x2="44" y2="62" stroke="#F57C00" stroke-width="1.5"/>
+    <line x1="114" y1="48" x2="114" y2="62" stroke="#F57C00" stroke-width="4"/>
+    <line x1="184" y1="48" x2="184" y2="62" stroke="#F57C00" stroke-width="2.5"/>
+    
+    <text x="125" y="74" text-anchor="middle" font-size="10" fill="#E65100">Each parameter: its own η</text>
+  </g>
+  
+  <!-- Arrow row1→row2 (from Gen3 down to Gen4) -->
+  <path d="M705,135 L705,155 L415,155 L415,170" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+  
+  <!-- Gen 4: Discriminative Fine-tuning -->
+  <g transform="translate(140,170)">
+    <rect width="300" height="105" rx="8" fill="white" stroke="#388E3C" stroke-width="2"/>
+    <rect width="300" height="22" rx="8" fill="#388E3C"/>
+    <rect y="10" width="300" height="12" fill="#388E3C"/>
+    <text x="150" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Gen 4: Discriminative Fine-tuning (ULMFiT)</text>
+    
+    <rect x="15" y="30" width="82" height="22" rx="4" fill="#C8E6C9" stroke="#43A047" stroke-width="1"/>
+    <text x="56" y="44" text-anchor="middle" font-size="10" fill="#2E7D32">Layer 1</text>
+    
+    <rect x="107" y="30" width="82" height="22" rx="4" fill="#FFE0B2" stroke="#F57C00" stroke-width="1"/>
+    <text x="148" y="44" text-anchor="middle" font-size="10" fill="#E65100">Layer 2</text>
+    
+    <rect x="200" y="30" width="82" height="22" rx="4" fill="#FFCDD2" stroke="#E53935" stroke-width="1"/>
+    <text x="241" y="44" text-anchor="middle" font-size="10" fill="#C62828">Layer 3</text>
+    
+    <!-- LR bars: small for bottom, large for top -->
+    <rect x="28" y="58" width="40" height="10" rx="2" fill="#43A047" opacity="0.7"/>
+    <text x="48" y="66" text-anchor="middle" font-size="8" fill="white" font-weight="bold">η¹</text>
+    <text x="28" y="84" font-size="9" fill="#43A047">≈ 0.001</text>
+    
+    <rect x="116" y="56" width="55" height="12" rx="2" fill="#F57C00" opacity="0.7"/>
+    <text x="143" y="66" text-anchor="middle" font-size="8" fill="white" font-weight="bold">η²</text>
+    <text x="116" y="84" font-size="9" fill="#E65100">≈ 0.004</text>
+    
+    <rect x="208" y="54" width="70" height="14" rx="2" fill="#E53935" opacity="0.7"/>
+    <text x="243" y="66" text-anchor="middle" font-size="8" fill="white" font-weight="bold">η³</text>
+    <text x="208" y="84" font-size="9" fill="#C62828">= 0.01</text>
+    
+    <text x="150" y="100" text-anchor="middle" font-size="10" fill="#2E7D32">Per-layer LR: bottom small → top large</text>
+  </g>
+  
+  <!-- Arrow 4→5 -->
+  <path d="M445,222 L465,222" fill="none" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+  
+  <!-- Gen 5: Discriminative + Scheduled -->
+  <g transform="translate(475,160)">
+    <rect width="360" height="125" rx="8" fill="white" stroke="#7B1FA2" stroke-width="2"/>
+    <rect width="360" height="22" rx="8" fill="#7B1FA2"/>
+    <rect y="10" width="360" height="12" fill="#7B1FA2"/>
+    <text x="180" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Gen 5: Discriminative + STLR (ULMFiT Full)</text>
+    
+    <!-- Mini STLR curves for each layer -->
+    <!-- Layer 1 (bottom) - small curve -->
+    <rect x="15" y="28" width="100" height="85" rx="4" fill="#F3E5F5" stroke="#CE93D8" stroke-width="1"/>
+    <text x="65" y="42" text-anchor="middle" font-size="9" fill="#4A148C" font-weight="bold">Layer 1</text>
+    <path d="M25,100 L32,98 L40,92 L50,80 L58,72 L65,70 L72,72 L82,78 L95,88 L105,98" fill="none" stroke="#43A047" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="65" y="112" text-anchor="middle" font-size="8" fill="#4A148C">STLR(η¹_max)</text>
+    
+    <!-- Layer 2 (middle) - medium curve -->
+    <rect x="130" y="28" width="100" height="85" rx="4" fill="#F3E5F5" stroke="#CE93D8" stroke-width="1"/>
+    <text x="180" y="42" text-anchor="middle" font-size="9" fill="#4A148C" font-weight="bold">Layer 2</text>
+    <path d="M140,100 L147,96 L155,85 L165,68 L173,58 L180,55 L187,58 L197,68 L210,82 L220,98" fill="none" stroke="#F57C00" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="180" y="112" text-anchor="middle" font-size="8" fill="#4A148C">STLR(η²_max)</text>
+    
+    <!-- Layer 3 (top) - large curve -->
+    <rect x="245" y="28" width="100" height="85" rx="4" fill="#F3E5F5" stroke="#CE93D8" stroke-width="1"/>
+    <text x="295" y="42" text-anchor="middle" font-size="9" fill="#4A148C" font-weight="bold">Layer 3</text>
+    <path d="M255,100 L262,92 L270,72 L280,48 L288,36 L295,32 L302,36 L312,52 L325,72 L335,98" fill="none" stroke="#E53935" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="295" y="112" text-anchor="middle" font-size="8" fill="#4A148C">STLR(η³_max)</text>
+  </g>
+  
+  <!-- Side annotations -->
+  <!-- Granularity labels -->
+  <g transform="translate(10,300)">
+    <rect width="820" height="100" rx="8" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    
+    <text x="410" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Granularity Progression</text>
+    
+    <rect x="20" y="35" width="130" height="45" rx="22" fill="#EEEEEE" stroke="#9E9E9E" stroke-width="1.5"/>
+    <text x="85" y="54" text-anchor="middle" font-size="11" fill="#616161" font-weight="bold">Global</text>
+    <text x="85" y="69" text-anchor="middle" font-size="9" fill="#9E9E9E">one η for all</text>
+    
+    <path d="M155,57 L175,57" fill="none" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+    
+    <rect x="185" y="35" width="130" height="45" rx="22" fill="#E3F2FD" stroke="#1976D2" stroke-width="1.5"/>
+    <text x="250" y="54" text-anchor="middle" font-size="11" fill="#0D47A1" font-weight="bold">Global × Time</text>
+    <text x="250" y="69" text-anchor="middle" font-size="9" fill="#1976D2">η(t) for all</text>
+    
+    <path d="M320,57 L340,57" fill="none" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+    
+    <rect x="350" y="35" width="130" height="45" rx="22" fill="#FFF3E0" stroke="#F57C00" stroke-width="1.5"/>
+    <text x="415" y="54" text-anchor="middle" font-size="11" fill="#E65100" font-weight="bold">Parameter</text>
+    <text x="415" y="69" text-anchor="middle" font-size="9" fill="#F57C00">η per param</text>
+    
+    <path d="M485,57 L505,57" fill="none" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+    
+    <rect x="515" y="35" width="130" height="45" rx="22" fill="#E8F5E9" stroke="#388E3C" stroke-width="1.5"/>
+    <text x="580" y="54" text-anchor="middle" font-size="11" fill="#2E7D32" font-weight="bold">Layer</text>
+    <text x="580" y="69" text-anchor="middle" font-size="9" fill="#388E3C">η per layer</text>
+    
+    <path d="M650,57 L670,57" fill="none" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+    
+    <rect x="680" y="35" width="120" height="45" rx="22" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.5"/>
+    <text x="740" y="54" text-anchor="middle" font-size="11" fill="#4A148C" font-weight="bold">Layer × Time</text>
+    <text x="740" y="69" text-anchor="middle" font-size="9" fill="#7B1FA2">η per layer × t</text>
+  </g>
+  
+  <!-- Bottom summary -->
+  <g transform="translate(10,420)">
+    <rect width="820" height="85" rx="8" fill="#E8EAF6" stroke="#5C6BC0" stroke-width="1.5"/>
+    
+    <text x="410" y="22" text-anchor="middle" font-size="12" font-weight="bold" fill="#283593">Key Insight</text>
+    
+    <text x="410" y="42" text-anchor="middle" font-size="11" fill="#3949AB">From "one-size-fits-all" to "layer-aware, time-varying"</text>
+    
+    <rect x="60" y="52" width="165" height="24" rx="4" fill="#C8E6C9" stroke="#43A047" stroke-width="1"/>
+    <text x="142" y="68" text-anchor="middle" font-size="10" fill="#2E7D32">Bottom: small η (preserve)</text>
+    
+    <rect x="250" y="52" width="165" height="24" rx="4" fill="#FFE0B2" stroke="#F57C00" stroke-width="1"/>
+    <text x="332" y="68" text-anchor="middle" font-size="10" fill="#E65100">Middle: moderate η</text>
+    
+    <rect x="440" y="52" width="165" height="24" rx="4" fill="#FFCDD2" stroke="#E53935" stroke-width="1"/>
+    <text x="522" y="68" text-anchor="middle" font-size="10" fill="#C62828">Top: large η (adapt)</text>
+    
+    <rect x="630" y="52" width="165" height="24" rx="4" fill="#E1BEE7" stroke="#7B1FA2" stroke-width="1"/>
+    <text x="712" y="68" text-anchor="middle" font-size="10" fill="#4A148C">All: STLR schedule</text>
+  </g>
+  
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8" fill="#666"/>
+    </marker>
+  </defs>
+</svg>

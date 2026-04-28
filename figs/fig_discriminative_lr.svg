@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" font-family="'Segoe UI', Arial, sans-serif">
+  <rect width="800" height="380" fill="#fafafa"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Uniform LR vs Discriminative Fine-tuning</text>
+  
+  <!-- Left: Uniform LR -->
+  <g transform="translate(20,50)">
+    <rect width="360" height="300" fill="white" stroke="#e0e0e0" rx="8"/>
+    <text x="180" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#D32F2F">Uniform Learning Rate</text>
+    
+    <!-- Network layers -->
+    <!-- Layer 3 (top) -->
+    <rect x="80" y="45" width="200" height="35" rx="5" fill="#FFE0B2" stroke="#F57C00" stroke-width="1.5"/>
+    <text x="180" y="67" text-anchor="middle" font-size="11" fill="#E65100">Layer 3 (high-level)</text>
+    
+    <!-- Layer 2 (middle) -->
+    <rect x="80" y="90" width="200" height="35" rx="5" fill="#FFF9C4" stroke="#FBC02D" stroke-width="1.5"/>
+    <text x="180" y="112" text-anchor="middle" font-size="11" fill="#F57F17">Layer 2 (mid-level)</text>
+    
+    <!-- Layer 1 (bottom) -->
+    <rect x="80" y="135" width="200" height="35" rx="5" fill="#C8E6C9" stroke="#43A047" stroke-width="1.5"/>
+    <text x="180" y="157" text-anchor="middle" font-size="11" fill="#2E7D32">Layer 1 (general)</text>
+    
+    <!-- Same LR for all -->
+    <line x1="290" y1="62" x2="330" y2="62" stroke="#D32F2F" stroke-width="2.5"/>
+    <text x="340" y="67" font-size="13" fill="#D32F2F" font-weight="bold">η=0.01</text>
+    
+    <line x1="290" y1="107" x2="330" y2="107" stroke="#D32F2F" stroke-width="2.5"/>
+    <text x="340" y="112" font-size="13" fill="#D32F2F" font-weight="bold">η=0.01</text>
+    
+    <line x1="290" y1="152" x2="330" y2="152" stroke="#D32F2F" stroke-width="2.5"/>
+    <text x="340" y="157" font-size="13" fill="#D32F2F" font-weight="bold">η=0.01</text>
+    
+    <!-- Warning for bottom layer -->
+    <rect x="68" y="130" width="204" height="45" rx="5" fill="none" stroke="#D32F2F" stroke-width="2.5" stroke-dasharray="5,3"/>
+    <text x="180" y="210" text-anchor="middle" font-size="11" fill="#D32F2F" font-weight="bold">⚠ General features overwritten!</text>
+    <text x="180" y="228" text-anchor="middle" font-size="10" fill="#888">Same step size → bottom layer</text>
+    <text x="180" y="242" text-anchor="middle" font-size="10" fill="#888">changes too much</text>
+    
+    <!-- Problem label -->
+    <rect x="55" y="260" width="250" height="28" rx="14" fill="#FFCDD2" stroke="#E53935" stroke-width="1"/>
+    <text x="180" y="279" text-anchor="middle" font-size="12" fill="#C62828" font-weight="bold">Catastrophic Forgetting Risk ✗</text>
+  </g>
+  
+  <!-- Right: Discriminative LR -->
+  <g transform="translate(420,50)">
+    <rect width="360" height="300" fill="white" stroke="#e0e0e0" rx="8"/>
+    <text x="180" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#388E3C">Discriminative Learning Rate</text>
+    
+    <!-- Layer 3 (top) -->
+    <rect x="80" y="45" width="200" height="35" rx="5" fill="#FFE0B2" stroke="#F57C00" stroke-width="1.5"/>
+    <text x="180" y="67" text-anchor="middle" font-size="11" fill="#E65100">Layer 3 (high-level)</text>
+    
+    <!-- Layer 2 (middle) -->
+    <rect x="80" y="90" width="200" height="35" rx="5" fill="#FFF9C4" stroke="#FBC02D" stroke-width="1.5"/>
+    <text x="180" y="112" text-anchor="middle" font-size="11" fill="#F57F17">Layer 2 (mid-level)</text>
+    
+    <!-- Layer 1 (bottom) -->
+    <rect x="80" y="135" width="200" height="35" rx="5" fill="#C8E6C9" stroke="#43A047" stroke-width="1.5"/>
+    <text x="180" y="157" text-anchor="middle" font-size="11" fill="#2E7D32">Layer 1 (general)</text>
+    
+    <!-- Different LR for each -->
+    <line x1="290" y1="62" x2="330" y2="62" stroke="#E65100" stroke-width="3.5"/>
+    <text x="340" y="67" font-size="13" fill="#E65100" font-weight="bold">η³=0.01</text>
+    
+    <line x1="290" y1="107" x2="325" y2="107" stroke="#F57F17" stroke-width="2.5"/>
+    <text x="335" y="112" font-size="12" fill="#F57F17">η²≈0.004</text>
+    
+    <line x1="290" y1="152" x2="318" y2="152" stroke="#2E7D32" stroke-width="1.8"/>
+    <text x="328" y="157" font-size="11" fill="#2E7D32">η¹≈0.001</text>
+    
+    <!-- Arrow indicating decreasing -->
+    <path d="M330,55 L330,160" fill="none" stroke="#666" stroke-width="1.2" stroke-dasharray="4,3"/>
+    <polygon points="330,160 326,150 334,150" fill="#666"/>
+    <text x="305" y="220" text-anchor="middle" font-size="10" fill="#666">↓ decreasing</text>
+    <text x="305" y="233" text-anchor="middle" font-size="10" fill="#666">by factor 2.6</text>
+    
+    <!-- Success label -->
+    <rect x="55" y="260" width="250" height="28" rx="14" fill="#C8E6C9" stroke="#43A047" stroke-width="1"/>
+    <text x="180" y="279" text-anchor="middle" font-size="12" fill="#2E7D32" font-weight="bold">Preserves Knowledge ✓</text>
+  </g>
+</svg>

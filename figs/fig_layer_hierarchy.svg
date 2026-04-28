@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 420" font-family="'Segoe UI', Arial, sans-serif">
+  <rect width="820" height="420" fill="#fafafa"/>
+  
+  <!-- Title -->
+  <text x="410" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Feature Hierarchy in Deep Networks</text>
+  <text x="410" y="48" text-anchor="middle" font-size="12" fill="#888">(Yosinski et al., 2014)</text>
+  
+  <!-- Network layers (left side) -->
+  <g transform="translate(30,65)">
+    <!-- Layer boxes stacked vertically -->
+    <rect x="0" y="0" width="200" height="55" rx="6" fill="#FFCDD2" stroke="#E53935" stroke-width="1.5"/>
+    <text x="100" y="22" text-anchor="middle" font-size="12" font-weight="bold" fill="#C62828">Layer 5 (Top)</text>
+    <text x="100" y="38" text-anchor="middle" font-size="10" fill="#C62828">Task-specific features</text>
+    
+    <rect x="0" y="60" width="200" height="55" rx="6" fill="#FFE0B2" stroke="#F57C00" stroke-width="1.5"/>
+    <text x="100" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#E65100">Layer 3-4 (Middle)</text>
+    <text x="100" y="98" text-anchor="middle" font-size="10" fill="#E65100">Object parts / patterns</text>
+    
+    <rect x="0" y="120" width="200" height="55" rx="6" fill="#C8E6C9" stroke="#43A047" stroke-width="1.5"/>
+    <text x="100" y="142" text-anchor="middle" font-size="12" font-weight="bold" fill="#2E7D32">Layer 1-2 (Bottom)</text>
+    <text x="100" y="158" text-anchor="middle" font-size="10" fill="#2E7D32">Edges, textures (general)</text>
+    
+    <!-- Arrow on left side -->
+    <text x="-10" y="50" font-size="11" fill="#666" transform="rotate(-90,-10,50)" text-anchor="middle">General ←→ Task-specific</text>
+    <line x1="-25" y1="10" x2="-25" y2="165" stroke="#999" stroke-width="1.5" marker-end="url(#arrowG)" marker-start="url(#arrowR)"/>
+    <defs>
+      <marker id="arrowG" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#999"/></marker>
+      <marker id="arrowR" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="#999"/></marker>
+    </defs>
+  </g>
+  
+  <!-- Transfer learning diagram (right side) -->
+  <g transform="translate(300,65)">
+    <text x="250" y="-2" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Transfer Learning Implication</text>
+    
+    <!-- Pretrained model -->
+    <rect x="20" y="15" width="180" height="175" rx="8" fill="white" stroke="#666" stroke-width="1.5"/>
+    <text x="110" y="35" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">Pretrained Model</text>
+    
+    <!-- Layers inside pretrained -->
+    <rect x="35" y="45" width="150" height="40" rx="4" fill="#FFCDD2" stroke="#E53935" stroke-width="1"/>
+    <text x="110" y="62" text-anchor="middle" font-size="10" fill="#C62828">Top: task-specific</text>
+    <text x="110" y="76" text-anchor="middle" font-size="10" fill="#C62828">→ NEEDS large LR</text>
+    
+    <rect x="35" y="90" width="150" height="40" rx="4" fill="#FFE0B2" stroke="#F57C00" stroke-width="1"/>
+    <text x="110" y="107" text-anchor="middle" font-size="10" fill="#E65100">Middle: patterns</text>
+    <text x="110" y="121" text-anchor="middle" font-size="10" fill="#E65100">→ moderate LR</text>
+    
+    <rect x="35" y="135" width="150" height="40" rx="4" fill="#C8E6C9" stroke="#43A047" stroke-width="1"/>
+    <text x="110" y="152" text-anchor="middle" font-size="10" fill="#2E7D32">Bottom: general</text>
+    <text x="110" y="166" text-anchor="middle" font-size="10" fill="#2E7D32">→ NEEDS small LR</text>
+  </g>
+  
+  <!-- LR scale bar -->
+  <g transform="translate(300,270)">
+    <!-- Single LR arrow -->
+    <text x="120" y="0" text-anchor="middle" font-size="12" font-weight="bold" fill="#D32F2F">Single LR (traditional)</text>
+    <rect x="0" y="15" width="250" height="30" rx="4" fill="#FFCDD2" stroke="#E53935" stroke-width="1.5"/>
+    <text x="125" y="35" text-anchor="middle" font-size="12" font-weight="bold" fill="#C62828">All layers: η = 0.01</text>
+    
+    <!-- Discriminative LR arrows -->
+    <text x="120" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="#388E3C">Discriminative LR (ULMFiT)</text>
+    <rect x="0" y="83" width="40" height="30" rx="4" fill="#C8E6C9" stroke="#43A047" stroke-width="1.5"/>
+    <text x="20" y="103" text-anchor="middle" font-size="10" fill="#2E7D32">0.001</text>
+    
+    <rect x="50" y="83" width="60" height="30" rx="4" fill="#FFE0B2" stroke="#F57C00" stroke-width="1.5"/>
+    <text x="80" y="103" text-anchor="middle" font-size="10" fill="#E65100">0.004</text>
+    
+    <rect x="120" y="83" width="130" height="30" rx="4" fill="#FFCDD2" stroke="#E53935" stroke-width="1.5"/>
+    <text x="185" y="103" text-anchor="middle" font-size="11" font-weight="bold" fill="#C62828">0.01</text>
+    
+    <!-- Arrow -->
+    <text x="125" y="130" text-anchor="middle" font-size="11" fill="#666">← small (preserve general knowledge)  |  large (adapt to new task) →</text>
+  </g>
+</svg>

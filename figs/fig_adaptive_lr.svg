@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350" font-family="'Segoe UI', Arial, sans-serif">
+  <rect width="800" height="350" fill="#fafafa"/>
+  
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Fixed LR vs Adaptive LR: Convergence Path</text>
+  
+  <!-- Left panel: Fixed LR -->
+  <g transform="translate(20,45)">
+    <rect width="370" height="280" fill="white" stroke="#e0e0e0" rx="8"/>
+    <text x="185" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#D32F2F">Fixed Learning Rate</text>
+    
+    <!-- Contour lines (elliptical) -->
+    <ellipse cx="185" cy="150" rx="140" ry="100" fill="none" stroke="#e8e8e8" stroke-width="1"/>
+    <ellipse cx="185" cy="150" rx="110" ry="78" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+    <ellipse cx="185" cy="150" rx="80" ry="56" fill="none" stroke="#d5d5d5" stroke-width="1"/>
+    <ellipse cx="185" cy="150" rx="50" ry="35" fill="none" stroke="#ccc" stroke-width="1"/>
+    <ellipse cx="185" cy="150" rx="25" ry="17" fill="#FFF3E0" stroke="#FFB74D" stroke-width="1.5"/>
+    
+    <!-- Minimum -->
+    <circle cx="185" cy="150" r="3" fill="#FF9800"/>
+    <text x="200" y="147" font-size="10" fill="#FF9800">min</text>
+    
+    <!-- Zigzag path -->
+    <polyline points="50,60 120,200 200,100 250,180 170,130 220,160 190,145 200,155 188,148 195,150" 
+              fill="none" stroke="#D32F2F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="50" cy="60" r="4" fill="#D32F2F"/>
+    
+    <text x="185" y="270" text-anchor="middle" font-size="11" fill="#888">Oscillates in steep direction</text>
+    <text x="185" y="285" text-anchor="middle" font-size="11" fill="#888">Slow progress in flat direction</text>
+  </g>
+  
+  <!-- Right panel: Adaptive LR -->
+  <g transform="translate(410,45)">
+    <rect width="370" height="280" fill="white" stroke="#e0e0e0" rx="8"/>
+    <text x="185" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#388E3C">Adaptive Learning Rate (Adam)</text>
+    
+    <!-- Contour lines -->
+    <ellipse cx="185" cy="150" rx="140" ry="100" fill="none" stroke="#e8e8e8" stroke-width="1"/>
+    <ellipse cx="185" cy="150" rx="110" ry="78" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+    <ellipse cx="185" cy="150" rx="80" ry="56" fill="none" stroke="#d5d5d5" stroke-width="1"/>
+    <ellipse cx="185" cy="150" rx="50" ry="35" fill="none" stroke="#ccc" stroke-width="1"/>
+    <ellipse cx="185" cy="150" rx="25" ry="17" fill="#E8F5E9" stroke="#66BB6A" stroke-width="1.5"/>
+    
+    <!-- Minimum -->
+    <circle cx="185" cy="150" r="3" fill="#388E3C"/>
+    <text x="200" y="147" font-size="10" fill="#388E3C">min</text>
+    
+    <!-- Smooth path -->
+    <polyline points="50,60 90,95 120,120 145,135 162,142 173,147 180,149 184,150 185,150" 
+              fill="none" stroke="#388E3C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="50" cy="60" r="4" fill="#388E3C"/>
+    
+    <text x="185" y="270" text-anchor="middle" font-size="11" fill="#888">Automatically adjusts step size</text>
+    <text x="185" y="285" text-anchor="middle" font-size="11" fill="#888">per parameter → efficient path</text>
+  </g>
+</svg>

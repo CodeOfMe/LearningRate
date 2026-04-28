@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" font-family="'Segoe UI', Arial, sans-serif">
+  <rect width="800" height="380" fill="#fafafa"/>
+  
+  <!-- Title -->
+  <text x="400" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Discriminative LR + STLR: Per-Layer Schedule</text>
+  <text x="400" y="42" text-anchor="middle" font-size="11" fill="#888">Each layer follows STLR but with different η_max values</text>
+  
+  <!-- Axes -->
+  <line x1="80" y1="320" x2="750" y2="320" stroke="#666" stroke-width="1.5"/>
+  <line x1="80" y1="320" x2="80" y2="50" stroke="#666" stroke-width="1.5"/>
+  
+  <text x="415" y="355" text-anchor="middle" font-size="12" fill="#555">Training Iteration (t)</text>
+  <text x="28" y="185" text-anchor="middle" font-size="12" fill="#555" transform="rotate(-90,28,185)">Learning Rate (η)</text>
+  
+  <!-- Y ticks -->
+  <text x="72" y="324" text-anchor="end" font-size="10" fill="#888">0</text>
+  <text x="72" y="80" text-anchor="end" font-size="10" fill="#888">0.01</text>
+  <text x="72" y="155" text-anchor="end" font-size="10" fill="#888">0.005</text>
+  <text x="72" y="240" text-anchor="end" font-size="10" fill="#888">0.002</text>
+  
+  <!-- Grid -->
+  <line x1="80" y1="80" x2="750" y2="80" stroke="#eee" stroke-width="1"/>
+  <line x1="80" y1="155" x2="750" y2="155" stroke="#eee" stroke-width="1"/>
+  <line x1="80" y1="240" x2="750" y2="240" stroke="#eee" stroke-width="1"/>
+  
+  <!-- Cut point -->
+  <line x1="155" y1="50" x2="155" y2="320" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="158" y="62" font-size="9" fill="#888">cut</text>
+  
+  <!-- Layer 3 curve (top, η_max=0.01) - RED -->
+  <!-- Warm-up: from (80,308) to (155,80), then decay to (750,305) -->
+  <path d="M80,305 L90,295 L100,280 L110,260 L120,235 L130,200 L140,160 L148,120 L155,80 L165,90 L180,110 L210,145 L250,185 L300,215 L350,240 L400,260 L450,275 L500,285 L550,292 L600,296 L650,299 L700,302 L750,305" 
+        fill="none" stroke="#D32F2F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Layer 2 curve (middle, η_max≈0.004) - ORANGE -->
+  <path d="M80,313 L90,310 L100,305 L110,295 L120,282 L130,265 L140,250 L148,238 L155,230 L165,238 L180,248 L210,262 L250,275 L300,285 L350,292 L400,298 L450,302 L500,305 L550,307 L600,309 L700,311 L750,312" 
+        fill="none" stroke="#F57C00" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Layer 1 curve (bottom, η_max≈0.0015) - GREEN -->
+  <path d="M80,317 L90,316 L100,315 L110,313 L120,310 L130,307 L140,303 L148,300 L155,297 L165,300 L180,303 L210,308 L250,311 L300,314 L400,316 L550,317 L750,318" 
+        fill="none" stroke="#43A047" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Layer 3 peak marker -->
+  <circle cx="155" cy="80" r="4" fill="#D32F2F"/>
+  <line x1="155" y1="80" x2="155" y2="320" stroke="#D32F2F" stroke-width="0.5" stroke-dasharray="2,4"/>
+  
+  <!-- Layer 2 peak marker -->
+  <circle cx="155" cy="230" r="4" fill="#F57C00"/>
+  
+  <!-- Layer 1 peak marker -->
+  <circle cx="155" cy="297" r="4" fill="#43A047"/>
+  
+  <!-- Legend -->
+  <rect x="560" y="50" width="180" height="95" fill="white" stroke="#ddd" rx="6"/>
+  
+  <line x1="575" y1="70" x2="610" y2="70" stroke="#D32F2F" stroke-width="2.8"/>
+  <text x="618" y="74" font-size="11" fill="#333">Layer 3 (top)</text>
+  <text x="618" y="86" font-size="10" fill="#D32F2F">η_max = 0.01</text>
+  
+  <line x1="575" y1="100" x2="610" y2="100" stroke="#F57C00" stroke-width="2.8"/>
+  <text x="618" y="104" font-size="11" fill="#333">Layer 2 (mid)</text>
+  <text x="618" y="116" font-size="10" fill="#F57C00">η_max ≈ 0.004</text>
+  
+  <line x1="575" y1="130" x2="610" y2="130" stroke="#43A047" stroke-width="2.8"/>
+  <text x="618" y="134" font-size="11" fill="#333">Layer 1 (bot)</text>
+  <text x="618" y="146" font-size="10" fill="#43A047">η_max ≈ 0.0015</text>
+  
+  <!-- Annotations -->
+  <text x="300" y="370" text-anchor="middle" font-size="11" fill="#666">
+    Each layer has its own STLR curve — same shape, different scale
+  </text>
+</svg>
