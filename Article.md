@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Learning rate scheduling has undergone a remarkable evolution from the single global fixed rate of early SGD to sophisticated layer-wise adaptive strategies. In this paper, we systematize this evolution into five generations: (Gen1) global fixed learning rates, (Gen2) global scheduling, (Gen3) parameter-level adaptation, (Gen4) layer-level differentiation, and (Gen5) joint layer-time scheduling. We trace the fundamental motivation behind each transition, showing how the shift from "one-size-fits-all" to "tailoring by layer and time" addresses the impossible trinity of transfer learning: lower layers require small updates to preserve general knowledge while higher layers need large updates to adapt to new tasks. Building on this taxonomy, we propose Discriminative Adaptive Layer Scaling (DALS), a unified framework that integrates phase-adaptive cosine scheduling, depth-aware Grokfast gradient filtering, and LARS-style trust ratios into a single coherent optimizer. We benchmark 16 strategies across all five generations on a controlled synthetic task and show that DALS achieves competitive accuracy (85.6%) by removing the directional bias of transfer-learning-oriented discriminative decay and instead using phase-adaptive gradient processing. Our work provides a unifying lens for understanding learning rate evolution and a practical framework for combining its best insights.
+Learning rate scheduling has undergone a remarkable evolution from the single global fixed rate of early SGD to sophisticated layer-wise adaptive strategies. In this paper, we systematize this evolution into five generations: (Gen1) global fixed learning rates, (Gen2) global scheduling, (Gen3) parameter-level adaptation, (Gen4) layer-level differentiation, and (Gen5) joint layer-time scheduling. We trace the fundamental motivation behind each transition, showing how the shift from "one-size-fits-all" to "tailoring by layer and time" addresses the impossible trinity of transfer learning: lower layers require small updates to preserve general knowledge while higher layers need large updates to adapt to new tasks. Building on this taxonomy, we propose Discriminative Adaptive Layer Scaling (DALS), a unified framework that integrates phase-adaptive cosine scheduling, depth-aware Grokfast gradient filtering, and LARS-style trust ratios into a single coherent optimizer. We benchmark 18 strategies including two DALS variants across all five generations on a controlled synthetic task. The base DALS achieves 85.6% accuracy, while DALS-Acc — incorporating SGDR-style warm restarts and stronger weight decay — matches the best result at 86.4%, demonstrating that the DALS framework can be tuned for both fast convergence (DALS-Fast reaches 80% in 4 epochs) and high accuracy. Our work provides a unifying lens for understanding learning rate evolution and a practical framework for combining its best insights.
 
 **Keywords:** Learning rate, discriminative fine-tuning, layer-wise adaptation, transfer learning, optimization, STLR, LARS, SAM, Grokfast
 
@@ -55,8 +55,6 @@ $$\eta_t = \eta_{\min} + \frac{1}{2}(\eta_{\max} - \eta_{\min})\left(1 + \cos\fr
 **SGDR** (Loshchilov and Hutter 2017) introduces periodic warm restarts, allowing the optimizer to escape local minima by periodically resetting the learning rate. Each restart provides fresh exploration capability while retaining useful momentum from prior cycles.
 
 **Figure 2** compares different learning rate scheduling strategies from Generation 2, illustrating how each addresses the fundamental principle of "walk fast early, walk slow later" with different trade-offs between smoothness and exploration capability.
-
-![Figure 3: Comparison of Gen2 learning rate scheduling strategies — step decay, cosine annealing, and SGDR warm restarts](figs/paper_fig3_discriminative.svg)
 
 ### 2.3 Generation 3: Parameter-Level Adaptive Learning Rate
 
@@ -158,11 +156,11 @@ $$\text{update}_t = \text{sign}(\beta_1 m_t + (1-\beta_1) g_t)$$
 
 **Schedule-Free** (Defazio et al. 2024) eliminates the need for learning rate schedules entirely through a running average that provably converges without scheduling.
 
-**Figure 6** presents the full evolutionary panorama, showing the progression from global → global×time → parameter → layer → layer×time.
+**Figure 6** presents the accuracy comparison across all 18 strategies, showing the progression from global → global×time → parameter → layer → layer×time and the DALS family.
 
-![Figure 6: Panoramic view of learning rate strategy evolution across five generations](figs/paper_fig6_benchmark.svg)
+![Figure 6: Best accuracy comparison across 18 optimization strategies](figs/paper_fig6_benchmark.svg)
 
-*Figure 6: The evolutionary panorama from Gen1 global fixed LR through Gen5 joint layer×time scheduling.*
+*Figure 6: Accuracy comparison across all 18 strategies. The DALS family spans from DALS-Fast (85.3%, fastest convergence) through DALS (85.6%, balanced) to DALS-Acc (86.4%, best accuracy).*
 
 ## 3. Method: Discriminative Adaptive Layer Scaling (DALS)
 
@@ -287,9 +285,11 @@ Table 1 presents the comprehensive benchmark results.
 | Discriminative LR | 3ep | 5ep | 12ep | 3.4s |
 | STLR+Discriminative | 10ep | 21ep | n/a | 3.5s |
 
-![Figure 6: Benchmark results across 16 strategies and 5 generations](figs/paper_fig6_benchmark.svg)
+**Table 2** presents the convergence speed comparison, and **Figure 6** shows the accuracy comparison across all strategies.
 
-*Figure 6: Accuracy comparison across all strategies. DALS achieves competitive performance without the directional bias of transfer-learning-oriented methods.*
+![Figure 6: Best accuracy comparison across 18 optimization strategies](figs/paper_fig6_benchmark.svg)
+
+*Figure 6: Accuracy comparison across all strategies. DALS (85.6%) and its variants DALS-Fast (85.3%) and DALS-Acc (86.4%) span the full accuracy range, with DALS-Acc matching the best result.*
 
 ### 4.3 Analysis and Discussion
 
