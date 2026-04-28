@@ -1,82 +1,85 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 200" width="460" height="200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 260" width="500" height="260">
   <style>
     text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
   </style>
 
+  <!-- Background -->
+  <rect width="500" height="260" fill="#fff" rx="4"/>
+
+  <!-- Title -->
+  <text x="250" y="22" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">Slanted Triangular Learning Rate (STLR)</text>
+
   <!-- Plot area background -->
-  <rect x="55" y="15" width="370" height="145" fill="#fafafa" stroke="#ddd" stroke-width="0.5"/>
+  <rect x="60" y="35" width="400" height="160" fill="#fafafa" stroke="#ddd" stroke-width="0.5"/>
 
   <!-- Y-axis -->
-  <line x1="55" y1="15" x2="55" y2="160" stroke="#333" stroke-width="1"/>
+  <line x1="60" y1="35" x2="60" y2="195" stroke="#333" stroke-width="1"/>
   <!-- X-axis -->
-  <line x1="55" y1="160" x2="425" y2="160" stroke="#333" stroke-width="1"/>
+  <line x1="60" y1="195" x2="460" y2="195" stroke="#333" stroke-width="1"/>
 
   <!-- Y-axis label -->
-  <text x="15" y="90" text-anchor="middle" fill="#333" font-size="10" transform="rotate(-90,15,90)">Learning Rate</text>
+  <text x="18" y="115" text-anchor="middle" fill="#333" font-size="10" transform="rotate(-90,18,115)">Learning Rate</text>
 
   <!-- X-axis label -->
-  <text x="240" y="190" text-anchor="middle" fill="#333" font-size="10">Training Iteration</text>
+  <text x="260" y="245" text-anchor="middle" fill="#333" font-size="10">Training Iteration</text>
 
-  <!-- Y-axis ticks and labels -->
-  <line x1="52" y1="160" x2="55" y2="160" stroke="#333" stroke-width="0.8"/>
-  <text x="48" y="163" text-anchor="end" fill="#555" font-size="8">0</text>
+  <!-- Y-axis ticks -->
+  <line x1="56" y1="195" x2="60" y2="195" stroke="#333" stroke-width="0.8"/>
+  <text x="52" y="199" text-anchor="end" fill="#555" font-size="9">0</text>
 
-  <line x1="52" y1="107" x2="55" y2="107" stroke="#333" stroke-width="0.8"/>
-  <text x="48" y="110" text-anchor="end" fill="#555" font-size="8">0.5 η</text>
+  <line x1="56" y1="135" x2="60" y2="135" stroke="#333" stroke-width="0.8"/>
+  <text x="52" y="139" text-anchor="end" fill="#555" font-size="9">0.5η</text>
 
-  <line x1="52" y1="55" x2="55" y2="55" stroke="#333" stroke-width="0.8"/>
-  <text x="48" y="58" text-anchor="end" fill="#555" font-size="8">η</text>
+  <line x1="56" y1="75" x2="60" y2="75" stroke="#333" stroke-width="0.8"/>
+  <text x="52" y="79" text-anchor="end" fill="#555" font-size="9">η</text>
 
-  <!-- η max label -->
-  <text x="48" y="48" text-anchor="end" fill="#2980b9" font-size="9" font-weight="bold">η_max</text>
-  <line x1="50" y1="55" x2="55" y2="55" stroke="#2980b9" stroke-width="1.2"/>
+  <!-- η_max label -->
+  <text x="52" y="68" text-anchor="end" fill="#2980b9" font-size="10" font-weight="bold">η_max</text>
+  <line x1="56" y1="75" x2="60" y2="75" stroke="#2980b9" stroke-width="1.5"/>
 
   <!-- X-axis ticks -->
-  <line x1="55" y1="160" x2="55" y2="163" stroke="#333" stroke-width="0.8"/>
-  <text x="55" y="173" text-anchor="middle" fill="#555" font-size="8">0</text>
+  <line x1="60" y1="195" x2="60" y2="199" stroke="#333" stroke-width="0.8"/>
+  <text x="60" y="212" text-anchor="middle" fill="#555" font-size="9">0</text>
 
-  <line x1="91" y1="160" x2="91" y2="163" stroke="#333" stroke-width="0.8"/>
-  <text x="91" y="173" text-anchor="middle" fill="#555" font-size="7">T/10</text>
+  <line x1="100" y1="195" x2="100" y2="199" stroke="#333" stroke-width="0.8"/>
+  <text x="100" y="212" text-anchor="middle" fill="#555" font-size="8">T/10</text>
 
-  <line x1="240" y1="160" x2="240" y2="163" stroke="#333" stroke-width="0.8"/>
-  <text x="240" y="173" text-anchor="middle" fill="#555" font-size="8">T/2</text>
+  <line x1="260" y1="195" x2="260" y2="199" stroke="#333" stroke-width="0.8"/>
+  <text x="260" y="212" text-anchor="middle" fill="#555" font-size="9">T/2</text>
 
-  <line x1="425" y1="160" x2="425" y2="163" stroke="#333" stroke-width="0.8"/>
-  <text x="420" y="173" text-anchor="end" fill="#555" font-size="8">T</text>
+  <line x1="460" y1="195" x2="460" y2="199" stroke="#333" stroke-width="0.8"/>
+  <text x="455" y="212" text-anchor="end" fill="#555" font-size="9">T</text>
 
   <!-- Dashed vertical cut point line at 10% of T -->
-  <line x1="91" y1="18" x2="91" y2="160" stroke="#e74c3c" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="96" y="28" text-anchor="start" fill="#e74c3c" font-size="8" font-weight="bold">cut_frac = 0.1</text>
-
-  <!-- Phase labels -->
-  <text x="73" y="175" text-anchor="middle" fill="#e67e22" font-size="7.5" font-weight="bold">Warm-up</text>
-  <text x="240" y="175" text-anchor="middle" fill="#2471a3" font-size="7.5" font-weight="bold">Fine-tuning (Annealing)</text>
-
-  <!-- The STLR curve -->
-  <!-- Warm-up phase: 0 to cut_point (10% of T) — linear rise from 0 to η_max -->
-  <!-- Fine-tuning phase: cut_point to T — cosine decline from η_max to 0 -->
-
-  <!-- Using path: warm-up from (55,160) to (91,55), then cosine decline from (91,55) to (425,160) -->
-
-  <!-- Warm-up: linear rise -->
-  <path d="M 55,160 L 91,55" fill="none" stroke="#e67e22" stroke-width="2.5" stroke-linecap="round"/>
-
-  <!-- Cosine decline: from (91,55) to (425,160) -->
-  <!-- Approximate cosine annealing with bezier curves -->
-  <path d="M 91,55 C 130,55 160,120 210,138 Q 280,155 350,158 Q 390,160 425,160" 
-        fill="none" stroke="#2471a3" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="38" x2="100" y2="195" stroke="#e74c3c" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="108" y="48" text-anchor="start" fill="#e74c3c" font-size="9" font-weight="bold">cut_frac = 0.1</text>
 
   <!-- Horizontal reference line at η_max -->
-  <line x1="55" y1="55" x2="425" y2="55" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="60" y1="75" x2="460" y2="75" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
 
-  <!-- Phase bracket at top -->
-  <line x1="57" y1="23" x2="89" y2="23" stroke="#e67e22" stroke-width="1.5"/>
-  <text x="73" y="19" text-anchor="middle" fill="#e67e22" font-size="7.5" font-weight="bold">Phase 1</text>
+  <!-- Phase labels at top -->
+  <line x1="62" y1="42" x2="98" y2="42" stroke="#e67e22" stroke-width="2"/>
+  <text x="80" y="38" text-anchor="middle" fill="#e67e22" font-size="8.5" font-weight="bold">Warm-up</text>
 
-  <line x1="93" y1="23" x2="365" y2="23" stroke="#2471a3" stroke-width="1.5"/>
-  <text x="230" y="19" text-anchor="middle" fill="#2471a3" font-size="7.5" font-weight="bold">Phase 2</text>
+  <line x1="102" y1="42" x2="400" y2="42" stroke="#2471a3" stroke-width="2"/>
+  <text x="250" y="38" text-anchor="middle" fill="#2471a3" font-size="8.5" font-weight="bold">Annealing</text>
+
+  <!-- The STLR curve -->
+  <!-- Warm-up: linear rise from (60,195) to (100,75) -->
+  <path d="M 60,195 L 100,75" fill="none" stroke="#e67e22" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Cosine decline: from (100,75) to (460,195) -->
+  <path d="M 100,75 C 150,75 180,150 230,168 Q 320,188 400,192 Q 440,195 460,195" 
+        fill="none" stroke="#2471a3" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Phase labels below X-axis -->
+  <text x="80" y="228" text-anchor="middle" fill="#e67e22" font-size="8.5" font-weight="bold">Phase 1</text>
+  <text x="280" y="228" text-anchor="middle" fill="#2471a3" font-size="8.5" font-weight="bold">Phase 2</text>
 
   <!-- ratio annotation -->
-  <text x="380" y="48" text-anchor="start" fill="#7f8c8d" font-size="8" font-style="italic">ratio = 32</text>
-  <text x="380" y="59" text-anchor="start" fill="#7f8c8d" font-size="7.5">(max/min ratio)</text>
+  <text x="410" y="68" text-anchor="start" fill="#7f8c8d" font-size="9" font-style="italic">ratio = 32</text>
+  <text x="410" y="80" text-anchor="start" fill="#7f8c8d" font-size="8">(max/min ratio)</text>
+
+  <!-- Discriminative overlay hint -->
+  <text x="260" y="254" text-anchor="middle" fill="#27ae60" font-size="8.5" font-style="italic">Combined with discriminative layer-wise rates: ηˡ = η_max^l × STLR(t)</text>
 </svg>

@@ -16,9 +16,9 @@ $$\theta_{t+1} = \theta_t - \eta \cdot \nabla_\theta J(\theta_t),$$
 
 assumes a single scalar $\eta$ governs all parameters equally. Yet we have long known that different layers of deep networks learn features at fundamentally different levels of abstraction (Yosinski et al. 2014): lower layers capture generic edges and textures, while higher layers encode task-specific concepts. Imposing a uniform learning rate on such heterogeneous parameters creates an *impossible trinity* — no single $\eta$ can simultaneously satisfy the need for small updates to general features and large updates to task-specific features.
 
-![Figure 2: The impossible trinity of learning rate selection — no single LR can satisfy the competing demands of feature preservation and task adaptation](figs/paper_fig2_impossibility.svg)
+![Figure 1: The impossible trinity of learning rate selection — no single LR can satisfy the competing demands of feature preservation and task adaptation](figs/paper_fig1_impossibility.svg)
 
-*Figure 2: The impossible trinity — lower layers need small updates to preserve general features, higher layers need large updates for task adaptation, and no single learning rate can satisfy both.*
+*Figure 1: The impossible trinity — lower layers need small updates to preserve general features, higher layers need large updates for task adaptation, and no single learning rate can satisfy both.*
 
 This tension has fueled a five-generation evolution of learning rate strategies, each generation expanding the granularity of control:
 
@@ -32,7 +32,7 @@ We propose **Discriminative Adaptive Layer Scaling (DALS)**, a unified optimizer
 
 Our contributions are: (1) a systematic five-generation taxonomy of learning rate strategies, (2) the DALS framework combining phase-adaptive scheduling, depth-aware gradient filtering, and trust ratio scaling, with speed and accuracy variants, (3) a comprehensive benchmark of 18 strategies across all five generations, and (4) an analysis of why naive combination of transfer-learning-oriented methods fails for from-scratch training, and how phase-and-depth-aware processing addresses this.
 
-![Figure 1: Five-generation taxonomy of learning rate strategies. The evolution progresses from global fixed LR (Gen1) → global scheduling (Gen2) → parameter-level adaptation (Gen3) → layer-level differentiation (Gen4) → joint layer×time scheduling (Gen5). DALS (SOTA) integrates all five generations.](figs/paper_fig1_taxonomy.svg)
+![Figure 2: Five-generation taxonomy of learning rate strategies. The evolution progresses from global fixed LR (Gen1) → global scheduling (Gen2) → parameter-level adaptation (Gen3) → layer-level differentiation (Gen4) → joint layer×time scheduling (Gen5). DALS (SOTA) integrates all five generations.](figs/paper_fig2_taxonomy.svg)
 
 ## 2. Related Work
 
@@ -54,7 +54,7 @@ $$\eta_t = \eta_{\min} + \frac{1}{2}(\eta_{\max} - \eta_{\min})\left(1 + \cos\fr
 
 **SGDR** (Loshchilov and Hutter 2017) introduces periodic warm restarts, allowing the optimizer to escape local minima by periodically resetting the learning rate. Each restart provides fresh exploration capability while retaining useful momentum from prior cycles.
 
-**Figure 2** compares different learning rate scheduling strategies from Generation 2, illustrating how each addresses the fundamental principle of "walk fast early, walk slow later" with different trade-offs between smoothness and exploration capability.
+These Generation 2 strategies illustrate a fundamental principle: "walk fast early, walk slow later," with different trade-offs between smoothness and exploration capability.
 
 ### 2.3 Generation 3: Parameter-Level Adaptive Learning Rate
 
@@ -83,10 +83,6 @@ $$\theta_{t+1} = \theta_t - \eta \cdot \hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon)
 **AdaBound** (Luo et al. 2019) dynamically bounds Adam's learning rate between adaptive and fixed regimes, smoothly transitioning from Adam-like to SGD-like behavior:
 
 $$\underline{\eta}_t \leq \alpha_t \leq \overline{\eta}_t, \quad \text{where bounds converge to SGD values as } t \to \infty$$
-
-**Figure 3** contrasts adaptive versus fixed learning rates on a non-smooth loss surface, showing how adaptive methods find more efficient paths by slowing down in steep directions and speeding up in flat ones.
-
-While Gen3 achieves per-parameter adaptation, it remains fundamentally *layer-agnostic* — two parameters in the same layer with similar gradient magnitudes receive similar treatment regardless of their position in the architecture.
 
 ### 2.4 Generation 4: Layer-Level Differentiation
 
@@ -155,12 +151,6 @@ $$\text{update}_t = \text{sign}(\beta_1 m_t + (1-\beta_1) g_t)$$
 **Adafactor** (Shazeer and Stern 2018) reduces memory by factoring the second-moment matrix into row and column components, crucial for training large language models.
 
 **Schedule-Free** (Defazio et al. 2024) eliminates the need for learning rate schedules entirely through a running average that provably converges without scheduling.
-
-**Figure 6** presents the accuracy comparison across all 18 strategies, showing the progression from global → global×time → parameter → layer → layer×time and the DALS family.
-
-![Figure 6: Best accuracy comparison across 18 optimization strategies](figs/paper_fig6_benchmark.svg)
-
-*Figure 6: Accuracy comparison across all 18 strategies. The DALS family spans from DALS-Fast (85.3%, fastest convergence) through DALS (85.6%, balanced) to DALS-Acc (86.4%, best accuracy).*
 
 ## 3. Method: Discriminative Adaptive Layer Scaling (DALS)
 
@@ -241,7 +231,21 @@ Each component has been independently validated; DALS provides a principled fram
 
 ### 4.1 Experimental Setup
 
-We benchmark 18 learning rate strategies (including two DALS variants) across all 5 generations on a controlled synthetic classification task. The task uses a small multi-layer perceptron trained from scratch on synthetic data, enabling rapid comparison of optimization dynamics while controlling for architecture and data confounds. We report best test accuracy (%) for each strategy.
+We benchmark 18 learning rate strategies (including two DALS variants) across all 5 generations on a controlled synthetic classification task. We deliberately choose a synthetic setting rather than a standard benchmark (e.g., CIFAR-10 or ImageNet) for three reasons:
+
+1. **Control of confounds.** Real-world datasets introduce confounding factors — data augmentation, regularization, normalization strategy, and model pretrained weights — that interact with the learning rate and make it difficult to isolate the effect of the LR strategy itself. A synthetic task with fixed architecture, no augmentation, and no pretrained weights ensures that performance differences are attributable to the optimizer.
+
+2. **Rapid iteration.** The synthetic benchmark completes 80 epochs in 3–6 seconds per strategy, enabling exhaustive hyperparameter tuning and multiple runs for all 18 strategies. This would be prohibitively expensive on ImageNet.
+
+3. **Focus on optimization dynamics.** Our goal is to compare the *dynamics* of different LR strategies — how quickly each converges, whether it stalls, and how it interacts with layer-wise scaling — rather than to claim state-of-the-art on any particular dataset.
+
+**Task design.** We generate a 10-class classification task from a Gaussian mixture: 8000 samples in $\mathbb{R}^{64}$, where the first 10 dimensions carry the class signal (scaled by 3×) and the remaining 54 are pure noise ($\sigma = 0.1$). Labels are determined by $\arg\max$ of the signal dimensions. The train/test split is 6400/1600 with a fixed random seed (42). This design creates a task that is learnable (clear signal in the first 10 dimensions) but non-trivial (54 noise dimensions require the optimizer to ignore irrelevant features).
+
+**Model.** A 4-layer MLP (64→128→128→10) with ReLU activations, trained from scratch for 80 epochs with batch size 64. No dropout, no batch normalization, no data augmentation — ensuring optimizer behavior is the primary variable.
+
+**Hyperparameters.** Each strategy uses its canonical hyperparameters from the original papers: Adam/AdamW use $\text{lr}=3\times10^{-4}$, SGD-family methods use $\text{lr}=0.01$–$0.05$ with momentum 0.9 and weight decay $10^{-4}$, and layer-wise methods use decay factor $\delta=2.6$ (Howard and Ruder 2018). DALS variants use the configurations described in Section 3.4.
+
+We report best test accuracy (%) and convergence speed (epochs to reach 60%/70%/80% thresholds) for each strategy.
 
 ### 4.2 Results
 
@@ -266,9 +270,9 @@ Table 1 presents the comprehensive benchmark results.
 | Grokfast | Gen 5 | 85.9 | Gradient EMA filtering |
 | STLR+Discriminative | Gen 5 | 75.3 | Slanted triangular + layer-wise LR |
 | SAM+Discriminative | SOTA | 83.2 | Flat minima + layer-wise LR |
-| DALS (Ours) | SOTA | 85.6 | Phase-adaptive + LARS + Grokfast |
-| DALS-Fast | SOTA | 85.3 | Aggressive LR, no early filtering |
-| DALS-Acc | SOTA | **86.4** | SGDR restarts + Grokfast + WD |
+| **DALS (Ours)**| SOTA | 85.6 | Phase-adaptive + LARS + Grokfast |
+| **DALS-Fast (Ours)**| SOTA | 85.3 | Aggressive LR, no early filtering |
+| **DALS-Acc (Ours)** | SOTA | **86.4** | SGDR restarts + Grokfast + WD |
 
 **Table 2**: Convergence speed — epochs to reach accuracy thresholds.
 
@@ -321,7 +325,7 @@ This speed-accuracy tradeoff within a single framework demonstrates the flexibil
 
 On transfer learning benchmarks, discriminative fine-tuning reduces error by ~19% and adding STLR yields an additional ~10% reduction — precisely because lower layers now contain valuable pretrained features worth preserving.
 
-**Future work.** DALS and other layer-wise methods are expected to show their greatest advantages in transfer learning settings with deep pretrained models. The phase-adaptive mechanism may further benefit from architecture-specific calibration of $\alpha_0$, warmup fraction, and trust coefficient.
+**Benchmark limitations.** Our synthetic benchmark intentionally sacrifices ecological validity for experimental control. A 4-layer MLP on Gaussian data cannot represent the optimization landscape of modern deep networks (ResNets, Transformers) on natural images or language. Several findings may not directly transfer: (1) the accuracy gap between Gen4 (Discriminative) and Gen1-3 methods may shrink or reverse on pretrained models where lower layers do contain transferable knowledge; (2) DALS's phase-adaptive mechanism may be more or less impactful when the loss landscape has a different structure; (3) hyperparameters tuned on this benchmark may not be optimal for larger models. Nevertheless, the benchmark serves its intended purpose — comparing optimization dynamics under controlled conditions — and the qualitative insights (directional bias of discriminative decay, phase-dependent smoothing benefits, LARS's direction-free scaling) are mechanism-level properties that should generalize across scales.
 
 ## 5. Conclusion
 

@@ -91,7 +91,7 @@
   <rect x="287" y="77" rx="2" ry="2" width="115" height="16" fill="#e74c3c" opacity="0.15" stroke="#e74c3c" stroke-width="0.5"/>
   <text x="296" y="89" text-anchor="start" fill="#e74c3c" font-size="6.5">Phase 0: Δ > 0.01</text>
   <rect x="287" y="95" rx="2" ry="2" width="115" height="13" fill="#f39c12" opacity="0.15" stroke="#f39c12" stroke-width="0.5"/>
-  <text x="296" y="105" text-anchor="start" fill="#f39c12" font-size="6.5">Phase 1: 0.002 < Δ ≤ 0.01</text>
+  <text x="296" y="105" text-anchor="start" fill="#f39c12" font-size="6.5">Phase 1: 0.002 &lt; Δ ≤ 0.01</text>
   <rect x="287" y="110" rx="2" ry="2" width="115" height="13" fill="#27ae60" opacity="0.15" stroke="#27ae60" stroke-width="0.5"/>
   <text x="296" y="120" text-anchor="start" fill="#27ae60" font-size="6.5">Phase 2: Δ ≤ 0.002</text>
 
