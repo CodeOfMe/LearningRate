@@ -64,11 +64,7 @@ print(f"{'='*70}")
 
 RESULTS_DIR = Path(__file__).parent / "results"
 DATA_DIR = Path(__file__).parent / "data"
-HF_DATA_DIR = DATA_DIR / "huggingface"
 RESULTS_DIR.mkdir(exist_ok=True)
-
-import os as _os
-_os.environ['HF_HOME'] = str(HF_DATA_DIR)
 
 STRATEGIES = [
     'Gen1_FixedSGD', 'Gen2_CosineSGD', 'Gen2_SGDR',
@@ -208,16 +204,9 @@ def _run_nlp_benchmark(strategy_name, dataset_name, epochs, train_loader, val_lo
 
     seed_all(42)
 
-    model_path = str(HF_DATA_DIR / 'distilbert-base-uncased')
-    if Path(model_path).exists() and (Path(model_path) / 'model.safetensors').exists():
-        model = DistilBertForSequenceClassification.from_pretrained(
-            model_path, num_labels=num_labels
-        ).to(DEVICE)
-    else:
-        model = DistilBertForSequenceClassification.from_pretrained(
-            'distilbert-base-uncased', num_labels=num_labels
-        ).to(DEVICE)
-        model.save_pretrained(model_path)
+    model = DistilBertForSequenceClassification.from_pretrained(
+        'distilbert-base-uncased', num_labels=num_labels
+    ).to(DEVICE)
 
     # Freeze embeddings for more stable fine-tuning (optional — off by default)
     # for param in model.distilbert.embeddings.parameters():
@@ -249,24 +238,31 @@ def _run_nlp_benchmark(strategy_name, dataset_name, epochs, train_loader, val_lo
             labels = batch['label'].to(DEVICE)
 
             if is_sam:
-                def closure():
-                    opt.zero_grad()
-                    out = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-                    return out.loss
-                try:
-                    loss = closure()
-                    opt.first_step(zero_grad=True)
-                    with torch.enable_grad():
-                        closure()
-                    opt.second_step()
-                except Exception:
-                    continue
+                opt.zero_grad()
+                out = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+                loss = out.loss
+                loss.backward()
+                opt.first_step(zero_grad=True)
+                with torch.enable_grad():
+                    out2 = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+                    loss2 = out2.loss
+                    loss2.backward()
+                opt.second_step()
             elif is_dals:
-                opt.zero_grad(set_to_none=True)
+                if isinstance(opt, Lookahead):
+                    opt.zero_grad()
+                else:
+                    opt.zero_grad(set_to_none=True)
                 out = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
                 loss = out.loss
                 loss.backward()
                 opt.update_phase(loss.item())
+                opt.step()
+            elif isinstance(opt, Lookahead):
+                opt.zero_grad()
+                out = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+                loss = out.loss
+                loss.backward()
                 opt.step()
             else:
                 opt.zero_grad(set_to_none=True)
@@ -282,10 +278,7 @@ def _run_nlp_benchmark(strategy_name, dataset_name, epochs, train_loader, val_lo
             n_batches += 1
 
             with torch.no_grad():
-                if not is_sam:
-                    preds = out.logits.argmax(dim=-1)
-                else:
-                    preds = model(input_ids=input_ids, attention_mask=attention_mask).logits.argmax(dim=-1)
+                preds = out.logits.argmax(dim=-1)
                 correct_train += (preds == labels).sum().item()
                 total_train += len(labels)
 
@@ -381,16 +374,15 @@ def run_synthetic(strategy_name, epochs=80):
         for xb, yb in train_loader:
             xb, yb = xb.to(DEVICE), yb.to(DEVICE)
             if is_sam:
-                def closure():
-                    opt.zero_grad()
-                    out = model(xb)
-                    loss = F.cross_entropy(out, yb)
-                    loss.backward()
-                    return loss
-                closure()
+                opt.zero_grad()
+                out = model(xb)
+                loss = F.cross_entropy(out, yb)
+                loss.backward()
                 opt.first_step(zero_grad=True)
                 with torch.enable_grad():
-                    closure()
+                    out2 = model(xb)
+                    loss2 = F.cross_entropy(out2, yb)
+                    loss2.backward()
                 opt.second_step()
             elif isinstance(opt, (DALS, DALSFast, DALSAcc)):
                 out = model(xb)
@@ -399,6 +391,12 @@ def run_synthetic(strategy_name, epochs=80):
                 opt.update_phase(loss.item())
                 opt.step()
                 opt.zero_grad(set_to_none=True)
+            elif isinstance(opt, Lookahead):
+                opt.zero_grad()
+                out = model(xb)
+                loss = F.cross_entropy(out, yb)
+                loss.backward()
+                opt.step()
             else:
                 opt.zero_grad(set_to_none=True)
                 out = model(xb)
@@ -588,16 +586,15 @@ def run_cifar10(strategy_name, epochs=50):
         for xb, yb in train_loader:
             xb, yb = xb.to(DEVICE, non_blocking=PIN_MEMORY), yb.to(DEVICE, non_blocking=PIN_MEMORY)
             if is_sam:
-                def closure():
-                    opt.zero_grad()
-                    out = model(xb)
-                    loss = F.cross_entropy(out, yb)
-                    loss.backward()
-                    return loss
-                loss = closure()
+                opt.zero_grad()
+                out = model(xb)
+                loss = F.cross_entropy(out, yb)
+                loss.backward()
                 opt.first_step(zero_grad=True)
                 with torch.enable_grad():
-                    closure()
+                    out2 = model(xb)
+                    loss2 = F.cross_entropy(out2, yb)
+                    loss2.backward()
                 opt.second_step()
             elif isinstance(opt, (DALS, DALSFast, DALSAcc)):
                 out = model(xb)
@@ -606,6 +603,12 @@ def run_cifar10(strategy_name, epochs=50):
                 opt.update_phase(loss.item())
                 opt.step()
                 opt.zero_grad(set_to_none=True)
+            elif isinstance(opt, Lookahead):
+                opt.zero_grad()
+                out = model(xb)
+                loss = F.cross_entropy(out, yb)
+                loss.backward()
+                opt.step()
             else:
                 opt.zero_grad(set_to_none=True)
                 out = model(xb)
@@ -720,22 +723,11 @@ def _create_cifar10_optimizer(name, model, total_steps, steps_per_epoch):
 # 3. RTE Benchmark (DistilBERT, 10 epochs)
 # ============================================================================
 def run_rte(strategy_name, epochs=10):
-    from datasets import load_dataset, load_from_disk
+    from datasets import load_dataset
     from transformers import DistilBertTokenizer
 
-    rte_path = HF_DATA_DIR / 'rte'
-    if rte_path.exists():
-        dataset = load_from_disk(str(rte_path))
-    else:
-        dataset = load_dataset('nyu-mll/glue', 'rte')
-        dataset.save_to_disk(str(rte_path))
-
-    tokenizer_path = str(HF_DATA_DIR / 'distilbert-base-uncased')
-    if Path(tokenizer_path).exists():
-        tokenizer = DistilBertTokenizer.from_pretrained(tokenizer_path)
-    else:
-        tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
-        tokenizer.save_pretrained(tokenizer_path)
+    dataset = load_dataset('nyu-mll/glue', 'rte')
+    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
     def tokenize(batch):
         return tokenizer(batch['sentence1'], batch['sentence2'],
@@ -760,13 +752,6 @@ def run_rte(strategy_name, epochs=10):
 # ============================================================================
 def run_trec6(strategy_name, epochs=10):
     from transformers import DistilBertTokenizer
-
-    tokenizer_path = str(HF_DATA_DIR / 'distilbert-base-uncased')
-    if Path(tokenizer_path).exists():
-        tokenizer = DistilBertTokenizer.from_pretrained(tokenizer_path)
-    else:
-        tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
-        tokenizer.save_pretrained(tokenizer_path)
 
     # Load TREC-6 from local files (downloaded to data/trec)
     trec_dir = DATA_DIR / 'trec'
@@ -817,7 +802,7 @@ def run_trec6(strategy_name, epochs=10):
 
     label2id = {'ABBR': 0, 'DESC': 1, 'ENTY': 2, 'HUM': 3, 'LOC': 4, 'NUM': 5}
 
-    # tokenizer already loaded above
+    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
     class TRECDataset(torch.utils.data.Dataset):
         def __init__(self, data, tokenizer, label2id, max_len=128):
@@ -855,22 +840,11 @@ def run_trec6(strategy_name, epochs=10):
 # 5. IMDb Benchmark (DistilBERT, 5 epochs)
 # ============================================================================
 def run_imdb(strategy_name, epochs=5):
-    from datasets import load_dataset, load_from_disk
+    from datasets import load_dataset
     from transformers import DistilBertTokenizer
 
-    imdb_path = HF_DATA_DIR / 'imdb'
-    if imdb_path.exists():
-        dataset = load_from_disk(str(imdb_path))
-    else:
-        dataset = load_dataset('imdb')
-        dataset.save_to_disk(str(imdb_path))
-
-    tokenizer_path = str(HF_DATA_DIR / 'distilbert-base-uncased')
-    if Path(tokenizer_path).exists():
-        tokenizer = DistilBertTokenizer.from_pretrained(tokenizer_path)
-    else:
-        tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
-        tokenizer.save_pretrained(tokenizer_path)
+    dataset = load_dataset('imdb')
+    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
     def tokenize(batch):
         return tokenizer(batch['text'], padding='max_length', truncation=True, max_length=256)

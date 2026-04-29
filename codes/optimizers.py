@@ -535,8 +535,8 @@ class Lookahead(Optimizer):
     def load_state_dict(self, state_dict):
         self.optimizer.load_state_dict(state_dict)
 
-    def zero_grad(self):
-        self.optimizer.zero_grad()
+    def zero_grad(self, set_to_none=False):
+        self.optimizer.zero_grad(set_to_none=set_to_none)
 
     @property
     def defaults(self):
@@ -598,8 +598,8 @@ class SAM(Optimizer):
             closure()
         self.second_step()
 
-    def zero_grad(self):
-        self.base_optimizer.zero_grad()
+    def zero_grad(self, set_to_none=False):
+        self.base_optimizer.zero_grad(set_to_none=set_to_none)
 
     def state_dict(self):
         return self.base_optimizer.state_dict()
