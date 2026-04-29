@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 340" width="520" height="340">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  </style>
+
+  <!-- Background -->
+  <rect width="520" height="340" fill="#fff" rx="4"/>
+
+  <!-- Title -->
+  <text x="260" y="24" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">Evolution of Learning Rate Strategies</text>
+  <text x="260" y="40" text-anchor="middle" fill="#666" font-size="10">Increasing granularity: Global → Parameter → Layer → Layer × Time</text>
+
+  <!-- Arrows between nodes -->
+  <line x1="102" y1="90" x2="118" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="206" y1="90" x2="222" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="310" y1="90" x2="326" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="414" y1="90" x2="430" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Gen 1: Fixed LR - Red -->
+  <rect x="18" y="50" rx="8" ry="8" width="84" height="82" fill="#c0392b" stroke="#a93226" stroke-width="0.5"/>
+  <text x="60" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Gen 1</text>
+  <text x="60" y="87" text-anchor="middle" fill="#fff" font-size="10.5">Fixed LR</text>
+  <line x1="28" y1="94" x2="92" y2="94" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="60" y="108" text-anchor="middle" fill="#f5b7b1" font-size="9" font-style="italic">Global</text>
+  <text x="60" y="124" text-anchor="middle" fill="#fadbd8" font-size="9">SGD</text>
+
+  <!-- Gen 2: LR Schedule - Orange -->
+  <rect x="122" y="50" rx="8" ry="8" width="84" height="82" fill="#d35400" stroke="#ba4a00" stroke-width="0.5"/>
+  <text x="164" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Gen 2</text>
+  <text x="164" y="87" text-anchor="middle" fill="#fff" font-size="10.5">LR Schedule</text>
+  <line x1="132" y1="94" x2="196" y2="94" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="164" y="108" text-anchor="middle" fill="#f5cba7" font-size="9" font-style="italic">Global × Time</text>
+  <text x="164" y="124" text-anchor="middle" fill="#fdebd0" font-size="9">Cosine, SGDR</text>
+
+  <!-- Gen 3: Adaptive - Blue -->
+  <rect x="226" y="50" rx="8" ry="8" width="84" height="82" fill="#2471a3" stroke="#1a5276" stroke-width="0.5"/>
+  <text x="268" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Gen 3</text>
+  <text x="268" y="87" text-anchor="middle" fill="#fff" font-size="10.5">Adaptive</text>
+  <line x1="236" y1="94" x2="300" y2="94" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="268" y="108" text-anchor="middle" fill="#aed6f1" font-size="9" font-style="italic">Parameter</text>
+  <text x="268" y="124" text-anchor="middle" fill="#d6eaf8" font-size="9">Adam, AdamW</text>
+
+  <!-- Gen 4: Layer-wise - Green -->
+  <rect x="330" y="50" rx="8" ry="8" width="84" height="82" fill="#1e8449" stroke="#196f3d" stroke-width="0.5"/>
+  <text x="372" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Gen 4</text>
+  <text x="372" y="87" text-anchor="middle" fill="#fff" font-size="10.5">Layer-wise</text>
+  <line x1="340" y1="94" x2="404" y2="94" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="372" y="108" text-anchor="middle" fill="#a9dfbf" font-size="9" font-style="italic">Layer</text>
+  <text x="372" y="124" text-anchor="middle" fill="#d5f5e3" font-size="9">LARS, Disc.</text>
+
+  <!-- Gen 5: Layer×Time - Purple -->
+  <rect x="434" y="50" rx="8" ry="8" width="84" height="82" fill="#7d3c98" stroke="#6c3483" stroke-width="0.5"/>
+  <text x="476" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Gen 5</text>
+  <text x="476" y="87" text-anchor="middle" fill="#fff" font-size="10.5">Layer × Time</text>
+  <line x1="444" y1="94" x2="508" y2="94" stroke="#fff" stroke-width="0.5" opacity="0.4"/>
+  <text x="476" y="108" text-anchor="middle" fill="#d2b4de" font-size="9" font-style="italic">Layer × Time</text>
+  <text x="476" y="124" text-anchor="middle" fill="#ebdef0" font-size="9">DALS (Ours)</text>
+
+  <!-- Granularity arrow -->
+  <line x1="30" y1="158" x2="490" y2="158" stroke="#999" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="260" y="176" text-anchor="middle" fill="#666" font-size="9">Granularity of LR assignment</text>
+  <text x="35" y="176" text-anchor="start" fill="#999" font-size="9">Coarse</text>
+  <text x="488" y="176" text-anchor="end" fill="#999" font-size="9">Fine</text>
+
+  <!-- Timeline bar -->
+  <rect x="18" y="200" rx="4" ry="4" width="500" height="8" fill="#eee" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="18" y="200" rx="4" ry="4" width="20" height="8" fill="#c0392b"/>
+  <rect x="122" y="200" rx="4" ry="4" width="20" height="8" fill="#d35400"/>
+  <rect x="226" y="200" rx="4" ry="4" width="20" height="8" fill="#2471a3"/>
+  <rect x="330" y="200" rx="4" ry="4" width="20" height="8" fill="#1e8449"/>
+  <rect x="434" y="200" rx="4" ry="4" width="20" height="8" fill="#7d3c98"/>
+
+  <!-- Period labels -->
+  <text x="60" y="228" text-anchor="middle" fill="#666" font-size="8.5">~2012</text>
+  <text x="164" y="228" text-anchor="middle" fill="#666" font-size="8.5">~2016</text>
+  <text x="268" y="228" text-anchor="middle" fill="#666" font-size="8.5">~2017</text>
+  <text x="372" y="228" text-anchor="middle" fill="#666" font-size="8.5">~2019</text>
+  <text x="476" y="228" text-anchor="middle" fill="#666" font-size="8.5">~2024+</text>
+
+  <!-- Formal notation -->
+  <text x="260" y="268" text-anchor="middle" fill="#444" font-size="10">
+    η = const → η(t) → η(θᵢ) → η(l) → η(l, t)
+  </text>
+  <text x="260" y="288" text-anchor="middle" fill="#888" font-size="9" font-style="italic">Formal granularity progression</text>
+
+  <!-- Decorative: small DALS integration arrow -->
+  <path d="M 476,136 C 476,160 260,160 260,50" fill="none" stroke="#e91e63" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arr)" opacity="0.5"/>
+  <text x="360" y="155" text-anchor="middle" fill="#e91e63" font-size="7" font-style="italic" opacity="0.7">DALS integrates all generations</text>
+</svg>

@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420" width="600" height="420">
+  <defs>
+    <marker id="flow-arr5" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#333"/>
+    </marker>
+    <filter id="sh5" x="-3%" y="-3%" width="106%" height="109%">
+      <feDropShadow dx="1" dy="1" stdDeviation="1.5" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  </style>
+
+  <!-- Background -->
+  <rect width="600" height="420" fill="#fff" rx="4"/>
+
+  <!-- Title -->
+  <text x="300" y="22" text-anchor="middle" fill="#222" font-size="12" font-weight="bold">DALS: Phase-Adaptive + Depth-Aware + Trust Ratio</text>
+
+  <!-- ==================== LEFT: Layer columns ==================== -->
+
+  <!-- Depth arrow pointing up -->
+  <line x1="42" y1="310" x2="42" y2="42" stroke="#8e44ad" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#flow-arr5)"/>
+  <text x="34" y="175" text-anchor="middle" fill="#8e44ad" font-size="8.5" transform="rotate(-90,34,175)" font-style="italic">depth d = 0 → 1</text>
+
+  <!-- Layer 1 (bottom, d_l=0) -->
+  <rect x="60" y="52" rx="6" ry="6" width="108" height="245" fill="#fef9e7" stroke="#f39c12" stroke-width="1" filter="url(#sh5)"/>
+  <text x="114" y="70" text-anchor="middle" fill="#2c3e50" font-size="9.5" font-weight="bold">Layer 1 (d=0)</text>
+
+  <rect x="68" y="78" rx="3" ry="3" width="92" height="30" fill="#e67e22" opacity="0.15" stroke="#e67e22" stroke-width="0.7"/>
+  <text x="114" y="92" text-anchor="middle" fill="#e67e22" font-size="7.5" font-weight="bold">Phase-Adaptive</text>
+  <text x="114" y="103" text-anchor="middle" fill="#e67e22" font-size="7">η₀ · cos(t)</text>
+
+  <rect x="68" y="114" rx="3" ry="3" width="92" height="48" fill="#27ae60" opacity="0.15" stroke="#27ae60" stroke-width="0.7"/>
+  <text x="114" y="128" text-anchor="middle" fill="#27ae60" font-size="7.5" font-weight="bold">Grokfast (α₀−0.3)</text>
+  <text x="114" y="140" text-anchor="middle" fill="#27ae60" font-size="7">blend=0.3 (filtered)</text>
+  <text x="114" y="152" text-anchor="middle" fill="#27ae60" font-size="7">Phase 0: no filter</text>
+
+  <rect x="68" y="168" rx="3" ry="3" width="92" height="24" fill="#3498db" opacity="0.15" stroke="#3498db" stroke-width="0.7"/>
+  <text x="114" y="184" text-anchor="middle" fill="#3498db" font-size="7.5" font-weight="bold">Trust Ratio r¹</text>
+
+  <rect x="68" y="198" rx="3" ry="3" width="92" height="22" fill="#95a5a6" opacity="0.2" stroke="#95a5a6" stroke-width="0.7"/>
+  <text x="114" y="213" text-anchor="middle" fill="#7f8c8d" font-size="7.5">Momentum m¹</text>
+
+  <rect x="68" y="226" rx="3" ry="3" width="92" height="22" fill="#f8f9fa" stroke="#555" stroke-width="0.7"/>
+  <text x="114" y="241" text-anchor="middle" fill="#2c3e50" font-size="7.5" font-weight="bold">θ¹ −= η·r¹·m¹</text>
+
+  <rect x="68" y="254" rx="3" ry="3" width="92" height="20" fill="#dfe6e9" stroke="#636e72" stroke-width="0.7"/>
+  <text x="114" y="268" text-anchor="middle" fill="#2c3e50" font-size="8">Bottom update</text>
+
+  <!-- Layer 2 (middle) -->
+  <rect x="180" y="52" rx="6" ry="6" width="108" height="245" fill="#fef9e7" stroke="#f39c12" stroke-width="1" filter="url(#sh5)"/>
+  <text x="234" y="70" text-anchor="middle" fill="#2c3e50" font-size="9.5" font-weight="bold">Layer 2 (d=0.5)</text>
+
+  <rect x="188" y="78" rx="3" ry="3" width="92" height="30" fill="#e67e22" opacity="0.15" stroke="#e67e22" stroke-width="0.7"/>
+  <text x="234" y="92" text-anchor="middle" fill="#e67e22" font-size="7.5" font-weight="bold">Phase-Adaptive</text>
+  <text x="234" y="103" text-anchor="middle" fill="#e67e22" font-size="7">η₀ · cos(t)</text>
+
+  <rect x="188" y="114" rx="3" ry="3" width="92" height="48" fill="#27ae60" opacity="0.15" stroke="#27ae60" stroke-width="0.7"/>
+  <text x="234" y="128" text-anchor="middle" fill="#27ae60" font-size="7.5" font-weight="bold">Grokfast (α₀)</text>
+  <text x="234" y="140" text-anchor="middle" fill="#27ae60" font-size="7">blend=0.5 (balanced)</text>
+  <text x="234" y="152" text-anchor="middle" fill="#27ae60" font-size="7">Phase 1: α=0.6</text>
+
+  <rect x="188" y="168" rx="3" ry="3" width="92" height="24" fill="#3498db" opacity="0.15" stroke="#3498db" stroke-width="0.7"/>
+  <text x="234" y="184" text-anchor="middle" fill="#3498db" font-size="7.5" font-weight="bold">Trust Ratio r²</text>
+
+  <rect x="188" y="198" rx="3" ry="3" width="92" height="22" fill="#95a5a6" opacity="0.2" stroke="#95a5a6" stroke-width="0.7"/>
+  <text x="234" y="213" text-anchor="middle" fill="#7f8c8d" font-size="7.5">Momentum m²</text>
+
+  <rect x="188" y="226" rx="3" ry="3" width="92" height="22" fill="#f8f9fa" stroke="#555" stroke-width="0.7"/>
+  <text x="234" y="241" text-anchor="middle" fill="#2c3e50" font-size="7.5" font-weight="bold">θ² −= η·r²·m²</text>
+
+  <rect x="188" y="254" rx="3" ry="3" width="92" height="20" fill="#dfe6e9" stroke="#636e72" stroke-width="0.7"/>
+  <text x="234" y="268" text-anchor="middle" fill="#2c3e50" font-size="8">Mid update</text>
+
+  <!-- Layer 3 (top, d_l=1) — only show header, use "..." for brevity -->
+  <rect x="300" y="52" rx="6" ry="6" width="108" height="245" fill="#fef9e7" stroke="#f39c12" stroke-width="1" filter="url(#sh5)"/>
+  <text x="354" y="70" text-anchor="middle" fill="#2c3e50" font-size="9.5" font-weight="bold">Layer L (d=1)</text>
+
+  <rect x="308" y="78" rx="3" ry="3" width="92" height="30" fill="#e67e22" opacity="0.15" stroke="#e67e22" stroke-width="0.7"/>
+  <text x="354" y="92" text-anchor="middle" fill="#e67e22" font-size="7.5" font-weight="bold">Phase-Adaptive</text>
+  <text x="354" y="103" text-anchor="middle" fill="#e67e22" font-size="7">η₀ · cos(t)</text>
+
+  <rect x="308" y="114" rx="3" ry="3" width="92" height="48" fill="#27ae60" opacity="0.15" stroke="#27ae60" stroke-width="0.7"/>
+  <text x="354" y="128" text-anchor="middle" fill="#27ae60" font-size="7.5" font-weight="bold">Grokfast (α₀+0.1)</text>
+  <text x="354" y="140" text-anchor="middle" fill="#27ae60" font-size="7">blend=0.7 (more raw)</text>
+  <text x="354" y="152" text-anchor="middle" fill="#27ae60" font-size="7">Phase 2: α=0.7</text>
+
+  <rect x="308" y="168" rx="3" ry="3" width="92" height="24" fill="#3498db" opacity="0.15" stroke="#3498db" stroke-width="0.7"/>
+  <text x="354" y="184" text-anchor="middle" fill="#3498db" font-size="7.5" font-weight="bold">Trust Ratio rᴸ</text>
+
+  <rect x="308" y="198" rx="3" ry="3" width="92" height="22" fill="#95a5a6" opacity="0.2" stroke="#95a5a6" stroke-width="0.7"/>
+  <text x="354" y="213" text-anchor="middle" fill="#7f8c8d" font-size="7.5">Momentum mᴸ</text>
+
+  <rect x="308" y="226" rx="3" ry="3" width="92" height="22" fill="#f8f9fa" stroke="#555" stroke-width="0.7"/>
+  <text x="354" y="241" text-anchor="middle" fill="#2c3e50" font-size="7.5" font-weight="bold">θᴸ −= η·rᴸ·mᴸ</text>
+
+  <rect x="308" y="254" rx="3" ry="3" width="92" height="20" fill="#dfe6e9" stroke="#636e72" stroke-width="0.7"/>
+  <text x="354" y="268" text-anchor="middle" fill="#2c3e50" font-size="8">Top update</text>
+
+  <!-- Flow arrows between layers -->
+  <line x1="168" y1="170" x2="180" y2="170" stroke="#333" stroke-width="1.2" marker-end="url(#flow-arr5)"/>
+  <line x1="288" y1="170" x2="300" y2="170" stroke="#333" stroke-width="1.2" marker-end="url(#flow-arr5)"/>
+
+  <!-- ==================== RIGHT: Info panels ==================== -->
+
+  <!-- Phase Detection Panel -->
+  <rect x="425" y="52" rx="6" ry="6" width="155" height="108" fill="#e8f4fd" stroke="#2980b9" stroke-width="1.2" filter="url(#sh5)"/>
+  <text x="502" y="70" text-anchor="middle" fill="#2c3e50" font-size="9.5" font-weight="bold">Phase Detection</text>
+  <text x="433" y="86" text-anchor="start" fill="#2c3e50" font-size="7">Δ = (L_ema^(t-1) − L_ema^t) / |L_ema^(t-1)|</text>
+  <rect x="433" y="94" rx="2" ry="2" width="138" height="16" fill="#e74c3c" opacity="0.12" stroke="#e74c3c" stroke-width="0.5"/>
+  <text x="442" y="106" text-anchor="start" fill="#e74c3c" font-size="7.5">Phase 0: Δ &gt; 0.01 (explore)</text>
+  <rect x="433" y="113" rx="2" ry="2" width="138" height="14" fill="#f39c12" opacity="0.12" stroke="#f39c12" stroke-width="0.5"/>
+  <text x="442" y="124" text-anchor="start" fill="#f39c12" font-size="7.5">Phase 1: 0.002 &lt; Δ ≤ 0.01</text>
+  <rect x="433" y="130" rx="2" ry="2" width="138" height="14" fill="#27ae60" opacity="0.12" stroke="#27ae60" stroke-width="0.5"/>
+  <text x="442" y="141" text-anchor="start" fill="#27ae60" font-size="7.5">Phase 2: Δ ≤ 0.002 (refine)</text>
+
+  <!-- Depth-Aware Behavior Panel -->
+  <rect x="425" y="170" rx="6" ry="6" width="155" height="105" fill="#fdebd0" stroke="#e67e22" stroke-width="1.2" filter="url(#sh5)"/>
+  <text x="502" y="188" text-anchor="middle" fill="#2c3e50" font-size="9.5" font-weight="bold">Depth-Aware Behavior</text>
+  <text x="433" y="204" text-anchor="start" fill="#2c3e50" font-size="7.5" font-weight="bold">Bottom layers (d≈0):</text>
+  <text x="433" y="216" text-anchor="start" fill="#555" font-size="7">• blend = 0.3 + 0.4·0 = 0.3</text>
+  <text x="433" y="227" text-anchor="start" fill="#555" font-size="7">• More filtered signal (stable)</text>
+  <text x="433" y="242" text-anchor="start" fill="#2c3e50" font-size="7.5" font-weight="bold">Top layers (d≈1):</text>
+  <text x="433" y="254" text-anchor="start" fill="#555" font-size="7">• blend = 0.3 + 0.4·1 = 0.7</text>
+  <text x="433" y="265" text-anchor="start" fill="#555" font-size="7">• More raw gradient (adaptive)</text>
+
+  <!-- ==================== BOTTOM: Formula + Legend ==================== -->
+
+  <!-- Update formula -->
+  <rect x="60" y="310" rx="5" ry="5" width="380" height="36" fill="#f0f3f5" stroke="#ddd" stroke-width="0.5"/>
+  <text x="250" y="328" text-anchor="middle" fill="#2c3e50" font-size="9" font-weight="bold">θˡ ← θˡ − η(t) · rˡ · mˡ</text>
+  <text x="250" y="341" text-anchor="middle" fill="#555" font-size="8">η(t) = η₀ · cosine(t),  blend(l) = 0.3 + 0.4·(l/(L−1))</text>
+
+  <!-- Legend row -->
+  <rect x="60" y="355" rx="2" ry="2" width="12" height="10" fill="#e67e22" opacity="0.25" stroke="#e67e22" stroke-width="0.6"/>
+  <text x="78" y="364" text-anchor="start" fill="#555" font-size="8">Phase-Adaptive LR (Gen2)</text>
+
+  <rect x="215" y="355" rx="2" ry="2" width="12" height="10" fill="#27ae60" opacity="0.25" stroke="#27ae60" stroke-width="0.6"/>
+  <text x="233" y="364" text-anchor="start" fill="#555" font-size="8">Depth-Aware Grokfast (Gen5+)</text>
+
+  <rect x="395" y="355" rx="2" ry="2" width="12" height="10" fill="#3498db" opacity="0.25" stroke="#3498db" stroke-width="0.6"/>
+  <text x="413" y="364" text-anchor="start" fill="#555" font-size="8">LARS Trust (Gen4)</text>
+
+  <rect x="510" y="355" rx="2" ry="2" width="12" height="10" fill="#95a5a6" opacity="0.3" stroke="#95a5a6" stroke-width="0.6"/>
+  <text x="528" y="364" text-anchor="start" fill="#555" font-size="8">Momentum</text>
+
+  <!-- Comparison annotation -->
+  <rect x="425" y="285" rx="5" ry="5" width="155" height="52" fill="#e8f8e8" stroke="#27ae60" stroke-width="1" filter="url(#sh5)"/>
+  <text x="502" y="302" text-anchor="middle" fill="#27ae60" font-size="8" font-weight="bold">✓ DALS: No directional bias</text>
+  <text x="502" y="314" text-anchor="middle" fill="#555" font-size="7">Adapts by phase &amp; depth</text>
+  <text x="502" y="328" text-anchor="middle" fill="#c0392b" font-size="7.5">✗ Disc. decay × STLR: 75.3%</text>
+
+  <!-- Arrow from layer columns to right panels -->
+  <line x1="408" y1="105" x2="425" y2="105" stroke="#2980b9" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#flow-arr5)"/>
+  <line x1="408" y1="220" x2="425" y2="220" stroke="#e67e22" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#flow-arr5)"/>
+</svg>
