@@ -20,9 +20,23 @@
 
 \title[Learning Rate Engineering]{Learning Rate Engineering: From Coarse Single Parameter to Layered Evolution}
 
-\author*[1]{\fnm{Firstname} \sur{Lastname}}\email{email@example.com}
+\author[1]{\fnm{Ming-Hong} \sur{Yao}}
 
-\affil*[1]{\orgdiv{Department}, \orgname{Institution Name}, \orgaddress{\city{City}, \country{Country}}}
+\author[1]{\fnm{Di} \sur{Wang}}
+
+\author[1]{\fnm{Jian} \sur{Cui}}
+
+\author[1]{\fnm{Jin-Yan} \sur{Chen}}
+
+\author[1]{\fnm{Zi-Hao} \sur{Cui}}
+
+\author[1]{\fnm{Fa} \sur{Wang}}
+
+\author[1]{\fnm{Chen} \sur{Wei}}
+
+\author*[1]{\fnm{Qiu-Ye} \sur{Yu}}\email{yuqiuye@jisu.edu.cn}
+
+\affil[1]{\orgdiv{School of AI}, \orgname{Jilin International Sciences University}, \orgaddress{\city{Changchun}, \country{China}}}
 
 \abstract{Learning rate scheduling has undergone a remarkable evolution from the single global fixed rate of early SGD to sophisticated layer-wise adaptive strategies. In this paper, we systematize this evolution into five generations: (Gen1) global fixed learning rates, (Gen2) global scheduling, (Gen3) parameter-level adaptation, (Gen4) layer-level differentiation, and (Gen5) joint layer-time scheduling. We trace the fundamental motivation behind each transition, showing how the shift from ``one-size-fits-all'' to ``tailoring by layer and time'' addresses the impossible trinity of transfer learning: lower layers require small updates to preserve general knowledge while higher layers need large updates to adapt to new tasks. Building on this taxonomy, we propose Discriminative Adaptive Layer Scaling (DALS), a unified framework that integrates phase-adaptive cosine scheduling, depth-aware Grokfast gradient filtering, and LARS-style trust ratios into a single coherent optimizer. We benchmark 18 strategies including three DALS variants across all five generations on five datasets: synthetic (MLP, from scratch), CIFAR-10 (ConvNet, from scratch), RTE (DistilBERT, fine-tune), TREC-6 (DistilBERT, fine-tune), and IMDb (DistilBERT, fine-tune). On synthetic, DALS achieves the best accuracy at 98.0\%, while DALS-Fast reaches 90\% in just 3 epochs. The cross-dataset analysis reveals striking regime-dependent patterns: strategies that dominate from-scratch training (DALS, Fixed SGD) falter on fine-tuning tasks, while adaptive methods (RAdam, Lookahead) excel on NLP benchmarks---no single strategy wins across all regimes. Critically, STLR+Discriminative---the ULMFiT champion---catastrophically fails on from-scratch tasks (43.6\% on TREC-6 from scratch vs.\ 96.8\% with RAdam), confirming that directional decay biases are harmful without pretrained features. Conversely, on IMDb fine-tuning, discriminative methods recover to competitive levels. DALS's phase-and-depth-aware design avoids either extreme, achieving the best synthetic result while maintaining competitive fine-tuning performance.}
 
@@ -387,7 +401,7 @@ Future work should evaluate DALS on large-scale transfer learning benchmarks whe
 \item \textbf{Funding:} Not applicable.
 \item \textbf{Conflicts of interest/Competing interests:} The authors declare no conflicts of interest.
 \item \textbf{Data availability:} All datasets used are publicly available. Code is available at the project repository.
-\item \textbf{Authors' contributions:} All authors contributed to the study conception and design.
+\item \textbf{Authors' contributions:} Ming-Hong Yao wrote the manuscript; Di Wang deployed the experimental environment; Jian Cui ran the tests; Jin-Yan Chen selected the datasets; Zi-Hao Cui tested the code; Fa Wang tested the code; Chen Wei tested the code; Qiu-Ye Yu conceived the research ideas and supervised the project.
 \end{itemize}
 
 \bibliographystyle{sn-basic}
