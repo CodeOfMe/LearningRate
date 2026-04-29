@@ -216,9 +216,15 @@ def train_and_evaluate(name, epochs=EPOCHS):
                     loss.backward()
                     opt.update_phase(loss.item())
                     opt.step()
-                opt.zero_grad(set_to_none=True)
+                try:
+                    opt.zero_grad(set_to_none=True)
+                except TypeError:
+                    opt.zero_grad()
             else:
-                opt.zero_grad(set_to_none=True)
+                try:
+                    opt.zero_grad(set_to_none=True)
+                except TypeError:
+                    opt.zero_grad()
                 with torch.autocast(amp_device_type, enabled=USE_AMP):
                     out = model(xb)
                     loss = F.cross_entropy(out, yb)
@@ -298,21 +304,42 @@ if __name__ == '__main__':
 
     all_results = {}
     all_histories = {}
+    checkpoint_file = RESULTS_DIR / 'cifar10_results.json'
+
+    # Resume from checkpoint if exists
+    if checkpoint_file.exists():
+        with open(checkpoint_file) as f:
+            saved = json.load(f)
+        for name in saved:
+            all_results[name] = saved[name]
+            all_histories[name] = saved[name].get('history', {})
+        completed = set(all_results.keys())
+        print(f"  Resumed {len(completed)} completed strategies: {sorted(completed)}")
+    else:
+        completed = set()
 
     for name in strategies:
+        if name in completed:
+            r = all_results[name]
+            print(f"\n  [{name}] — already done: Best={r['best_acc']:.1f}%", flush=True)
+            continue
         print(f"\n  [{name}]", flush=True)
         t0 = time.time()
         try:
             history, best_acc, milestones, total_time = train_and_evaluate(name)
-            all_histories[name] = history
+            all_histories[name] = {k: [float(x) for x in vs] for k, vs in history.items()} if isinstance(history, dict) else history
             all_results[name] = {
                 'best_acc': best_acc,
                 'final_acc': history['test_acc'][-1],
                 'milestones': milestones,
                 'total_time': total_time,
+                'history': {k: [float(x) for x in vs] for k, vs in history.items()},
             }
             ms = "  ".join([f"{k}%:{v[0]}ep" for k, v in sorted(milestones.items())])
             print(f"  => Best={best_acc:.1f}%  Final={history['test_acc'][-1]:.1f}%  {ms}  ({total_time:.1f}s)")
+            # Incremental save after each strategy
+            with open(checkpoint_file, 'w') as f:
+                json.dump(all_results, f, indent=2)
         except Exception as e:
             import traceback
             traceback.print_exc()

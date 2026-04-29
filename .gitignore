@@ -217,6 +217,11 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 .DS_Store
+
+# Large data files (auto-downloaded by Test_All.py)
 codes/data/cifar-10-python.tar.gz
 codes/data/cifar-10-batches-py/
+codes/data/trec/
+codes/data/huggingface/
+codes/results/
 pdf_texts/
