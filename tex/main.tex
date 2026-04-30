@@ -71,7 +71,7 @@ Our contributions are: (1) a systematic five-generation taxonomy of learning rat
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{paper_fig2_taxonomy}
-\caption{Five-generation taxonomy of learning rate strategies. The evolution progresses from global fixed LR (Gen1) $\to$ global scheduling (Gen2) $\to$ parameter-level adaptation (Gen3) $\to$ layer-level differentiation (Gen4) $\to$ joint layer$\times$time scheduling (Gen5). DALS (SOTA) integrates all five generations.}\label{fig:taxonomy}
+\caption{Five-generation taxonomy of learning rate strategies. The evolution progresses from global fixed LR (Gen1) \texorpdfstring{$\to$}{->} global scheduling (Gen2) \texorpdfstring{$\to$}{->} parameter-level adaptation (Gen3) \texorpdfstring{$\to$}{->} layer-level differentiation (Gen4) \texorpdfstring{$\to$}{->} joint layer\texorpdfstring{$\times$}{x}time scheduling (Gen5). DALS (SOTA) integrates all five generations.}\label{fig:taxonomy}
 \end{figure}
 
 \section{Related Work}\label{sec:related}
@@ -153,7 +153,7 @@ This ratio naturally adapts the effective learning rate per layer based on the r
 \caption{Feature hierarchy---lower layers capture general features requiring smaller updates, higher layers encode task-specific concepts requiring larger updates.}\label{fig:discriminative}
 \end{figure}
 
-\subsection{Generation 5: Joint Layer$\times$Time Scheduling}
+\subsection{Generation 5: Joint Layer\texorpdfstring{$\times$}{x}Time Scheduling}
 
 The most recent generation combines layer-level differentiation with temporal dynamics.
 
