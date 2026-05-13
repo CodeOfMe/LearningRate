@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 340" width="620" height="340">
+  <defs>
+    <marker id="darr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <path d="M0,0 L7,2.5 L0,5 Z" fill="#333"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  </style>
+
+  <!-- Background -->
+  <rect width="620" height="340" fill="#fff" rx="4"/>
+
+  <!-- Panel (a) label -->
+  <text x="140" y="22" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">(a) Uniform LR</text>
+
+  <!-- 5 layers - uniform (all same color) -->
+  <rect x="80" y="38" rx="5" ry="5" width="110" height="38" fill="#5da5da" stroke="#4080b0" stroke-width="0.8"/>
+  <text x="135" y="61" text-anchor="middle" fill="#fff" font-size="10">Layer 5 (Top)</text>
+
+  <rect x="80" y="82" rx="5" ry="5" width="110" height="38" fill="#5da5da" stroke="#4080b0" stroke-width="0.8"/>
+  <text x="135" y="105" text-anchor="middle" fill="#fff" font-size="10">Layer 4</text>
+
+  <rect x="80" y="126" rx="5" ry="5" width="110" height="38" fill="#5da5da" stroke="#4080b0" stroke-width="0.8"/>
+  <text x="135" y="149" text-anchor="middle" fill="#fff" font-size="10">Layer 3</text>
+
+  <rect x="80" y="170" rx="5" ry="5" width="110" height="38" fill="#5da5da" stroke="#4080b0" stroke-width="0.8"/>
+  <text x="135" y="193" text-anchor="middle" fill="#fff" font-size="10">Layer 2</text>
+
+  <rect x="80" y="214" rx="5" ry="5" width="110" height="38" fill="#5da5da" stroke="#4080b0" stroke-width="0.8"/>
+  <text x="135" y="237" text-anchor="middle" fill="#fff" font-size="10">Layer 1 (Bottom)</text>
+
+  <!-- Warning signs on bottom layers -->
+  <text x="70" y="193" text-anchor="middle" fill="#e74c3c" font-size="14">⚠</text>
+  <text x="70" y="233" text-anchor="middle" fill="#e74c3c" font-size="14">⚠</text>
+
+  <!-- Same LR bracket on right -->
+  <line x1="195" y1="42" x2="205" y2="42" stroke="#555" stroke-width="1.2"/>
+  <line x1="205" y1="42" x2="205" y2="248" stroke="#555" stroke-width="1.2"/>
+  <line x1="195" y1="248" x2="205" y2="248" stroke="#555" stroke-width="1.2"/>
+  <text x="212" y="140" text-anchor="start" fill="#555" font-size="10">η</text>
+  <text x="212" y="153" text-anchor="start" fill="#555" font-size="10">(same)</text>
+
+  <!-- Problem annotation -->
+  <text x="135" y="275" text-anchor="middle" fill="#c0392b" font-size="9" font-weight="bold">⚠ Forgetting risk in lower layers</text>
+  <text x="135" y="289" text-anchor="middle" fill="#c0392b" font-size="9">⚠ Slow convergence in upper layers</text>
+
+  <!-- Divider -->
+  <line x1="270" y1="15" x2="270" y2="310" stroke="#ccc" stroke-width="0.8" stroke-dasharray="4,3"/>
+
+  <!-- Panel (b) label -->
+  <text x="440" y="22" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">(b) Discriminative Fine-tuning</text>
+
+  <!-- 5 layers - discriminative (gradient) -->
+  <rect x="390" y="38" rx="5" ry="5" width="110" height="38" fill="#27ae60" stroke="#1e8449" stroke-width="0.8"/>
+  <text x="445" y="61" text-anchor="middle" fill="#fff" font-size="10">Layer 5 (Top)</text>
+
+  <rect x="390" y="82" rx="5" ry="5" width="110" height="38" fill="#2ecc71" stroke="#27ae60" stroke-width="0.8"/>
+  <text x="445" y="105" text-anchor="middle" fill="#fff" font-size="10">Layer 4</text>
+
+  <rect x="390" y="126" rx="5" ry="5" width="110" height="38" fill="#58d68d" stroke="#2ecc71" stroke-width="0.8"/>
+  <text x="445" y="149" text-anchor="middle" fill="#333" font-size="10">Layer 3</text>
+
+  <rect x="390" y="170" rx="5" ry="5" width="110" height="38" fill="#82e0aa" stroke="#58d68d" stroke-width="0.8"/>
+  <text x="445" y="193" text-anchor="middle" fill="#333" font-size="10">Layer 2</text>
+
+  <rect x="390" y="214" rx="5" ry="5" width="110" height="38" fill="#abebc6" stroke="#82e0aa" stroke-width="0.8"/>
+  <text x="445" y="237" text-anchor="middle" fill="#333" font-size="10">Layer 1 (Bottom)</text>
+
+  <!-- Check mark on bottom layers -->
+  <text x="380" y="233" text-anchor="middle" fill="#27ae60" font-size="14">✓</text>
+
+  <!-- LR arrows on right side - decreasing -->
+  <line x1="510" y1="52" x2="540" y2="52" stroke="#1e8449" stroke-width="3" marker-end="url(#darr)"/>
+  <text x="548" y="56" text-anchor="start" fill="#1e8449" font-size="10">η⁵ (large)</text>
+
+  <line x1="510" y1="96" x2="532" y2="96" stroke="#229954" stroke-width="2.5" marker-end="url(#darr)"/>
+  <text x="548" y="100" text-anchor="start" fill="#229954" font-size="10">η⁴</text>
+
+  <line x1="510" y1="140" x2="524" y2="140" stroke="#27ae60" stroke-width="2" marker-end="url(#darr)"/>
+  <text x="548" y="144" text-anchor="start" fill="#27ae60" font-size="10">η³</text>
+
+  <line x1="510" y1="184" x2="520" y2="184" stroke="#2ecc71" stroke-width="1.5" marker-end="url(#darr)"/>
+  <text x="548" y="188" text-anchor="start" fill="#2ecc71" font-size="10">η²</text>
+
+  <line x1="510" y1="228" x2="515" y2="228" stroke="#58d68d" stroke-width="1" marker-end="url(#darr)"/>
+  <text x="548" y="232" text-anchor="start" fill="#58d68d" font-size="10">η¹ (small)</text>
+
+  <!-- Decay formula -->
+  <text x="445" y="275" text-anchor="middle" fill="#27ae60" font-size="10" font-style="italic">ηˡ = η_top × decay^(L − l)</text>
+  <text x="445" y="289" text-anchor="middle" fill="#27ae60" font-size="9">✓ Knowledge preserved ✓ Fast convergence</text>
+</svg>

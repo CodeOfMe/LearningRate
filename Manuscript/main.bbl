@@ -1,0 +1,93 @@
+\begin{thebibliography}{18}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Inproceedings
+\bibitem[{Chen et~al.(2023)Chen, Liang, Huang, Real, Wong, Qin, Le and Hieu}]{chen2023symbolic}
+\bibinfo{author}{Chen, X.}, \bibinfo{author}{Liang, C.}, \bibinfo{author}{Huang, D.}, \bibinfo{author}{Real, E.}, \bibinfo{author}{Wong, K.}, \bibinfo{author}{Qin, F.}, \bibinfo{author}{Le, Q.V.}, \bibinfo{author}{Hieu, J.}, \bibinfo{year}{2023}.
+\newblock \bibinfo{title}{Symbolic discovery of optimization algorithms}, in: \bibinfo{booktitle}{Advances in Neural Information Processing Systems (NeurIPS)}.
+%Type = Article
+\bibitem[{Chen et~al.(2024)Chen, Guo, Yang, Hu and Wang}]{chen2024grokfast}
+\bibinfo{author}{Chen, Y.}, \bibinfo{author}{Guo, Q.}, \bibinfo{author}{Yang, H.}, \bibinfo{author}{Hu, X.}, \bibinfo{author}{Wang, W.}, \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{Grokfast: Accelerated grokking by amplifying slow gradients}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:2405.20233} .
+%Type = Inproceedings
+\bibitem[{Defazio et~al.(2024)Defazio, Jelassi and Liao}]{defazio2024schedulefree}
+\bibinfo{author}{Defazio, A.}, \bibinfo{author}{Jelassi, S.}, \bibinfo{author}{Liao, R.}, \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{The road less scheduled}, in: \bibinfo{booktitle}{Proceedings of the 12th International Conference on Learning Representations (ICLR)}.
+%Type = Article
+\bibitem[{Duchi et~al.(2011)Duchi, Hazan and Singer}]{duchi2011adagrad}
+\bibinfo{author}{Duchi, J.}, \bibinfo{author}{Hazan, E.}, \bibinfo{author}{Singer, Y.}, \bibinfo{year}{2011}.
+\newblock \bibinfo{title}{Adaptive subgradient methods for online learning and stochastic optimization}.
+\newblock \bibinfo{journal}{Journal of Machine Learning Research} \bibinfo{volume}{12}, \bibinfo{pages}{2121--2159}.
+%Type = Inproceedings
+\bibitem[{Foret et~al.(2020)Foret, Kleiner, Mobahi and Hinton}]{foret2020sam}
+\bibinfo{author}{Foret, P.}, \bibinfo{author}{Kleiner, A.}, \bibinfo{author}{Mobahi, H.}, \bibinfo{author}{Hinton, G.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Sharpness-aware minimization for efficiently improving generalization}, in: \bibinfo{booktitle}{Proceedings of the 8th International Conference on Learning Representations (ICLR)}.
+%Type = Article
+\bibitem[{Howard and Ruder(2018)}]{howard2018ulmfit}
+\bibinfo{author}{Howard, J.}, \bibinfo{author}{Ruder, S.}, \bibinfo{year}{2018}.
+\newblock \bibinfo{title}{Universal language model fine-tuning for text classification}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:1801.06146} .
+%Type = Inproceedings
+\bibitem[{Kingma and Ba(2015)}]{kingma2015adam}
+\bibinfo{author}{Kingma, D.P.}, \bibinfo{author}{Ba, J.}, \bibinfo{year}{2015}.
+\newblock \bibinfo{title}{Adam: A method for stochastic optimization}, in: \bibinfo{booktitle}{Proceedings of the 3rd International Conference on Learning Representations (ICLR)}.
+%Type = Inproceedings
+\bibitem[{Liu et~al.(2020)Liu, Jiang, He, Chen, Liu, Gao and Han}]{liu2020radam}
+\bibinfo{author}{Liu, L.}, \bibinfo{author}{Jiang, H.}, \bibinfo{author}{He, P.}, \bibinfo{author}{Chen, W.}, \bibinfo{author}{Liu, X.}, \bibinfo{author}{Gao, J.}, \bibinfo{author}{Han, J.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{On the variance of the adaptive learning rate and beyond}, in: \bibinfo{booktitle}{Proceedings of the 8th International Conference on Learning Representations (ICLR)}.
+%Type = Inproceedings
+\bibitem[{Loshchilov and Hutter(2017)}]{loshchilov2017sgdr}
+\bibinfo{author}{Loshchilov, I.}, \bibinfo{author}{Hutter, F.}, \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{{SGDR}: Stochastic gradient descent with warm restarts}, in: \bibinfo{booktitle}{Proceedings of the 5th International Conference on Learning Representations (ICLR)}.
+%Type = Inproceedings
+\bibitem[{Loshchilov and Hutter(2019)}]{loshchilov2019decoupled}
+\bibinfo{author}{Loshchilov, I.}, \bibinfo{author}{Hutter, F.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{Decoupled weight decay regularization}, in: \bibinfo{booktitle}{Proceedings of the 7th International Conference on Learning Representations (ICLR)}.
+%Type = Inproceedings
+\bibitem[{Luo et~al.(2019)Luo, Xiong, Liu and Zhang}]{luo2019adabound}
+\bibinfo{author}{Luo, L.}, \bibinfo{author}{Xiong, Y.}, \bibinfo{author}{Liu, Y.}, \bibinfo{author}{Zhang, X.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{Adaptive gradient methods with dynamic bound of learning rate}, in: \bibinfo{booktitle}{Proceedings of the 7th International Conference on Learning Representations (ICLR)}.
+%Type = Article
+\bibitem[{Ruder(2016)}]{ruder2016overview}
+\bibinfo{author}{Ruder, S.}, \bibinfo{year}{2016}.
+\newblock \bibinfo{title}{An overview of gradient descent optimization algorithms}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:1609.04747} .
+%Type = Inproceedings
+\bibitem[{Shazeer and Stern(2018)}]{shazeer2018adafactor}
+\bibinfo{author}{Shazeer, N.}, \bibinfo{author}{Stern, M.}, \bibinfo{year}{2018}.
+\newblock \bibinfo{title}{Adafactor: Adaptive learning rates with sublinear memory cost}, in: \bibinfo{booktitle}{Proceedings of the 35th International Conference on Machine Learning (ICML)}, pp. \bibinfo{pages}{4596--4604}.
+%Type = Article
+\bibitem[{Tieleman and Hutter(2012)}]{tieleman2012rmsprop}
+\bibinfo{author}{Tieleman, T.}, \bibinfo{author}{Hutter, G.}, \bibinfo{year}{2012}.
+\newblock \bibinfo{title}{{Lecture 6.5 -- RmsProp}: Divide the gradient by a running average of its recent magnitude}.
+\newblock \bibinfo{journal}{COURSERA: Neural Networks for Machine Learning} .
+%Type = Article
+\bibitem[{Yang et~al.(2019)Yang, Zhang, Chen and Hsieh}]{yang2019lars}
+\bibinfo{author}{Yang, Y.}, \bibinfo{author}{Zhang, H.}, \bibinfo{author}{Chen, Z.}, \bibinfo{author}{Hsieh, C.J.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{Large batch training of convolutional networks with layer-wise adaptive rate scaling}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:1902.08642} .
+%Type = Inproceedings
+\bibitem[{Yosinski et~al.(2014)Yosinski, Clune, Bengio and Lipson}]{yosinski2014transferable}
+\bibinfo{author}{Yosinski, J.}, \bibinfo{author}{Clune, J.}, \bibinfo{author}{Bengio, Y.}, \bibinfo{author}{Lipson, H.}, \bibinfo{year}{2014}.
+\newblock \bibinfo{title}{How transferable are features in deep neural networks?}, in: \bibinfo{booktitle}{Advances in Neural Information Processing Systems (NeurIPS)}, pp. \bibinfo{pages}{3320--3328}.
+%Type = Inproceedings
+\bibitem[{You et~al.(2020)You, Li, Reddi, Hseu, Kumar, Bhojanapalli, Song, Demmel, Hsieh and Gupta}]{you2020lamb}
+\bibinfo{author}{You, Y.}, \bibinfo{author}{Li, J.}, \bibinfo{author}{Reddi, S.}, \bibinfo{author}{Hseu, J.}, \bibinfo{author}{Kumar, S.}, \bibinfo{author}{Bhojanapalli, S.}, \bibinfo{author}{Song, X.}, \bibinfo{author}{Demmel, J.}, \bibinfo{author}{Hsieh, C.J.}, \bibinfo{author}{Gupta, A.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Large batch optimization for deep learning: Training {BERT} in 76 minutes}, in: \bibinfo{booktitle}{Proceedings of the 8th International Conference on Learning Representations (ICLR)}.
+%Type = Inproceedings
+\bibitem[{Zhang et~al.(2020)Zhang, Lucas, Ba and Hinton}]{zhang2020lookahead}
+\bibinfo{author}{Zhang, M.R.}, \bibinfo{author}{Lucas, J.}, \bibinfo{author}{Ba, J.}, \bibinfo{author}{Hinton, G.E.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Lookahead optimizer: k steps forward, 1 step back}, in: \bibinfo{booktitle}{Advances in Neural Information Processing Systems (NeurIPS)}, pp. \bibinfo{pages}{5956--5966}.
+
+\end{thebibliography}

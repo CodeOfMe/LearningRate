@@ -1,73 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 440" width="520" height="440">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 420" width="360" height="420">
   <defs>
-    <marker id="tri-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#c0392b"/>
-    </marker>
-    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
-      <feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.15"/>
+    <linearGradient id="gradLarge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="gradSmall" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="gradModerate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.10"/>
     </filter>
   </defs>
   <style>
-    text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    text { font-family: Arial, Helvetica, sans-serif; }
   </style>
 
-  <!-- Background -->
-  <rect width="520" height="440" fill="#fafafa" rx="8"/>
+  <rect width="360" height="420" fill="#ffffff" rx="6"/>
+
+  <!-- Triangle frame -->
+  <polygon points="180,90 40,340 320,340"
+           fill="none" stroke="#e2e8f0" stroke-width="1.8" stroke-dasharray="8,5" stroke-linejoin="round"/>
+
+  <!-- Large η — Top vertex -->
+  <rect x="121" y="56" rx="8" ry="8" width="118" height="42" fill="url(#gradLarge)" filter="url(#softShadow)"/>
+  <text x="180" y="75" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Large &#x3b7;</text>
+  <text x="180" y="90" text-anchor="middle" fill="#fee2e2" font-size="8.5">Fast but forgetting</text>
+
+  <!-- Small η — Bottom-left -->
+  <rect x="4" y="330" rx="8" ry="8" width="118" height="42" fill="url(#gradSmall)" filter="url(#softShadow)"/>
+  <text x="63" y="349" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Small &#x3b7;</text>
+  <text x="63" y="364" text-anchor="middle" fill="#fef3c7" font-size="8.5">Stable but slow</text>
+
+  <!-- Moderate η — Bottom-right -->
+  <rect x="238" y="330" rx="8" ry="8" width="118" height="42" fill="url(#gradModerate)" filter="url(#softShadow)"/>
+  <text x="297" y="349" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Moderate &#x3b7;</text>
+  <text x="297" y="364" text-anchor="middle" fill="#fed7aa" font-size="8.5">Compromise</text>
+
+  <!-- Edge labels -->
+  <text x="95" y="240" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-style="italic" transform="rotate(-40,95,240)">Convergence</text>
+  <text x="95" y="252" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-style="italic" transform="rotate(-40,95,252)">vs. Stability</text>
+
+  <text x="265" y="240" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-style="italic" transform="rotate(40,265,240)">Learning</text>
+  <text x="265" y="252" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-style="italic" transform="rotate(40,265,252)">vs. Forgetting</text>
+
+  <text x="180" y="388" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-style="italic">Speed vs. Preservation</text>
+
+  <!-- Center -->
+  <circle cx="180" cy="260" r="50" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <circle cx="180" cy="260" r="45" fill="none" stroke="#f1f5f9" stroke-width="0.8"/>
+  <text x="180" y="254" text-anchor="middle" fill="#dc2626" font-size="12" font-weight="bold">Impossible</text>
+  <text x="180" y="270" text-anchor="middle" fill="#dc2626" font-size="12" font-weight="bold">Trinity</text>
 
   <!-- Title -->
-  <text x="260" y="28" text-anchor="middle" fill="#2c3e50" font-size="13" font-weight="bold">Single Global Learning Rate Cannot Satisfy All Layers</text>
-
-  <!-- Triangle (larger, with margins) -->
-  <!-- Top vertex: (260, 70)  Bottom-left: (70, 370)  Bottom-right: (450, 370) -->
-  <line x1="260" y1="90" x2="85" y2="355" stroke="#c0392b" stroke-width="2.5" opacity="0.5" stroke-dasharray="8,4"/>
-  <line x1="85" y1="365" x2="435" y2="365" stroke="#c0392b" stroke-width="2.5" opacity="0.5" stroke-dasharray="8,4"/>
-  <line x1="435" y1="355" x2="260" y2="90" stroke="#c0392b" stroke-width="2.5" opacity="0.5" stroke-dasharray="8,4"/>
-
-  <!-- Center "impossible" label -->
-  <rect x="185" y="210" rx="10" ry="10" width="150" height="44" fill="#c0392b" opacity="0.12" stroke="#c0392b" stroke-width="1.5"/>
-  <text x="260" y="230" text-anchor="middle" fill="#c0392b" font-size="13" font-weight="bold">Impossible</text>
-  <text x="260" y="247" text-anchor="middle" fill="#c0392b" font-size="13" font-weight="bold">Trinity</text>
-
-  <!-- ⚡ conflict symbols on edges -->
-  <text x="155" y="195" text-anchor="middle" fill="#e74c3c" font-size="18">⚡</text>
-  <text x="365" y="195" text-anchor="middle" fill="#e74c3c" font-size="18">⚡</text>
-  <text x="260" y="385" text-anchor="middle" fill="#e74c3c" font-size="18">⚡</text>
-
-  <!-- Top vertex box: Large η -->
-  <rect x="185" y="55" rx="8" ry="8" width="150" height="34" fill="#e74c3c" filter="url(#shadow)"/>
-  <text x="260" y="77" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">Large η</text>
-  <!-- Description below top box -->
-  <text x="260" y="105" text-anchor="middle" fill="#922b21" font-size="9.5">Fast high-layer adaptation</text>
-  <text x="260" y="118" text-anchor="middle" fill="#c0392b" font-size="9.5" font-style="italic">↳ Catastrophic forgetting in lower layers</text>
-
-  <!-- Bottom-left vertex box: Small η -->
-  <rect x="15" y="345" rx="8" ry="8" width="120" height="34" fill="#e67e22" filter="url(#shadow)"/>
-  <text x="75" y="367" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">Small η</text>
-  <!-- Description -->
-  <text x="75" y="395" text-anchor="middle" fill="#7e5109" font-size="9.5">Preserved lower-layer knowledge</text>
-  <text x="75" y="408" text-anchor="middle" fill="#c0392b" font-size="9.5" font-style="italic">↳ Extremely slow convergence</text>
-
-  <!-- Bottom-right vertex box: Moderate η -->
-  <rect x="380" y="345" rx="8" ry="8" width="120" height="34" fill="#f39c12" filter="url(#shadow)"/>
-  <text x="440" y="367" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">Moderate η</text>
-  <!-- Description -->
-  <text x="440" y="395" text-anchor="middle" fill="#7d6608" font-size="9.5">Partial forgetting + partial learning</text>
-  <text x="440" y="408" text-anchor="middle" fill="#c0392b" font-size="9.5" font-style="italic">↳ Neither optimal</text>
-
-  <!-- Edge labels (outside triangle) -->
-  <text x="140" y="165" text-anchor="middle" fill="#7f8c8d" font-size="9" transform="rotate(-54,140,165)">convergence vs. stability</text>
-  <text x="370" y="165" text-anchor="middle" fill="#7f8c8d" font-size="9" transform="rotate(54,370,165)">learning vs. forgetting</text>
-  <text x="260" y="322" text-anchor="middle" fill="#7f8c8d" font-size="9">speed vs. preservation</text>
-
-  <!-- Arrow indicators along edges -->
-  <!-- Left edge: top to bottom-left -->
-  <line x1="175" y1="130" x2="110" y2="310" stroke="#c0392b" stroke-width="1.5" marker-end="url(#tri-arr)" opacity="0.4"/>
-  <!-- Right edge: top to bottom-right -->
-  <line x1="345" y1="130" x2="410" y2="310" stroke="#c0392b" stroke-width="1.5" marker-end="url(#tri-arr)" opacity="0.4"/>
-  <!-- Bottom edge: left to right -->
-  <line x1="140" y1="362" x2="380" y2="362" stroke="#c0392b" stroke-width="1.5" marker-end="url(#tri-arr)" opacity="0.4"/>
-
-  <!-- Small annotation -->
-  <rect x="170" y="415" rx="4" ry="4" width="180" height="20" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="0.5"/>
-  <text x="260" y="430" text-anchor="middle" fill="#7f8c8d" font-size="8.5">No single η satisfies all requirements</text>
+  <text x="180" y="24" text-anchor="middle" fill="#1e293b" font-size="11" font-weight="bold">The Impossible Trinity of Single Learning Rate</text>
 </svg>

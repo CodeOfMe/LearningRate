@@ -1,0 +1,57 @@
+This is BibTeX, Version 0.99e (TeX Live 2026)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: cas-model2-names.bst
+Database file #1: references.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Warning--empty pages in chen2023symbolic
+Warning--empty pages in defazio2024schedulefree
+Warning--empty pages in foret2020sam
+Warning--empty pages in kingma2015adam
+Warning--empty pages in liu2020radam
+Warning--empty pages in loshchilov2017sgdr
+Warning--empty pages in loshchilov2019decoupled
+Warning--empty pages in luo2019adabound
+Warning--empty pages in you2020lamb
+You've used 18 entries,
+            2990 wiz_defined-function locations,
+            818 strings with 9545 characters,
+and the built_in function-call counts, 12454 in all, are:
+= -- 909
+> -- 588
+< -- 10
++ -- 229
+- -- 207
+* -- 1348
+:= -- 1835
+add.period$ -- 42
+call.type$ -- 18
+change.case$ -- 159
+chr.to.int$ -- 18
+cite$ -- 27
+duplicate$ -- 939
+empty$ -- 860
+format.name$ -- 271
+if$ -- 2313
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 176
+newline$ -- 93
+num.names$ -- 72
+pop$ -- 409
+preamble$ -- 1
+purify$ -- 141
+quote$ -- 0
+skip$ -- 322
+stack$ -- 0
+substring$ -- 353
+swap$ -- 633
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 162
+warning$ -- 9
+while$ -- 65
+width$ -- 0
+write$ -- 240
+(There were 9 warnings)
