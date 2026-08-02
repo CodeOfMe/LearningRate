@@ -225,3 +225,6 @@ codes/data/trec/
 codes/data/huggingface/
 codes/results/
 pdf_texts/
+
+# Manuscript submission working directory
+NEUCOM-D-26-12332/
