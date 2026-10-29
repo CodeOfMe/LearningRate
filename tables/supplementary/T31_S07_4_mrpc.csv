@@ -1,0 +1,19 @@
+﻿Strategy,time (s),memory (MB),throughput (samples/s)
+Lookahead,72.1,3693,228.7
+RAdam,59.7,3541,276.3
+AdamW,56.7,3541,290.9
+LARS,68.1,3541,241.9
+AdaBound,106.1,1628,155.3
+Grokfast,56.2,3541,293.1
+Adam,55.9,3541,295.0
+Lion,55.9,3541,294.9
+Fixed_SGD,51.6,3541,319.2
+SAM,133.6,3574,123.4
+DALS_Acc,67.4,3525,244.6
+SGDR,63.7,3390,258.7
+SAM_Disc,128.6,3594,128.2
+Cosine_SGD,48.9,3541,337.3
+DALS,54.3,3541,303.8
+Discriminative,47.0,3541,350.6
+STLR_Disc,47.1,3541,350.1
+DALS_Fast,52.7,3541,312.7

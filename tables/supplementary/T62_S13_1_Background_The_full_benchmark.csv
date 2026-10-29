@@ -1,0 +1,3 @@
+﻿GPU,Architecture,CUDA Cores,VRAM,Memory Bus,Memory Bandwidth
+GeForce RTX 4060 Laptop,Ada Lovelace,3072,8 GB GDDR6,128-bit,256 GB/s
+GeForce RTX 4070 Laptop,Ada Lovelace,4608,8 GB GDDR6,128-bit,256 GB/s

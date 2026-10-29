@@ -218,13 +218,20 @@ __marimo__/
 .streamlit/secrets.toml
 .DS_Store
 
-# Large data files (auto-downloaded by Test_All.py)
-codes/data/cifar-10-python.tar.gz
-codes/data/cifar-10-batches-py/
-codes/data/trec/
-codes/data/huggingface/
-codes/results/
-pdf_texts/
 
-# Manuscript submission working directory
-NEUCOM-D-26-12332/
+# Project data / pretrained models / caches (download separately)
+data/
+datasets/
+models/
+outputs/
+*.tar.gz
+*.safetensors
+*.arrow
+*.pt
+*.pth
+
+# macOS
+.DS_Store
+
+# keep the archived initial-run logs
+!tables/source_data/initial_raw/*.log

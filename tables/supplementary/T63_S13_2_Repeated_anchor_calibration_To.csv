@@ -1,0 +1,4 @@
+﻿Device,Mean accuracy (%),Std (pp),Per-seed accuracy (%)
+RTX 4070,53.04,2.04,"49.76, 52.85, 53.19, 55.05, 54.37"
+RTX 4060,53.99,0.56,"54.68, 53.73, 54.37, 53.07, 54.09"
+Difference,~0.95 (0.99 as reported),-,-

@@ -1,0 +1,11 @@
+torch>=2.0
+torchvision>=0.15
+transformers>=4.30
+datasets>=2.12
+scikit-learn>=1.2
+numpy>=1.23
+pandas>=1.5
+matplotlib>=3.7
+openpyxl>=3.1
+python-docx>=0.8.11
+tqdm>=4.65

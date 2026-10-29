@@ -1,0 +1,17 @@
+﻿Combination,mean accuracy (%)
+no_filter_no_phase,59.3220
+no_filter_no_depth,59.1500
+no_filter,58.7240
+no_trust_no_depth,56.5960
+no_phase_no_depth,56.2820
+no_depth,56.1720
+no_phase,55.0540
+no_trust_no_phase,54.9200
+full,53.9880
+no_trust,53.4140
+no_trust_no_filter,50.0760
+no_cosine_no_trust,21.2820
+no_cosine_no_depth,19.7060
+no_cosine_no_phase,17.3860
+no_cosine,17.0660
+no_cosine_no_filter,15.8180

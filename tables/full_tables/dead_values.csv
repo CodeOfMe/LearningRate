@@ -1,0 +1,11 @@
+﻿dataset,strategy,type,value,detail,acc_mean,issue_flag
+mrpc,Discriminative,dead_value,66.4928,5 种子完全相同 = 66.4928 (std=0),66.4928,PROBLEM: dead-value (all seeds identical)
+mrpc,DALS_Fast,dead_value,66.4928,5 种子完全相同 = 66.4928 (std=0),66.4928,PROBLEM: dead-value (all seeds identical)
+mrpc,SAM_Disc,dead_value,68.3824,5 种子完全相同 = 68.3824 (std=0),68.3824,OK
+mrpc,STLR_Disc,dead_value,68.3824,5 种子完全相同 = 68.3824 (std=0),68.3824,PROBLEM: dead-value (all seeds identical)
+sst2_b,DALS_Acc,single_seed_collapse,50.9174,seed9999=50.92 其余均值 92.29，接近 2类多数类基线 51.0%,84.0138,OK
+sst2_b,AdaBound,dead_value,50.9174,5 种子完全相同 = 50.9174 (std=0),50.9174,PROBLEM: dead-value (all seeds identical)
+trec6,Discriminative,severe_degradation,,mean 38.84 低于数据集中位数 94.88 15+ 点,38.84,
+trec6,SAM_Disc,severe_degradation,,mean 35.32 低于数据集中位数 94.88 15+ 点,35.32,
+trec6,STLR_Disc,severe_degradation,,mean 36.44 低于数据集中位数 94.88 15+ 点,36.44,
+sst2_b,AdaBound,severe_degradation,,mean 50.92 低于数据集中位数 91.67 15+ 点,50.92,

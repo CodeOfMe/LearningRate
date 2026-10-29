@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this code or the result tables, please cite the paper below."
+title: "DALS: Depth-Aware Learning-rate Schedule"
+authors:
+  - family-names: "Yao"
+    given-names: "Ming-Hong"
+  - family-names: "Cui"
+    given-names: "Jian"
+  - family-names: "Wang"
+    given-names: "Di"
+  - family-names: "Yu"
+    given-names: "Qiu-Ye"
+preferred-citation:
+  type: article
+  title: "Learning Rate Engineering: From Coarse Single Parameter to Layered Evolution"
+  authors:
+    - family-names: "Yao"
+      given-names: "Ming-Hong"
+    - family-names: "Cui"
+      given-names: "Jian"
+    - family-names: "Wang"
+      given-names: "Di"
+    - family-names: "Yu"
+      given-names: "Qiu-Ye"
+  journal: "Neurocomputing"
+  year: 2026
+  doi: "10.1016/j.neucom.2026.135504"

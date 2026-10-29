@@ -1,0 +1,11 @@
+﻿Component pair,Interaction (pp)
+trust×filter,+8.0740
+cosine×filter,+5.9840
+filter×depth,+1.7580
+phase×depth,+0.9560
+cosine×phase,+0.7460
+filter×phase,+0.4680
+trust×phase,-0.4400
+cosine×depth,-0.4560
+trust×depth,-0.9980
+cosine×trust,-4.7900

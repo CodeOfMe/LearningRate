@@ -1,0 +1,451 @@
+﻿Dataset,Comparison,base (%),variant (%),diff,p,p_bonf,p_fdr,verdict
+cifar10,DALS vs AdaBound,83.27,78.56,-4.71,0.0000,0.0180,0.0004,FDR sig.
+cifar10,DALS vs Adam,81.44,78.56,-2.87,0.0007,0.3104,0.0027,FDR sig.
+cifar10,DALS vs AdamW,81.47,78.56,-2.91,0.0013,0.5857,0.0042,FDR sig.
+cifar10,DALS vs Cosine_SGD,82.86,78.56,-4.29,0.0002,0.0877,0.0011,FDR sig.
+cifar10,DALS vs Discriminative,82.30,78.56,-3.74,0.0007,0.3062,0.0027,FDR sig.
+cifar10,DALS vs Fixed_SGD,82.85,78.56,-4.29,0.0003,0.1521,0.0016,FDR sig.
+cifar10,DALS vs Grokfast,82.95,78.56,-4.39,0.0000,0.0177,0.0004,FDR sig.
+cifar10,DALS vs LARS,75.49,78.56,+3.07,0.0022,0.9754,0.0062,FDR sig.
+cifar10,DALS vs Lion,79.43,78.56,-0.87,0.0396,1.0000,0.0689,raw sig.
+cifar10,DALS vs Lookahead,77.75,78.56,+0.81,0.0254,1.0000,0.0469,FDR sig.
+cifar10,DALS vs RAdam,81.64,78.56,-3.08,0.0003,0.1343,0.0015,FDR sig.
+cifar10,DALS vs SAM,82.63,78.56,-4.07,0.0003,0.1471,0.0016,FDR sig.
+cifar10,DALS vs SAM_Disc,81.80,78.56,-3.23,0.0002,0.0749,0.0010,FDR sig.
+cifar10,DALS vs SGDR,82.04,78.56,-3.48,0.0005,0.1997,0.0020,FDR sig.
+cifar10,DALS vs STLR_Disc,81.00,78.56,-2.44,0.0002,0.0794,0.0010,FDR sig.
+cifar10,DALS_Fast vs AdaBound,83.27,84.23,+0.96,0.0018,0.7921,0.0051,FDR sig.
+cifar10,DALS_Fast vs Adam,81.44,84.23,+2.79,0.0001,0.0523,0.0008,FDR sig.
+cifar10,DALS_Fast vs AdamW,81.47,84.23,+2.75,0.0018,0.7845,0.0051,FDR sig.
+cifar10,DALS_Fast vs Cosine_SGD,82.86,84.23,+1.37,0.0007,0.3204,0.0027,FDR sig.
+cifar10,DALS_Fast vs Discriminative,82.30,84.23,+1.92,0.0005,0.2193,0.0021,FDR sig.
+cifar10,DALS_Fast vs Fixed_SGD,82.85,84.23,+1.38,0.0004,0.1555,0.0016,FDR sig.
+cifar10,DALS_Fast vs Grokfast,82.95,84.23,+1.27,0.0005,0.2343,0.0022,FDR sig.
+cifar10,DALS_Fast vs LARS,75.49,84.23,+8.73,0.0000,0.0039,0.0002,FDR sig.
+cifar10,DALS_Fast vs Lion,79.43,84.23,+4.79,0.0000,0.0098,0.0003,FDR sig.
+cifar10,DALS_Fast vs Lookahead,77.75,84.23,+6.47,0.0000,0.0154,0.0004,FDR sig.
+cifar10,DALS_Fast vs RAdam,81.64,84.23,+2.58,0.0001,0.0511,0.0008,FDR sig.
+cifar10,DALS_Fast vs SAM,82.63,84.23,+1.59,0.0010,0.4373,0.0035,FDR sig.
+cifar10,DALS_Fast vs SAM_Disc,81.80,84.23,+2.43,0.0002,0.1057,0.0013,FDR sig.
+cifar10,DALS_Fast vs SGDR,82.04,84.23,+2.18,0.0007,0.3302,0.0028,FDR sig.
+cifar10,DALS_Fast vs STLR_Disc,81.00,84.23,+3.22,0.0000,0.0034,0.0002,FDR sig.
+cifar10,DALS_Acc vs AdaBound,83.27,82.75,-0.52,0.1658,1.0000,0.2260,n.s.
+cifar10,DALS_Acc vs Adam,81.44,82.75,+1.32,0.0243,1.0000,0.0451,FDR sig.
+cifar10,DALS_Acc vs AdamW,81.47,82.75,+1.28,0.0593,1.0000,0.0979,n.s.
+cifar10,DALS_Acc vs Cosine_SGD,82.86,82.75,-0.10,0.4777,1.0000,0.5573,n.s.
+cifar10,DALS_Acc vs Discriminative,82.30,82.75,+0.45,0.1630,1.0000,0.2240,n.s.
+cifar10,DALS_Acc vs Fixed_SGD,82.85,82.75,-0.10,0.6034,1.0000,0.6754,n.s.
+cifar10,DALS_Acc vs Grokfast,82.95,82.75,-0.20,0.5819,1.0000,0.6563,n.s.
+cifar10,DALS_Acc vs LARS,75.49,82.75,+7.26,0.0000,0.0039,0.0002,FDR sig.
+cifar10,DALS_Acc vs Lion,79.43,82.75,+3.32,0.0006,0.2461,0.0023,FDR sig.
+cifar10,DALS_Acc vs Lookahead,77.75,82.75,+5.00,0.0005,0.2140,0.0021,FDR sig.
+cifar10,DALS_Acc vs RAdam,81.64,82.75,+1.11,0.0459,1.0000,0.0782,raw sig.
+cifar10,DALS_Acc vs SAM,82.63,82.75,+0.12,0.6968,1.0000,0.7550,n.s.
+cifar10,DALS_Acc vs SAM_Disc,81.80,82.75,+0.96,0.0028,1.0000,0.0074,FDR sig.
+cifar10,DALS_Acc vs SGDR,82.04,82.75,+0.71,0.0822,1.0000,0.1267,n.s.
+cifar10,DALS_Acc vs STLR_Disc,81.00,82.75,+1.75,0.0028,1.0000,0.0074,FDR sig.
+cifar100,DALS vs AdaBound,57.66,53.04,-4.62,0.0050,1.0000,0.0118,FDR sig.
+cifar100,DALS vs Adam,55.20,53.04,-2.15,0.1324,1.0000,0.1872,n.s.
+cifar100,DALS vs AdamW,54.85,53.04,-1.81,0.1862,1.0000,0.2481,n.s.
+cifar100,DALS vs Cosine_SGD,56.36,53.04,-3.32,0.0397,1.0000,0.0689,raw sig.
+cifar100,DALS vs Discriminative,54.03,53.04,-0.98,0.3648,1.0000,0.4419,n.s.
+cifar100,DALS vs Fixed_SGD,56.27,53.04,-3.23,0.0363,1.0000,0.0638,raw sig.
+cifar100,DALS vs Grokfast,57.69,53.04,-4.65,0.0064,1.0000,0.0145,FDR sig.
+cifar100,DALS vs LARS,44.68,53.04,+8.36,0.0015,0.6425,0.0045,FDR sig.
+cifar100,DALS vs Lion,55.10,53.04,-2.06,0.1133,1.0000,0.1644,n.s.
+cifar100,DALS vs Lookahead,52.47,53.04,+0.58,0.6308,1.0000,0.6955,n.s.
+cifar100,DALS vs RAdam,54.37,53.04,-1.32,0.2648,1.0000,0.3409,n.s.
+cifar100,DALS vs SAM,56.60,53.04,-3.56,0.0215,1.0000,0.0412,FDR sig.
+cifar100,DALS vs SAM_Disc,53.35,53.04,-0.30,0.7779,1.0000,0.8289,n.s.
+cifar100,DALS vs SGDR,54.99,53.04,-1.94,0.0760,1.0000,0.1185,n.s.
+cifar100,DALS vs STLR_Disc,51.19,53.04,+1.86,0.1857,1.0000,0.2481,n.s.
+cifar100,DALS_Fast vs AdaBound,57.66,59.61,+1.95,0.0114,1.0000,0.0234,FDR sig.
+cifar100,DALS_Fast vs Adam,55.20,59.61,+4.42,0.0009,0.3917,0.0032,FDR sig.
+cifar100,DALS_Fast vs AdamW,54.85,59.61,+4.76,0.0006,0.2838,0.0025,FDR sig.
+cifar100,DALS_Fast vs Cosine_SGD,56.36,59.61,+3.25,0.0013,0.5555,0.0041,FDR sig.
+cifar100,DALS_Fast vs Discriminative,54.03,59.61,+5.59,0.0000,0.0207,0.0004,FDR sig.
+cifar100,DALS_Fast vs Fixed_SGD,56.27,59.61,+3.34,0.0001,0.0253,0.0005,FDR sig.
+cifar100,DALS_Fast vs Grokfast,57.69,59.61,+1.92,0.0016,0.7204,0.0049,FDR sig.
+cifar100,DALS_Fast vs LARS,44.68,59.61,+14.93,0.0000,0.0001,0.0000,FDR sig.
+cifar100,DALS_Fast vs Lion,55.10,59.61,+4.51,0.0001,0.0328,0.0005,FDR sig.
+cifar100,DALS_Fast vs Lookahead,52.47,59.61,+7.15,0.0001,0.0422,0.0007,FDR sig.
+cifar100,DALS_Fast vs RAdam,54.37,59.61,+5.25,0.0001,0.0504,0.0008,FDR sig.
+cifar100,DALS_Fast vs SAM,56.60,59.61,+3.01,0.0005,0.2269,0.0022,FDR sig.
+cifar100,DALS_Fast vs SAM_Disc,53.35,59.61,+6.27,0.0001,0.0316,0.0005,FDR sig.
+cifar100,DALS_Fast vs SGDR,54.99,59.61,+4.63,0.0001,0.0233,0.0004,FDR sig.
+cifar100,DALS_Fast vs STLR_Disc,51.19,59.61,+8.43,0.0000,0.0076,0.0003,FDR sig.
+cifar100,DALS_Acc vs AdaBound,57.66,57.53,-0.13,0.7772,1.0000,0.8289,n.s.
+cifar100,DALS_Acc vs Adam,55.20,57.53,+2.33,0.0024,1.0000,0.0066,FDR sig.
+cifar100,DALS_Acc vs AdamW,54.85,57.53,+2.67,0.0002,0.0986,0.0012,FDR sig.
+cifar100,DALS_Acc vs Cosine_SGD,56.36,57.53,+1.17,0.0788,1.0000,0.1219,n.s.
+cifar100,DALS_Acc vs Discriminative,54.03,57.53,+3.50,0.0012,0.5401,0.0040,FDR sig.
+cifar100,DALS_Acc vs Fixed_SGD,56.27,57.53,+1.26,0.0838,1.0000,0.1283,n.s.
+cifar100,DALS_Acc vs Grokfast,57.69,57.53,-0.17,0.6471,1.0000,0.7099,n.s.
+cifar100,DALS_Acc vs LARS,44.68,57.53,+12.85,0.0000,0.0067,0.0003,FDR sig.
+cifar100,DALS_Acc vs Lion,55.10,57.53,+2.43,0.0070,1.0000,0.0159,FDR sig.
+cifar100,DALS_Acc vs Lookahead,52.47,57.53,+5.06,0.0001,0.0268,0.0005,FDR sig.
+cifar100,DALS_Acc vs RAdam,54.37,57.53,+3.16,0.0014,0.6256,0.0045,FDR sig.
+cifar100,DALS_Acc vs SAM,56.60,57.53,+0.92,0.1861,1.0000,0.2481,n.s.
+cifar100,DALS_Acc vs SAM_Disc,53.35,57.53,+4.18,0.0002,0.1090,0.0013,FDR sig.
+cifar100,DALS_Acc vs SGDR,54.99,57.53,+2.54,0.0109,1.0000,0.0227,FDR sig.
+cifar100,DALS_Acc vs STLR_Disc,51.19,57.53,+6.34,0.0003,0.1307,0.0015,FDR sig.
+imdb,DALS vs AdaBound,82.48,85.94,+3.46,0.0165,1.0000,0.0326,FDR sig.
+imdb,DALS vs Adam,87.10,85.94,-1.16,0.0022,0.9646,0.0061,FDR sig.
+imdb,DALS vs AdamW,87.20,85.94,-1.26,0.0003,0.1436,0.0015,FDR sig.
+imdb,DALS vs Cosine_SGD,86.13,85.94,-0.19,0.0185,1.0000,0.0360,FDR sig.
+imdb,DALS vs Discriminative,81.40,85.94,+4.53,0.0000,0.0002,0.0000,FDR sig.
+imdb,DALS vs Fixed_SGD,86.56,85.94,-0.62,0.0095,1.0000,0.0204,FDR sig.
+imdb,DALS vs Grokfast,86.93,85.94,-0.99,0.0003,0.1440,0.0015,FDR sig.
+imdb,DALS vs LARS,86.83,85.94,-0.89,0.0023,1.0000,0.0065,FDR sig.
+imdb,DALS vs Lion,86.91,85.94,-0.97,0.0042,1.0000,0.0103,FDR sig.
+imdb,DALS vs Lookahead,87.39,85.94,-1.45,0.0007,0.3179,0.0027,FDR sig.
+imdb,DALS vs RAdam,87.18,85.94,-1.24,0.0108,1.0000,0.0226,FDR sig.
+imdb,DALS vs SAM,86.55,85.94,-0.61,0.0223,1.0000,0.0421,FDR sig.
+imdb,DALS vs SAM_Disc,81.31,85.94,+4.63,0.0000,0.0008,0.0001,FDR sig.
+imdb,DALS vs SGDR,86.43,85.94,-0.49,0.0003,0.1352,0.0015,FDR sig.
+imdb,DALS vs STLR_Disc,81.64,85.94,+4.30,0.0000,0.0005,0.0001,FDR sig.
+imdb,DALS_Fast vs AdaBound,82.48,85.51,+3.04,0.0280,1.0000,0.0506,raw sig.
+imdb,DALS_Fast vs Adam,87.10,85.51,-1.59,0.0004,0.1620,0.0017,FDR sig.
+imdb,DALS_Fast vs AdamW,87.20,85.51,-1.69,0.0000,0.0033,0.0002,FDR sig.
+imdb,DALS_Fast vs Cosine_SGD,86.13,85.51,-0.62,0.0015,0.6696,0.0046,FDR sig.
+imdb,DALS_Fast vs Discriminative,81.40,85.51,+4.11,0.0000,0.0000,0.0000,FDR sig.
+imdb,DALS_Fast vs Fixed_SGD,86.56,85.51,-1.04,0.0003,0.1408,0.0015,FDR sig.
+imdb,DALS_Fast vs Grokfast,86.93,85.51,-1.42,0.0005,0.2223,0.0021,FDR sig.
+imdb,DALS_Fast vs LARS,86.83,85.51,-1.32,0.0002,0.0982,0.0012,FDR sig.
+imdb,DALS_Fast vs Lion,86.91,85.51,-1.40,0.0017,0.7422,0.0050,FDR sig.
+imdb,DALS_Fast vs Lookahead,87.39,85.51,-1.88,0.0001,0.0599,0.0008,FDR sig.
+imdb,DALS_Fast vs RAdam,87.18,85.51,-1.66,0.0026,1.0000,0.0068,FDR sig.
+imdb,DALS_Fast vs SAM,86.55,85.51,-1.04,0.0012,0.5122,0.0039,FDR sig.
+imdb,DALS_Fast vs SAM_Disc,81.31,85.51,+4.21,0.0000,0.0001,0.0000,FDR sig.
+imdb,DALS_Fast vs SGDR,86.43,85.51,-0.91,0.0004,0.1839,0.0019,FDR sig.
+imdb,DALS_Fast vs STLR_Disc,81.64,85.51,+3.87,0.0000,0.0000,0.0000,FDR sig.
+imdb,DALS_Acc vs AdaBound,82.48,86.34,+3.86,0.0101,1.0000,0.0215,FDR sig.
+imdb,DALS_Acc vs Adam,87.10,86.34,-0.76,0.0235,1.0000,0.0439,FDR sig.
+imdb,DALS_Acc vs AdamW,87.20,86.34,-0.86,0.0102,1.0000,0.0216,FDR sig.
+imdb,DALS_Acc vs Cosine_SGD,86.13,86.34,+0.21,0.0404,1.0000,0.0699,raw sig.
+imdb,DALS_Acc vs Discriminative,81.40,86.34,+4.94,0.0000,0.0049,0.0002,FDR sig.
+imdb,DALS_Acc vs Fixed_SGD,86.56,86.34,-0.22,0.3716,1.0000,0.4478,n.s.
+imdb,DALS_Acc vs Grokfast,86.93,86.34,-0.59,0.0170,1.0000,0.0334,FDR sig.
+imdb,DALS_Acc vs LARS,86.83,86.34,-0.49,0.0971,1.0000,0.1427,n.s.
+imdb,DALS_Acc vs Lion,86.91,86.34,-0.57,0.0011,0.4903,0.0038,FDR sig.
+imdb,DALS_Acc vs Lookahead,87.39,86.34,-1.05,0.0101,1.0000,0.0215,FDR sig.
+imdb,DALS_Acc vs RAdam,87.18,86.34,-0.84,0.0634,1.0000,0.1028,n.s.
+imdb,DALS_Acc vs SAM,86.55,86.34,-0.21,0.4351,1.0000,0.5130,n.s.
+imdb,DALS_Acc vs SAM_Disc,81.31,86.34,+5.04,0.0000,0.0074,0.0003,FDR sig.
+imdb,DALS_Acc vs SGDR,86.43,86.34,-0.09,0.5211,1.0000,0.5969,n.s.
+imdb,DALS_Acc vs STLR_Disc,81.64,86.34,+4.70,0.0000,0.0044,0.0002,FDR sig.
+mrpc,DALS vs AdaBound,81.08,67.48,-13.60,0.0002,0.1063,0.0013,FDR sig.
+mrpc,DALS vs Adam,80.89,67.48,-13.41,0.0001,0.0248,0.0005,FDR sig.
+mrpc,DALS vs AdamW,81.39,67.48,-13.91,0.0000,0.0106,0.0003,FDR sig.
+mrpc,DALS vs Cosine_SGD,67.50,67.48,-0.02,0.8621,1.0000,0.8924,n.s.
+mrpc,DALS vs Discriminative,66.49,67.48,+0.99,—,—,—,zero-variance
+mrpc,DALS vs Fixed_SGD,76.21,67.48,-8.73,0.0000,0.0164,0.0004,FDR sig.
+mrpc,DALS vs Grokfast,81.04,67.48,-13.57,0.0000,0.0093,0.0003,FDR sig.
+mrpc,DALS vs LARS,81.11,67.48,-13.63,0.0000,0.0016,0.0001,FDR sig.
+mrpc,DALS vs Lion,80.34,67.48,-12.86,0.0000,0.0064,0.0003,FDR sig.
+mrpc,DALS vs Lookahead,83.92,67.48,-16.44,0.0001,0.0231,0.0004,FDR sig.
+mrpc,DALS vs RAdam,81.45,67.48,-13.97,0.0000,0.0117,0.0003,FDR sig.
+mrpc,DALS vs SAM,74.61,67.48,-7.13,0.0088,1.0000,0.0191,FDR sig.
+mrpc,DALS vs SAM_Disc,68.38,67.48,-0.90,—,—,—,zero-variance
+mrpc,DALS vs SGDR,70.83,67.48,-3.36,0.0088,1.0000,0.0191,FDR sig.
+mrpc,DALS vs STLR_Disc,68.38,67.48,-0.90,—,—,—,zero-variance
+mrpc,DALS_Fast vs AdaBound,81.08,83.53,+2.45,0.1528,1.0000,0.2139,n.s.
+mrpc,DALS_Fast vs Adam,80.89,83.53,+2.64,0.0519,1.0000,0.0869,n.s.
+mrpc,DALS_Fast vs AdamW,81.39,83.53,+2.14,0.0141,1.0000,0.0280,FDR sig.
+mrpc,DALS_Fast vs Cosine_SGD,67.50,83.53,+16.03,0.0000,0.0037,0.0002,FDR sig.
+mrpc,DALS_Fast vs Discriminative,66.49,83.53,+17.04,—,—,—,zero-variance
+mrpc,DALS_Fast vs Fixed_SGD,76.21,83.53,+7.32,0.0001,0.0534,0.0008,FDR sig.
+mrpc,DALS_Fast vs Grokfast,81.04,83.53,+2.49,0.0040,1.0000,0.0099,FDR sig.
+mrpc,DALS_Fast vs LARS,81.11,83.53,+2.42,0.0086,1.0000,0.0189,FDR sig.
+mrpc,DALS_Fast vs Lion,80.34,83.53,+3.19,0.0061,1.0000,0.0141,FDR sig.
+mrpc,DALS_Fast vs Lookahead,83.92,83.53,-0.39,0.5122,1.0000,0.5913,n.s.
+mrpc,DALS_Fast vs RAdam,81.45,83.53,+2.08,0.0219,1.0000,0.0417,FDR sig.
+mrpc,DALS_Fast vs SAM,74.61,83.53,+8.92,0.0009,0.3944,0.0032,FDR sig.
+mrpc,DALS_Fast vs SAM_Disc,68.38,83.53,+15.15,—,—,—,zero-variance
+mrpc,DALS_Fast vs SGDR,70.83,83.53,+12.70,0.0000,0.0022,0.0002,FDR sig.
+mrpc,DALS_Fast vs STLR_Disc,68.38,83.53,+15.15,—,—,—,zero-variance
+mrpc,DALS_Acc vs AdaBound,81.08,73.58,-7.50,0.0011,0.4910,0.0038,FDR sig.
+mrpc,DALS_Acc vs Adam,80.89,73.58,-7.31,0.0012,0.5420,0.0040,FDR sig.
+mrpc,DALS_Acc vs AdamW,81.39,73.58,-7.81,0.0006,0.2761,0.0025,FDR sig.
+mrpc,DALS_Acc vs Cosine_SGD,67.50,73.58,+6.08,0.0025,1.0000,0.0068,FDR sig.
+mrpc,DALS_Acc vs Discriminative,66.49,73.58,+7.09,—,—,—,zero-variance
+mrpc,DALS_Acc vs Fixed_SGD,76.21,73.58,-2.63,0.0220,1.0000,0.0417,FDR sig.
+mrpc,DALS_Acc vs Grokfast,81.04,73.58,-7.47,0.0012,0.5124,0.0039,FDR sig.
+mrpc,DALS_Acc vs LARS,81.11,73.58,-7.53,0.0010,0.4394,0.0035,FDR sig.
+mrpc,DALS_Acc vs Lion,80.34,73.58,-6.76,0.0001,0.0450,0.0007,FDR sig.
+mrpc,DALS_Acc vs Lookahead,83.92,73.58,-10.34,0.0005,0.2073,0.0021,FDR sig.
+mrpc,DALS_Acc vs RAdam,81.45,73.58,-7.87,0.0002,0.0894,0.0011,FDR sig.
+mrpc,DALS_Acc vs SAM,74.61,73.58,-1.03,0.4127,1.0000,0.4905,n.s.
+mrpc,DALS_Acc vs SAM_Disc,68.38,73.58,+5.20,—,—,—,zero-variance
+mrpc,DALS_Acc vs SGDR,70.83,73.58,+2.75,0.0070,1.0000,0.0159,FDR sig.
+mrpc,DALS_Acc vs STLR_Disc,68.38,73.58,+5.20,—,—,—,zero-variance
+mrpc_b,DALS vs AdaBound,77.75,74.69,-3.06,0.2652,1.0000,0.3409,n.s.
+mrpc_b,DALS vs Adam,82.27,74.69,-7.58,0.0000,0.0099,0.0003,FDR sig.
+mrpc_b,DALS vs AdamW,81.73,74.69,-7.04,0.0000,0.0106,0.0003,FDR sig.
+mrpc_b,DALS vs Cosine_SGD,75.25,74.69,-0.56,0.1139,1.0000,0.1647,n.s.
+mrpc_b,DALS vs Discriminative,71.08,74.69,+3.61,0.0012,0.5385,0.0040,FDR sig.
+mrpc_b,DALS vs Fixed_SGD,80.22,74.69,-5.53,0.0001,0.0617,0.0008,FDR sig.
+mrpc_b,DALS vs Grokfast,82.85,74.69,-8.16,0.0000,0.0172,0.0004,FDR sig.
+mrpc_b,DALS vs LARS,81.33,74.69,-6.64,0.0015,0.6546,0.0046,FDR sig.
+mrpc_b,DALS vs Lion,80.59,74.69,-5.90,0.0002,0.0708,0.0010,FDR sig.
+mrpc_b,DALS vs Lookahead,84.66,74.69,-9.97,0.0000,0.0055,0.0002,FDR sig.
+mrpc_b,DALS vs RAdam,81.81,74.69,-7.12,0.0000,0.0076,0.0003,FDR sig.
+mrpc_b,DALS vs SAM,81.13,74.69,-6.44,0.0000,0.0068,0.0003,FDR sig.
+mrpc_b,DALS vs SAM_Disc,69.41,74.69,+5.28,0.0001,0.0280,0.0005,FDR sig.
+mrpc_b,DALS vs SGDR,78.33,74.69,-3.64,0.0055,1.0000,0.0130,FDR sig.
+mrpc_b,DALS vs STLR_Disc,70.98,74.69,+3.71,0.0006,0.2549,0.0023,FDR sig.
+mrpc_b,DALS_Fast vs AdaBound,77.75,73.37,-4.38,0.1191,1.0000,0.1710,n.s.
+mrpc_b,DALS_Fast vs Adam,82.27,73.37,-8.90,0.0001,0.0272,0.0005,FDR sig.
+mrpc_b,DALS_Fast vs AdamW,81.73,73.37,-8.36,0.0000,0.0171,0.0004,FDR sig.
+mrpc_b,DALS_Fast vs Cosine_SGD,75.25,73.37,-1.88,0.0010,0.4470,0.0035,FDR sig.
+mrpc_b,DALS_Fast vs Discriminative,71.08,73.37,+2.28,0.0073,1.0000,0.0165,FDR sig.
+mrpc_b,DALS_Fast vs Fixed_SGD,80.22,73.37,-6.85,0.0001,0.0497,0.0008,FDR sig.
+mrpc_b,DALS_Fast vs Grokfast,82.85,73.37,-9.48,0.0000,0.0005,0.0001,FDR sig.
+mrpc_b,DALS_Fast vs LARS,81.33,73.37,-7.97,0.0025,1.0000,0.0068,FDR sig.
+mrpc_b,DALS_Fast vs Lion,80.59,73.37,-7.22,0.0003,0.1384,0.0015,FDR sig.
+mrpc_b,DALS_Fast vs Lookahead,84.66,73.37,-11.29,0.0000,0.0006,0.0001,FDR sig.
+mrpc_b,DALS_Fast vs RAdam,81.81,73.37,-8.44,0.0000,0.0155,0.0004,FDR sig.
+mrpc_b,DALS_Fast vs SAM,81.13,73.37,-7.76,0.0001,0.0401,0.0007,FDR sig.
+mrpc_b,DALS_Fast vs SAM_Disc,69.41,73.37,+3.96,0.0001,0.0547,0.0008,FDR sig.
+mrpc_b,DALS_Fast vs SGDR,78.33,73.37,-4.97,0.0008,0.3709,0.0030,FDR sig.
+mrpc_b,DALS_Fast vs STLR_Disc,70.98,73.37,+2.39,0.0013,0.5543,0.0041,FDR sig.
+mrpc_b,DALS_Acc vs AdaBound,77.75,80.49,+2.75,0.1853,1.0000,0.2481,n.s.
+mrpc_b,DALS_Acc vs Adam,82.27,80.49,-1.78,0.2182,1.0000,0.2846,n.s.
+mrpc_b,DALS_Acc vs AdamW,81.73,80.49,-1.24,0.3075,1.0000,0.3874,n.s.
+mrpc_b,DALS_Acc vs Cosine_SGD,75.25,80.49,+5.24,0.0042,1.0000,0.0102,FDR sig.
+mrpc_b,DALS_Acc vs Discriminative,71.08,80.49,+9.41,0.0007,0.3127,0.0027,FDR sig.
+mrpc_b,DALS_Acc vs Fixed_SGD,80.22,80.49,+0.27,0.7854,1.0000,0.8306,n.s.
+mrpc_b,DALS_Acc vs Grokfast,82.85,80.49,-2.36,0.0526,1.0000,0.0879,n.s.
+mrpc_b,DALS_Acc vs LARS,81.33,80.49,-0.84,0.6560,1.0000,0.7178,n.s.
+mrpc_b,DALS_Acc vs Lion,80.59,80.49,-0.10,0.9375,1.0000,0.9548,n.s.
+mrpc_b,DALS_Acc vs Lookahead,84.66,80.49,-4.17,0.0074,1.0000,0.0166,FDR sig.
+mrpc_b,DALS_Acc vs RAdam,81.81,80.49,-1.32,0.3098,1.0000,0.3882,n.s.
+mrpc_b,DALS_Acc vs SAM,81.13,80.49,-0.64,0.5835,1.0000,0.6565,n.s.
+mrpc_b,DALS_Acc vs SAM_Disc,69.41,80.49,+11.08,0.0002,0.0772,0.0010,FDR sig.
+mrpc_b,DALS_Acc vs SGDR,78.33,80.49,+2.16,0.0450,1.0000,0.0773,raw sig.
+mrpc_b,DALS_Acc vs STLR_Disc,70.98,80.49,+9.51,0.0001,0.0609,0.0008,FDR sig.
+rte,DALS vs AdaBound,57.55,53.57,-3.97,0.1168,1.0000,0.1683,n.s.
+rte,DALS vs Adam,58.99,53.57,-5.42,0.0034,1.0000,0.0086,FDR sig.
+rte,DALS vs AdamW,58.34,53.57,-4.77,0.0861,1.0000,0.1305,n.s.
+rte,DALS vs Cosine_SGD,53.50,53.57,+0.07,0.8605,1.0000,0.8924,n.s.
+rte,DALS vs Discriminative,52.56,53.57,+1.01,0.1660,1.0000,0.2260,n.s.
+rte,DALS vs Fixed_SGD,53.94,53.57,-0.36,0.5372,1.0000,0.6090,n.s.
+rte,DALS vs Grokfast,53.57,53.57,-0.00,1.0000,1.0000,1.0000,n.s.
+rte,DALS vs LARS,55.23,53.57,-1.66,0.0845,1.0000,0.1290,n.s.
+rte,DALS vs Lion,59.06,53.57,-5.49,0.0060,1.0000,0.0139,FDR sig.
+rte,DALS vs Lookahead,59.64,53.57,-6.07,0.0016,0.7239,0.0049,FDR sig.
+rte,DALS vs RAdam,60.36,53.57,-6.79,0.0224,1.0000,0.0421,FDR sig.
+rte,DALS vs SAM,53.94,53.57,-0.36,0.8084,1.0000,0.8468,n.s.
+rte,DALS vs SAM_Disc,50.83,53.57,+2.74,0.0544,1.0000,0.0906,n.s.
+rte,DALS vs SGDR,53.00,53.57,+0.58,0.4382,1.0000,0.5153,n.s.
+rte,DALS vs STLR_Disc,52.06,53.57,+1.52,0.0485,1.0000,0.0816,raw sig.
+rte,DALS_Fast vs AdaBound,57.55,53.21,-4.33,0.0678,1.0000,0.1083,n.s.
+rte,DALS_Fast vs Adam,58.99,53.21,-5.78,0.0045,1.0000,0.0109,FDR sig.
+rte,DALS_Fast vs AdamW,58.34,53.21,-5.13,0.0626,1.0000,0.1024,n.s.
+rte,DALS_Fast vs Cosine_SGD,53.50,53.21,-0.29,0.4557,1.0000,0.5330,n.s.
+rte,DALS_Fast vs Discriminative,52.56,53.21,+0.65,0.2552,1.0000,0.3300,n.s.
+rte,DALS_Fast vs Fixed_SGD,53.94,53.21,-0.72,0.0474,1.0000,0.0801,raw sig.
+rte,DALS_Fast vs Grokfast,53.57,53.21,-0.36,0.3943,1.0000,0.4713,n.s.
+rte,DALS_Fast vs LARS,55.23,53.21,-2.02,0.0345,1.0000,0.0611,raw sig.
+rte,DALS_Fast vs Lion,59.06,53.21,-5.85,0.0039,1.0000,0.0099,FDR sig.
+rte,DALS_Fast vs Lookahead,59.64,53.21,-6.43,0.0047,1.0000,0.0113,FDR sig.
+rte,DALS_Fast vs RAdam,60.36,53.21,-7.15,0.0129,1.0000,0.0262,FDR sig.
+rte,DALS_Fast vs SAM,53.94,53.21,-0.72,0.6164,1.0000,0.6834,n.s.
+rte,DALS_Fast vs SAM_Disc,50.83,53.21,+2.38,0.0934,1.0000,0.1378,n.s.
+rte,DALS_Fast vs SGDR,53.00,53.21,+0.22,0.8133,1.0000,0.8500,n.s.
+rte,DALS_Fast vs STLR_Disc,52.06,53.21,+1.16,0.0349,1.0000,0.0616,raw sig.
+rte,DALS_Acc vs AdaBound,57.55,52.64,-4.91,0.0718,1.0000,0.1127,n.s.
+rte,DALS_Acc vs Adam,58.99,52.64,-6.35,0.0018,0.8117,0.0052,FDR sig.
+rte,DALS_Acc vs AdamW,58.34,52.64,-5.70,0.0665,1.0000,0.1071,n.s.
+rte,DALS_Acc vs Cosine_SGD,53.50,52.64,-0.87,0.3419,1.0000,0.4235,n.s.
+rte,DALS_Acc vs Discriminative,52.56,52.64,+0.07,0.9540,1.0000,0.9658,n.s.
+rte,DALS_Acc vs Fixed_SGD,53.94,52.64,-1.30,0.1598,1.0000,0.2204,n.s.
+rte,DALS_Acc vs Grokfast,53.57,52.64,-0.94,0.4317,1.0000,0.5104,n.s.
+rte,DALS_Acc vs LARS,55.23,52.64,-2.60,0.0317,1.0000,0.0566,raw sig.
+rte,DALS_Acc vs Lion,59.06,52.64,-6.43,0.0031,1.0000,0.0080,FDR sig.
+rte,DALS_Acc vs Lookahead,59.64,52.64,-7.00,0.0008,0.3589,0.0030,FDR sig.
+rte,DALS_Acc vs RAdam,60.36,52.64,-7.73,0.0112,1.0000,0.0232,FDR sig.
+rte,DALS_Acc vs SAM,53.94,52.64,-1.30,0.3672,1.0000,0.4436,n.s.
+rte,DALS_Acc vs SAM_Disc,50.83,52.64,+1.81,0.1908,1.0000,0.2534,n.s.
+rte,DALS_Acc vs SGDR,53.00,52.64,-0.36,0.6164,1.0000,0.6834,n.s.
+rte,DALS_Acc vs STLR_Disc,52.06,52.64,+0.58,0.5238,1.0000,0.5969,n.s.
+sst2,DALS vs AdaBound,82.43,89.93,+7.50,0.0000,0.0054,0.0002,FDR sig.
+sst2,DALS vs Adam,89.22,89.93,+0.71,0.1124,1.0000,0.1635,n.s.
+sst2,DALS vs AdamW,90.00,89.93,-0.07,0.8834,1.0000,0.9060,n.s.
+sst2,DALS vs Cosine_SGD,89.98,89.93,-0.05,0.7781,1.0000,0.8289,n.s.
+sst2,DALS vs Discriminative,87.75,89.93,+2.18,0.0006,0.2737,0.0025,FDR sig.
+sst2,DALS vs Fixed_SGD,89.95,89.93,-0.02,0.9227,1.0000,0.9441,n.s.
+sst2,DALS vs Grokfast,90.23,89.93,-0.30,0.3358,1.0000,0.4172,n.s.
+sst2,DALS vs LARS,90.48,89.93,-0.55,0.0874,1.0000,0.1315,n.s.
+sst2,DALS vs Lion,89.33,89.93,+0.60,0.0896,1.0000,0.1332,n.s.
+sst2,DALS vs Lookahead,90.67,89.93,-0.73,0.0216,1.0000,0.0412,FDR sig.
+sst2,DALS vs RAdam,89.84,89.93,+0.09,0.6651,1.0000,0.7242,n.s.
+sst2,DALS vs SAM,90.05,89.93,-0.11,0.5457,1.0000,0.6170,n.s.
+sst2,DALS vs SAM_Disc,88.14,89.93,+1.79,0.0018,0.7899,0.0051,FDR sig.
+sst2,DALS vs SGDR,90.02,89.93,-0.09,0.6421,1.0000,0.7061,n.s.
+sst2,DALS vs STLR_Disc,88.33,89.93,+1.61,0.0014,0.6347,0.0045,FDR sig.
+sst2,DALS_Fast vs AdaBound,82.43,90.02,+7.59,0.0000,0.0068,0.0003,FDR sig.
+sst2,DALS_Fast vs Adam,89.22,90.02,+0.80,0.1368,1.0000,0.1927,n.s.
+sst2,DALS_Fast vs AdamW,90.00,90.02,+0.02,0.9603,1.0000,0.9691,n.s.
+sst2,DALS_Fast vs Cosine_SGD,89.98,90.02,+0.05,0.7571,1.0000,0.8143,n.s.
+sst2,DALS_Fast vs Discriminative,87.75,90.02,+2.27,0.0003,0.1416,0.0015,FDR sig.
+sst2,DALS_Fast vs Fixed_SGD,89.95,90.02,+0.07,0.7968,1.0000,0.8387,n.s.
+sst2,DALS_Fast vs Grokfast,90.23,90.02,-0.21,0.2954,1.0000,0.3744,n.s.
+sst2,DALS_Fast vs LARS,90.48,90.02,-0.46,0.0890,1.0000,0.1331,n.s.
+sst2,DALS_Fast vs Lion,89.33,90.02,+0.69,0.1569,1.0000,0.2176,n.s.
+sst2,DALS_Fast vs Lookahead,90.67,90.02,-0.64,0.0204,1.0000,0.0394,FDR sig.
+sst2,DALS_Fast vs RAdam,89.84,90.02,+0.18,0.3274,1.0000,0.4090,n.s.
+sst2,DALS_Fast vs SAM,90.05,90.02,-0.02,0.3739,1.0000,0.4481,n.s.
+sst2,DALS_Fast vs SAM_Disc,88.14,90.02,+1.88,0.0010,0.4485,0.0035,FDR sig.
+sst2,DALS_Fast vs SGDR,90.02,90.02,+0.00,1.0000,1.0000,1.0000,n.s.
+sst2,DALS_Fast vs STLR_Disc,88.33,90.02,+1.70,0.0017,0.7621,0.0050,FDR sig.
+sst2,DALS_Acc vs AdaBound,82.43,90.34,+7.91,0.0000,0.0014,0.0001,FDR sig.
+sst2,DALS_Acc vs Adam,89.22,90.34,+1.12,0.0264,1.0000,0.0481,FDR sig.
+sst2,DALS_Acc vs AdamW,90.00,90.34,+0.34,0.5152,1.0000,0.5932,n.s.
+sst2,DALS_Acc vs Cosine_SGD,89.98,90.34,+0.37,0.1642,1.0000,0.2249,n.s.
+sst2,DALS_Acc vs Discriminative,87.75,90.34,+2.59,0.0005,0.2341,0.0022,FDR sig.
+sst2,DALS_Acc vs Fixed_SGD,89.95,90.34,+0.39,0.2699,1.0000,0.3460,n.s.
+sst2,DALS_Acc vs Grokfast,90.23,90.34,+0.11,0.7619,1.0000,0.8175,n.s.
+sst2,DALS_Acc vs LARS,90.48,90.34,-0.14,0.7117,1.0000,0.7693,n.s.
+sst2,DALS_Acc vs Lion,89.33,90.34,+1.01,0.0104,1.0000,0.0219,FDR sig.
+sst2,DALS_Acc vs Lookahead,90.67,90.34,-0.32,0.3538,1.0000,0.4359,n.s.
+sst2,DALS_Acc vs RAdam,89.84,90.34,+0.50,0.0858,1.0000,0.1305,n.s.
+sst2,DALS_Acc vs SAM,90.05,90.34,+0.30,0.2857,1.0000,0.3631,n.s.
+sst2,DALS_Acc vs SAM_Disc,88.14,90.34,+2.20,0.0013,0.5800,0.0042,FDR sig.
+sst2,DALS_Acc vs SGDR,90.02,90.34,+0.32,0.2721,1.0000,0.3478,n.s.
+sst2,DALS_Acc vs STLR_Disc,88.33,90.34,+2.02,0.0004,0.1712,0.0017,FDR sig.
+sst2_b,DALS vs AdaBound,91.54,91.83,+0.30,0.1862,1.0000,0.2481,n.s.
+sst2_b,DALS vs Adam,91.17,91.83,+0.67,0.2004,1.0000,0.2630,n.s.
+sst2_b,DALS vs AdamW,91.31,91.83,+0.53,0.0687,1.0000,0.1094,n.s.
+sst2_b,DALS vs Cosine_SGD,92.06,91.83,-0.23,0.1778,1.0000,0.2406,n.s.
+sst2_b,DALS vs Discriminative,91.03,91.83,+0.80,0.0373,1.0000,0.0653,raw sig.
+sst2_b,DALS vs Fixed_SGD,91.88,91.83,-0.05,0.7943,1.0000,0.8380,n.s.
+sst2_b,DALS vs Grokfast,91.81,91.83,+0.02,0.8799,1.0000,0.9060,n.s.
+sst2_b,DALS vs LARS,92.11,91.83,-0.28,0.4403,1.0000,0.5164,n.s.
+sst2_b,DALS vs Lion,91.31,91.83,+0.53,0.1992,1.0000,0.2622,n.s.
+sst2_b,DALS vs Lookahead,91.74,91.83,+0.09,0.8570,1.0000,0.8914,n.s.
+sst2_b,DALS vs RAdam,91.08,91.83,+0.76,0.1278,1.0000,0.1812,n.s.
+sst2_b,DALS vs SAM,92.11,91.83,-0.28,0.2289,1.0000,0.2977,n.s.
+sst2_b,DALS vs SAM_Disc,91.40,91.83,+0.44,0.0564,1.0000,0.0934,n.s.
+sst2_b,DALS vs SGDR,91.67,91.83,+0.16,0.5254,1.0000,0.5972,n.s.
+sst2_b,DALS vs STLR_Disc,91.06,91.83,+0.78,0.0139,1.0000,0.0277,FDR sig.
+sst2_b,DALS_Fast vs AdaBound,91.54,91.72,+0.18,0.4909,1.0000,0.5712,n.s.
+sst2_b,DALS_Fast vs Adam,91.17,91.72,+0.55,0.3096,1.0000,0.3882,n.s.
+sst2_b,DALS_Fast vs AdamW,91.31,91.72,+0.41,0.0834,1.0000,0.1281,n.s.
+sst2_b,DALS_Fast vs Cosine_SGD,92.06,91.72,-0.34,0.0705,1.0000,0.1114,n.s.
+sst2_b,DALS_Fast vs Discriminative,91.03,91.72,+0.69,0.0459,1.0000,0.0782,raw sig.
+sst2_b,DALS_Fast vs Fixed_SGD,91.88,91.72,-0.16,0.4993,1.0000,0.5779,n.s.
+sst2_b,DALS_Fast vs Grokfast,91.81,91.72,-0.09,0.5964,1.0000,0.6693,n.s.
+sst2_b,DALS_Fast vs LARS,92.11,91.72,-0.39,0.1544,1.0000,0.2148,n.s.
+sst2_b,DALS_Fast vs Lion,91.31,91.72,+0.41,0.2978,1.0000,0.3762,n.s.
+sst2_b,DALS_Fast vs Lookahead,91.74,91.72,-0.02,0.9504,1.0000,0.9657,n.s.
+sst2_b,DALS_Fast vs RAdam,91.08,91.72,+0.64,0.0764,1.0000,0.1187,n.s.
+sst2_b,DALS_Fast vs SAM,92.11,91.72,-0.39,0.0434,1.0000,0.0748,raw sig.
+sst2_b,DALS_Fast vs SAM_Disc,91.40,91.72,+0.32,0.1079,1.0000,0.1576,n.s.
+sst2_b,DALS_Fast vs SGDR,91.67,91.72,+0.05,0.8826,1.0000,0.9060,n.s.
+sst2_b,DALS_Fast vs STLR_Disc,91.06,91.72,+0.67,0.0025,1.0000,0.0068,FDR sig.
+sst2_b,DALS_Acc vs AdaBound,91.54,92.13,+0.60,0.0629,1.0000,0.1024,n.s.
+sst2_b,DALS_Acc vs Adam,91.17,92.13,+0.96,0.1599,1.0000,0.2204,n.s.
+sst2_b,DALS_Acc vs AdamW,91.31,92.13,+0.83,0.0278,1.0000,0.0505,raw sig.
+sst2_b,DALS_Acc vs Cosine_SGD,92.06,92.13,+0.07,0.7806,1.0000,0.8295,n.s.
+sst2_b,DALS_Acc vs Discriminative,91.03,92.13,+1.10,0.0139,1.0000,0.0277,FDR sig.
+sst2_b,DALS_Acc vs Fixed_SGD,91.88,92.13,+0.25,0.3298,1.0000,0.4109,n.s.
+sst2_b,DALS_Acc vs Grokfast,91.81,92.13,+0.32,0.1538,1.0000,0.2146,n.s.
+sst2_b,DALS_Acc vs LARS,92.11,92.13,+0.02,0.9304,1.0000,0.9498,n.s.
+sst2_b,DALS_Acc vs Lion,91.31,92.13,+0.83,0.0930,1.0000,0.1376,n.s.
+sst2_b,DALS_Acc vs Lookahead,91.74,92.13,+0.39,0.3585,1.0000,0.4379,n.s.
+sst2_b,DALS_Acc vs RAdam,91.08,92.13,+1.06,0.0129,1.0000,0.0262,FDR sig.
+sst2_b,DALS_Acc vs SAM,92.11,92.13,+0.02,0.8756,1.0000,0.9043,n.s.
+sst2_b,DALS_Acc vs SAM_Disc,91.40,92.13,+0.73,0.0709,1.0000,0.1117,n.s.
+sst2_b,DALS_Acc vs SGDR,91.67,92.13,+0.46,0.1194,1.0000,0.1710,n.s.
+sst2_b,DALS_Acc vs STLR_Disc,91.06,92.13,+1.08,0.0263,1.0000,0.0481,FDR sig.
+synthetic,DALS vs AdaBound,97.92,97.45,-0.47,0.0158,1.0000,0.0312,FDR sig.
+synthetic,DALS vs Adam,97.83,97.45,-0.38,0.0705,1.0000,0.1114,n.s.
+synthetic,DALS vs AdamW,97.81,97.45,-0.36,0.0876,1.0000,0.1315,n.s.
+synthetic,DALS vs Cosine_SGD,97.51,97.45,-0.06,0.7430,1.0000,0.8012,n.s.
+synthetic,DALS vs Discriminative,97.89,97.45,-0.44,0.0002,0.0953,0.0012,FDR sig.
+synthetic,DALS vs Fixed_SGD,97.38,97.45,+0.07,0.6903,1.0000,0.7498,n.s.
+synthetic,DALS vs Grokfast,97.60,97.45,-0.15,0.3503,1.0000,0.4327,n.s.
+synthetic,DALS vs LARS,97.49,97.45,-0.04,0.7990,1.0000,0.8389,n.s.
+synthetic,DALS vs Lion,97.72,97.45,-0.28,0.1275,1.0000,0.1812,n.s.
+synthetic,DALS vs Lookahead,97.97,97.45,-0.53,0.0086,1.0000,0.0189,FDR sig.
+synthetic,DALS vs RAdam,97.95,97.45,-0.50,0.0129,1.0000,0.0262,FDR sig.
+synthetic,DALS vs SAM,97.56,97.45,-0.11,0.6136,1.0000,0.6834,n.s.
+synthetic,DALS vs SAM_Disc,97.85,97.45,-0.40,0.0061,1.0000,0.0141,FDR sig.
+synthetic,DALS vs SGDR,97.56,97.45,-0.11,0.6593,1.0000,0.7197,n.s.
+synthetic,DALS vs STLR_Disc,97.85,97.45,-0.40,0.0085,1.0000,0.0188,FDR sig.
+synthetic,DALS_Fast vs AdaBound,97.92,97.38,-0.55,0.0238,1.0000,0.0442,FDR sig.
+synthetic,DALS_Fast vs Adam,97.83,97.38,-0.45,0.0876,1.0000,0.1315,n.s.
+synthetic,DALS_Fast vs AdamW,97.81,97.38,-0.44,0.1057,1.0000,0.1549,n.s.
+synthetic,DALS_Fast vs Cosine_SGD,97.51,97.38,-0.14,0.2472,1.0000,0.3206,n.s.
+synthetic,DALS_Fast vs Discriminative,97.89,97.38,-0.51,0.0260,1.0000,0.0478,FDR sig.
+synthetic,DALS_Fast vs Fixed_SGD,97.38,97.38,+0.00,1.0000,1.0000,1.0000,n.s.
+synthetic,DALS_Fast vs Grokfast,97.60,97.38,-0.23,0.1707,1.0000,0.2316,n.s.
+synthetic,DALS_Fast vs LARS,97.49,97.38,-0.11,0.6168,1.0000,0.6834,n.s.
+synthetic,DALS_Fast vs Lion,97.72,97.38,-0.35,0.1265,1.0000,0.1805,n.s.
+synthetic,DALS_Fast vs Lookahead,97.97,97.38,-0.60,0.0299,1.0000,0.0536,raw sig.
+synthetic,DALS_Fast vs RAdam,97.95,97.38,-0.57,0.0115,1.0000,0.0237,FDR sig.
+synthetic,DALS_Fast vs SAM,97.56,97.38,-0.19,0.3565,1.0000,0.4379,n.s.
+synthetic,DALS_Fast vs SAM_Disc,97.85,97.38,-0.47,0.0469,1.0000,0.0795,raw sig.
+synthetic,DALS_Fast vs SGDR,97.56,97.38,-0.19,0.3616,1.0000,0.4393,n.s.
+synthetic,DALS_Fast vs STLR_Disc,97.85,97.38,-0.47,0.0212,1.0000,0.0408,FDR sig.
+synthetic,DALS_Acc vs AdaBound,97.92,97.83,-0.10,0.5238,1.0000,0.5969,n.s.
+synthetic,DALS_Acc vs Adam,97.83,97.83,+0.00,1.0000,1.0000,1.0000,n.s.
+synthetic,DALS_Acc vs AdamW,97.81,97.83,+0.01,0.9549,1.0000,0.9658,n.s.
+synthetic,DALS_Acc vs Cosine_SGD,97.51,97.83,+0.31,0.1518,1.0000,0.2132,n.s.
+synthetic,DALS_Acc vs Discriminative,97.89,97.83,-0.06,0.5185,1.0000,0.5955,n.s.
+synthetic,DALS_Acc vs Fixed_SGD,97.38,97.83,+0.45,0.0651,1.0000,0.1052,n.s.
+synthetic,DALS_Acc vs Grokfast,97.60,97.83,+0.23,0.1916,1.0000,0.2537,n.s.
+synthetic,DALS_Acc vs LARS,97.49,97.83,+0.34,0.0628,1.0000,0.1024,n.s.
+synthetic,DALS_Acc vs Lion,97.72,97.83,+0.10,0.6304,1.0000,0.6955,n.s.
+synthetic,DALS_Acc vs Lookahead,97.97,97.83,-0.15,0.3585,1.0000,0.4379,n.s.
+synthetic,DALS_Acc vs RAdam,97.95,97.83,-0.12,0.3992,1.0000,0.4758,n.s.
+synthetic,DALS_Acc vs SAM,97.56,97.83,+0.26,0.2840,1.0000,0.3619,n.s.
+synthetic,DALS_Acc vs SAM_Disc,97.85,97.83,-0.03,0.7839,1.0000,0.8306,n.s.
+synthetic,DALS_Acc vs SGDR,97.56,97.83,+0.26,0.3601,1.0000,0.4387,n.s.
+synthetic,DALS_Acc vs STLR_Disc,97.85,97.83,-0.03,0.8541,1.0000,0.8904,n.s.
+trec6,DALS vs AdaBound,94.48,92.88,-1.60,0.0673,1.0000,0.1079,n.s.
+trec6,DALS vs Adam,96.52,92.88,-3.64,0.0041,1.0000,0.0101,FDR sig.
+trec6,DALS vs AdamW,96.60,92.88,-3.72,0.0017,0.7479,0.0050,FDR sig.
+trec6,DALS vs Cosine_SGD,92.80,92.88,+0.08,0.3739,1.0000,0.4481,n.s.
+trec6,DALS vs Discriminative,38.84,92.88,+54.04,0.0000,0.0145,0.0004,FDR sig.
+trec6,DALS vs Fixed_SGD,94.92,92.88,-2.04,0.0135,1.0000,0.0271,FDR sig.
+trec6,DALS vs Grokfast,95.96,92.88,-3.08,0.0024,1.0000,0.0066,FDR sig.
+trec6,DALS vs LARS,94.88,92.88,-2.00,0.0612,1.0000,0.1007,n.s.
+trec6,DALS vs Lion,96.68,92.88,-3.80,0.0015,0.6774,0.0047,FDR sig.
+trec6,DALS vs Lookahead,96.56,92.88,-3.68,0.0076,1.0000,0.0169,FDR sig.
+trec6,DALS vs RAdam,96.52,92.88,-3.64,0.0058,1.0000,0.0135,FDR sig.
+trec6,DALS vs SAM,95.20,92.88,-2.32,0.0028,1.0000,0.0074,FDR sig.
+trec6,DALS vs SAM_Disc,35.32,92.88,+57.56,0.0000,0.0215,0.0004,FDR sig.
+trec6,DALS vs SGDR,93.40,92.88,-0.52,0.4990,1.0000,0.5779,n.s.
+trec6,DALS vs STLR_Disc,36.44,92.88,+56.44,0.0000,0.0015,0.0001,FDR sig.
+trec6,DALS_Fast vs AdaBound,94.48,89.12,-5.36,0.0090,1.0000,0.0195,FDR sig.
+trec6,DALS_Fast vs Adam,96.52,89.12,-7.40,0.0042,1.0000,0.0102,FDR sig.
+trec6,DALS_Fast vs AdamW,96.60,89.12,-7.48,0.0028,1.0000,0.0074,FDR sig.
+trec6,DALS_Fast vs Cosine_SGD,92.80,89.12,-3.68,0.0096,1.0000,0.0205,FDR sig.
+trec6,DALS_Fast vs Discriminative,38.84,89.12,+50.28,0.0000,0.0212,0.0004,FDR sig.
+trec6,DALS_Fast vs Fixed_SGD,94.92,89.12,-5.80,0.0064,1.0000,0.0145,FDR sig.
+trec6,DALS_Fast vs Grokfast,95.96,89.12,-6.84,0.0035,1.0000,0.0088,FDR sig.
+trec6,DALS_Fast vs LARS,94.88,89.12,-5.76,0.0171,1.0000,0.0334,FDR sig.
+trec6,DALS_Fast vs Lion,96.68,89.12,-7.56,0.0024,1.0000,0.0066,FDR sig.
+trec6,DALS_Fast vs Lookahead,96.56,89.12,-7.44,0.0049,1.0000,0.0117,FDR sig.
+trec6,DALS_Fast vs RAdam,96.52,89.12,-7.40,0.0055,1.0000,0.0130,FDR sig.
+trec6,DALS_Fast vs SAM,95.20,89.12,-6.08,0.0038,1.0000,0.0096,FDR sig.
+trec6,DALS_Fast vs SAM_Disc,35.32,89.12,+53.80,0.0001,0.0499,0.0008,FDR sig.
+trec6,DALS_Fast vs SGDR,93.40,89.12,-4.28,0.0319,1.0000,0.0568,raw sig.
+trec6,DALS_Fast vs STLR_Disc,36.44,89.12,+52.68,0.0000,0.0086,0.0003,FDR sig.
+trec6,DALS_Acc vs AdaBound,94.48,94.00,-0.48,0.4175,1.0000,0.4949,n.s.
+trec6,DALS_Acc vs Adam,96.52,94.00,-2.52,0.0016,0.7148,0.0049,FDR sig.
+trec6,DALS_Acc vs AdamW,96.60,94.00,-2.60,0.0007,0.3108,0.0027,FDR sig.
+trec6,DALS_Acc vs Cosine_SGD,92.80,94.00,+1.20,0.0299,1.0000,0.0536,raw sig.
+trec6,DALS_Acc vs Discriminative,38.84,94.00,+55.16,0.0000,0.0106,0.0003,FDR sig.
+trec6,DALS_Acc vs Fixed_SGD,94.92,94.00,-0.92,0.0897,1.0000,0.1332,n.s.
+trec6,DALS_Acc vs Grokfast,95.96,94.00,-1.96,0.0000,0.0163,0.0004,FDR sig.
+trec6,DALS_Acc vs LARS,94.88,94.00,-0.88,0.1939,1.0000,0.2560,n.s.
+trec6,DALS_Acc vs Lion,96.68,94.00,-2.68,0.0008,0.3540,0.0030,FDR sig.
+trec6,DALS_Acc vs Lookahead,96.56,94.00,-2.56,0.0030,1.0000,0.0077,FDR sig.
+trec6,DALS_Acc vs RAdam,96.52,94.00,-2.52,0.0017,0.7645,0.0050,FDR sig.
+trec6,DALS_Acc vs SAM,95.20,94.00,-1.20,0.0736,1.0000,0.1151,n.s.
+trec6,DALS_Acc vs SAM_Disc,35.32,94.00,+58.68,0.0000,0.0130,0.0003,FDR sig.
+trec6,DALS_Acc vs SGDR,93.40,94.00,+0.60,0.2080,1.0000,0.2722,n.s.
+trec6,DALS_Acc vs STLR_Disc,36.44,94.00,+57.56,0.0000,0.0005,0.0001,FDR sig.

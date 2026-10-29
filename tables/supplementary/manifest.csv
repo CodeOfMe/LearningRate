@@ -1,0 +1,64 @@
+﻿table_id,section,subsection,rows,columns,csv_file,first_cell
+T01,S0. Overview,,14,5,T01_S00_Overview.csv,Section
+T02,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.1 Fixed SGD,11,7,T02_S01_1_Fixed_SGD.csv,Dataset
+T03,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.2 Cosine Decay SGD,11,7,T03_S01_2_Cosine_Decay_SGD.csv,Dataset
+T04,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.3 SGDR,11,7,T04_S01_3_SGDR.csv,Dataset
+T05,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.4 Adam,11,7,T05_S01_4_Adam.csv,Dataset
+T06,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.5 AdamW,11,7,T06_S01_5_AdamW.csv,Dataset
+T07,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.6 AdaBound,11,7,T07_S01_6_AdaBound.csv,Dataset
+T08,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.7 LARS,11,7,T08_S01_7_LARS.csv,Dataset
+T09,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.8 Discriminative LR,11,7,T09_S01_8_Discriminative_LR.csv,Dataset
+T10,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.9 RAdam,11,7,T10_S01_9_RAdam.csv,Dataset
+T11,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.10 Lion,11,7,T11_S01_10_Lion.csv,Dataset
+T12,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.11 Lookahead+AdamW,11,7,T12_S01_11_Lookahead_AdamW.csv,Dataset
+T13,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.12 SAM,11,7,T13_S01_12_SAM.csv,Dataset
+T14,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.13 Grokfast,11,7,T14_S01_13_Grokfast.csv,Dataset
+T15,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.14 STLR+Discriminative,11,7,T15_S01_14_STLR_Discriminative.csv,Dataset
+T16,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.15 SAM+Discriminative,11,7,T16_S01_15_SAM_Discriminative.csv,Dataset
+T17,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.16 DALS (Ours),11,7,T17_S01_16_DALS_Ours.csv,Dataset
+T18,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.17 DALS-Fast (Ours),11,7,T18_S01_17_DALS_Fast_Ours.csv,Dataset
+T19,S1. Main cross-dataset benchmark — per-seed test accuracy (%),S1.18 DALS-Acc (Ours),11,7,T19_S01_18_DALS_Acc_Ours.csv,Dataset
+T20,"S2. Hyperparameter sensitivity analysis (3 seeds, synthetic)",,22,6,T20_S02_Hyperparameter_sensitivity_analysis_3.csv,Hyperparameter
+T21,S3. Fair-budget tuning (5 seeds),S3.a Synthetic,19,6,T21_S03_a_a_Synthetic.csv,Strategy
+T22,S3. Fair-budget tuning (5 seeds),S3.b MRPC,19,6,T22_S03_b_b_MRPC.csv,Strategy
+T23,S4. Agility: epochs and time to reach target accuracy,,41,6,T23_S04_Agility_epochs_and_time.csv,Dataset
+T24,"S5. Statistical significance (5 seeds, all 10 datasets)",,451,9,T24_S05_Statistical_significance_5_seeds.csv,Dataset
+T25,"S6. Component ablation and interactions (5 seeds, synthetic)",S6.1 Main effects,6,2,T25_S06_1_Main_effects.csv,Component
+T26,"S6. Component ablation and interactions (5 seeds, synthetic)",S6.2 Two-way interactions,11,2,T26_S06_2_Two_way_interactions.csv,Component pair
+T27,"S6. Component ablation and interactions (5 seeds, synthetic)",S6.3 All 16 combinations (accuracy %),17,2,T27_S06_3_All_16_combinations_accuracy.csv,"Mask (cosine,trust,filter,phase,depth)"
+T28,S7. Efficiency analysis (5 seeds),S7.1 cifar10,19,4,T28_S07_1_cifar10.csv,Strategy
+T29,S7. Efficiency analysis (5 seeds),S7.2 cifar100,19,4,T29_S07_2_cifar100.csv,Strategy
+T30,S7. Efficiency analysis (5 seeds),S7.3 imdb,19,4,T30_S07_3_imdb.csv,Strategy
+T31,S7. Efficiency analysis (5 seeds),S7.4 mrpc,19,4,T31_S07_4_mrpc.csv,Strategy
+T32,S7. Efficiency analysis (5 seeds),S7.5 mrpc_b,19,4,T32_S07_5_mrpc_b.csv,Strategy
+T33,S7. Efficiency analysis (5 seeds),S7.6 rte,19,4,T33_S07_6_rte.csv,Strategy
+T34,S7. Efficiency analysis (5 seeds),S7.7 sst2,19,4,T34_S07_7_sst2.csv,Strategy
+T35,S7. Efficiency analysis (5 seeds),S7.8 sst2_b,19,4,T35_S07_8_sst2_b.csv,Strategy
+T36,S7. Efficiency analysis (5 seeds),S7.9 synthetic,19,4,T36_S07_9_synthetic.csv,Strategy
+T37,S7. Efficiency analysis (5 seeds),S7.10 trec6,19,4,T37_S07_10_trec6.csv,Strategy
+T38,S8. Macro-averaged F1 scores (%) (5 seeds),S8.1 Fixed SGD,11,7,T38_S08_1_Fixed_SGD.csv,Dataset
+T39,S8. Macro-averaged F1 scores (%) (5 seeds),S8.2 Cosine Decay SGD,11,7,T39_S08_2_Cosine_Decay_SGD.csv,Dataset
+T40,S8. Macro-averaged F1 scores (%) (5 seeds),S8.3 SGDR,11,7,T40_S08_3_SGDR.csv,Dataset
+T41,S8. Macro-averaged F1 scores (%) (5 seeds),S8.4 Adam,11,7,T41_S08_4_Adam.csv,Dataset
+T42,S8. Macro-averaged F1 scores (%) (5 seeds),S8.5 AdamW,11,7,T42_S08_5_AdamW.csv,Dataset
+T43,S8. Macro-averaged F1 scores (%) (5 seeds),S8.6 AdaBound,11,7,T43_S08_6_AdaBound.csv,Dataset
+T44,S8. Macro-averaged F1 scores (%) (5 seeds),S8.7 LARS,11,7,T44_S08_7_LARS.csv,Dataset
+T45,S8. Macro-averaged F1 scores (%) (5 seeds),S8.8 Discriminative LR,11,7,T45_S08_8_Discriminative_LR.csv,Dataset
+T46,S8. Macro-averaged F1 scores (%) (5 seeds),S8.9 RAdam,11,7,T46_S08_9_RAdam.csv,Dataset
+T47,S8. Macro-averaged F1 scores (%) (5 seeds),S8.10 Lion,11,7,T47_S08_10_Lion.csv,Dataset
+T48,S8. Macro-averaged F1 scores (%) (5 seeds),S8.11 Lookahead+AdamW,11,7,T48_S08_11_Lookahead_AdamW.csv,Dataset
+T49,S8. Macro-averaged F1 scores (%) (5 seeds),S8.12 SAM,11,7,T49_S08_12_SAM.csv,Dataset
+T50,S8. Macro-averaged F1 scores (%) (5 seeds),S8.13 Grokfast,11,7,T50_S08_13_Grokfast.csv,Dataset
+T51,S8. Macro-averaged F1 scores (%) (5 seeds),S8.14 STLR+Discriminative,11,7,T51_S08_14_STLR_Discriminative.csv,Dataset
+T52,S8. Macro-averaged F1 scores (%) (5 seeds),S8.15 SAM+Discriminative,11,7,T52_S08_15_SAM_Discriminative.csv,Dataset
+T53,S8. Macro-averaged F1 scores (%) (5 seeds),S8.16 DALS (Ours),11,7,T53_S08_16_DALS_Ours.csv,Dataset
+T54,S8. Macro-averaged F1 scores (%) (5 seeds),S8.17 DALS-Fast (Ours),11,7,T54_S08_17_DALS_Fast_Ours.csv,Dataset
+T55,S8. Macro-averaged F1 scores (%) (5 seeds),S8.18 DALS-Acc (Ours),11,7,T55_S08_18_DALS_Acc_Ours.csv,Dataset
+T56,S9. CIFAR-100 component ablation and interactions (5 seeds),S9.1 Main effects,6,2,T56_S09_1_Main_effects.csv,Component
+T57,S9. CIFAR-100 component ablation and interactions (5 seeds),S9.2 Two-way interactions,11,2,T57_S09_2_Two_way_interactions.csv,Component pair
+T58,S9. CIFAR-100 component ablation and interactions (5 seeds),S9.3 All 16 combinations (accuracy %),17,2,T58_S09_3_All_16_combinations_accuracy.csv,Combination
+T59,"S10. Depth-gradient noise measurement (CIFAR-100, SGD-momentum, 30 epochs)",,7,5,T59_S10_Depth_gradient_noise_measurement.csv,Layer
+T60,S11. DALS variants on ViT-Small (5 seeds),,4,4,T60_S11_DALS_variants_on_ViT.csv,Variant
+T61,S12. Hardware.,,19,11,T61_S12_Hardware.csv,Strategy
+T62,S13. Cross-device (GPU) calibration and comparability,"S13.1 Background. The full benchmark was carried out on a single laptop, an NVIDIA RTX 4060 Laptop GPU (8 GB, CUDA). To check that the reported scores are hardware-invariant, one identical configuration - the full DALS optimizer on CIFAR-100 - was also run on a second laptop that differs only in its GPU. As Table S13.1 shows, both are Ada Lovelace consumer laptop GPUs with 8 GB of GDDR6 VRAM, a 128-bit memory bus, and 256 GB/s of memory bandwidth; the only material difference is the CUDA-core count (3072 vs. 4608). These specifications are documented in References [1-5]. This section concerns the reported score (accuracy) only; runtime is not the object of comparison, and the anchor below is the only experiment in this study executed on two GPUs.",3,6,T62_S13_1_Background_The_full_benchmark.csv,GPU
+T63,S13. Cross-device (GPU) calibration and comparability,"S13.2 Repeated-anchor calibration. To measure the device effect directly on the reported metric, we trained one identical configuration - the full DALS optimizer on CIFAR-100 (ConvNet, five seeds) - once on each GPU. As Table S13.2 shows, the two means agree to within one point: 53.04 (RTX 4070) and 53.99 (RTX 4060), a difference of about 0.95 points, i.e. 0.99 when both are read at the reported precision. The two devices are therefore calibrated against each other on a task drawn from the paper's own benchmark. Since the tasks' memory demand is well within the 8 GB shared by both GPUs (Section S7), both configurations are more than sufficient for these experiments, and - as the anchor shows - they produce highly similar scores.",4,4,T63_S13_2_Repeated_anchor_calibration_To.csv,Device

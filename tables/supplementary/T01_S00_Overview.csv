@@ -1,0 +1,14 @@
+﻿Section,Analysis,Datasets,Seeds,Source file
+S1,"Main benchmark (Table 2), per-seed accuracy",10,5,final_data.jsonl
+S2,Hyperparameter sensitivity,1,3,sensitivity.json
+S3,Fair-budget tuning,2,5,fair_tuning_merged.json
+S4,Agility,3 (5/5/1 seeds),5/5/1,agility.json
+S5,Statistical significance,10,5,stage2_significance.json
+S6,Component ablation,1,5,stage3_interaction.json
+S7,Efficiency (time / memory / throughput),10,5,efficiency_table.md
+S8,"Macro-averaged F1, per-seed",10,5,01-04 source JSONs (converted to macro-F1)
+S9,CIFAR-100 component ablation and interactions,1,5,stage3_interaction.json (cifar100)
+S10,Depth-gradient noise measurement,1,1,grad_noise.json
+S11,DALS variants on ViT-Small,1,5,vit_results/
+S12,Hardware (machine allocation per cell),10,5,final_data.jsonl (gpu field)
+S13,Cross-device (GPU) calibration and comparability,1,5,anchor: DALS/CIFAR-100 (both GPUs)
